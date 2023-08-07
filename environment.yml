@@ -1,0 +1,12 @@
+name: opac_compress
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - numpy
+  - tqdm
+  - python>3.8
+  - jax
+  - h5py
+  - tensorflow
+  - keras
