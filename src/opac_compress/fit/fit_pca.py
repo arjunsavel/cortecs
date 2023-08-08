@@ -1,3 +1,6 @@
+import numpy as np
+# todo: loop over all wavelengths.
+
 def standardize_cube(flux_cube):
     """
     Prepare a flux cube for PCA.
@@ -27,7 +30,12 @@ def standardize_cube(flux_cube):
 
 def do_svd(fStd, nc, nx):
     """
-    Performs STD on a standardized data cube.
+    Does the SVD on the standardized flux cube.
+
+    :param fStd:  standardized flux cube
+    :param nc:  number of components to keep
+    :param nx:  number of pixels
+    :return:  xMat, s, vh, u
     """
 
     xMat = np.ones((nx, nc + 1))  # Note the extra column of 1s
@@ -43,7 +51,6 @@ def fit_mlr(cube, xMat):
     """
     Fits the MLR to the flux cube with the PCA outputs and normalizes accordingly.
     """
-    fNorm = np.moveaxis(cube.copy(), 0, -1)
     X = xMat
     XT = X.T
     Y = np.moveaxis(cube.copy(), 0, -1)
@@ -54,7 +61,7 @@ def fit_mlr(cube, xMat):
     return fNorm, beta
 
 
-def do_pca(cube, nc):
+def do_pca(cube, nc=3):
     """
     Does all the PCA steps. right now for a single spectrum.
 
@@ -82,6 +89,13 @@ def do_pca(cube, nc):
         return
 
     return xMat, fStd, fNorm, beta, s, vh, u
+
+def pre_fit_pca(opacity, nc=2):
+    xMat, fStd, fNorm, beta, s, vh, u = do_pca(opacity, nc)
+    return xMat
+
+def fit_pca(cross_section, P, T, nc=3):
+    raise NotImplementedError
 
 
 # redo for the PCA lol this is the big one!!

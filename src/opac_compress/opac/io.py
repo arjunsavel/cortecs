@@ -1,5 +1,5 @@
 """
-Reads and writes opacity data from various sources.
+Reads opacity data from various sources.
 
 
 
@@ -33,14 +33,9 @@ class loader_base(object):
         wl = 1e4/wno
         return wl, T, P, cross_section
 
-class writer_base(object):
+class loader_heliosk(loader_base):
     """
-    writes opacity data to various sources.
-    maybe i don't need a writing class...because need to write different thing for each type of writer.
+    loads in opacity data from the heliosk database.
     """
 
-    def __init__(self):
-        raise NotImplementedError
-
-    def write(self, filename, loader='chimera'):
-        raise NotImplementedError # if it's chimera, remember to write as wno!
+    def load(self, f):

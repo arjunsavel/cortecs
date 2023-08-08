@@ -30,6 +30,6 @@ def feed_forward(x, n_layers, weights, biases):
 
 @jax.jit
 def eval_neural_network(x, n_layers, weights, biases):
-    res = f_forward(x[0], n_layers, weights, biases)
+    res = feed_forward(x[0], n_layers, weights, biases)
     return res
 

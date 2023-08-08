@@ -7,10 +7,13 @@ import keras
 import numpy as np
 import matplotlib.pyplot as plt
 
+# todo: loop over all wavelengths.
 
-def train_neural_network(Opac,
-                         n_layers,
-                         n_neurons,
+def fit_neural_net(cross_section,
+                   P,
+                   T,
+                         n_layers=3,
+                         n_neurons=8,
                          activation='sigmoid',
                          learn_rate=0.04,
                          loss='mean_squared_error',
@@ -20,7 +23,7 @@ def train_neural_network(Opac,
                          plot=False):
     """
     trains a neural network to fit the opacity data.
-    :param Opac:
+    :param Opac: not an actual opac.
     :param n_layers:
     :param n_neurons:
     :param activation:
@@ -36,7 +39,7 @@ def train_neural_network(Opac,
     """
     if sequential_model is None:
         layers_list = []
-        for layer in n_layers:
+        for i in range(n_layers):
             layers_list += [layers.Dense(n_neurons, activation=activation)]
 
         layers_list += [layers.Dense(1)] # final layer to predict single value
@@ -48,15 +51,14 @@ def train_neural_network(Opac,
 
     neural_network.compile(loss=loss, optimizer=tf.keras.optimizers.Adam(learn_rate))
 
-    wl, P, T, predict_data = Opac.wl, Opac.P, Opac.T, Opac.cross_section
-    # unpack opacity data
+    # unpack opacity data. todo: not repeat this for every wavelength!
     P_unraveled = np.tile(np.repeat(np.log10(P), len(T)), len(wl))
     T_unraveled = np.tile(np.tile(np.log10(T), len(P)), len(wl))
-    lambda_unraveled = np.repeat(wl, len(P) * len(T))
+    # lambda_unraveled = np.repeat(wl, len(P) * len(T))
 
-
-    input_array = np.column_stack([T_unraveled, P_unraveled, lambda_unraveled])
-    predict_data_flattened = predict_data.flatten()
+    # todo: try to predict everything in one big net, not wavelength-independent?
+    input_array = np.column_stack([T_unraveled, P_unraveled])
+    predict_data_flattened = cross_section.flatten()
 
     history = neural_network.fit(
         input_array,

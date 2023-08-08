@@ -1,8 +1,19 @@
 import jax
 import numpy as np
 
+# todo: loop over all wavelengths.
+
 @jax.jit
-def fit(wavelength_ind, plot=False, species='H2', save=False):
+def fit_polynomial(wavelength_ind, plot=False, species='H2', save=False):
+    """
+    todo: actually take in the Opac object.
+    fits a polynomial to the opacity data.
+    :param wavelength_ind:
+    :param plot:
+    :param species:
+    :param save:
+    :return:
+    """
     xsecarr = species_dict[species]
 
     single_pres_single_temp = xsecarr[:, :, wavelength_ind].copy()
@@ -24,7 +35,7 @@ def fit(wavelength_ind, plot=False, species='H2', save=False):
     coeff, r, rank, s = np.linalg.lstsq(A, B, rcond=-1)
 
     TT, PP = np.meshgrid(np.log10(T), np.log10(P), copy=False)
-    #     TT, PP = np.meshgrid(T, P, copy=False)
+
 
     z2 = (
     np.ones_like(TT), TT, PP, TT ** 2, TT ** 2 * PP, TT ** 2 * PP ** 2, TT * PP ** 2, TT * PP, TT * PP ** 3, PP ** 4,
@@ -33,11 +44,7 @@ def fit(wavelength_ind, plot=False, species='H2', save=False):
 
     im = np.tensordot(z2, coeff, axes=([0], [0]))
 
-    if plot:
-        plt.imshow(abs((im - Z) / Z))
-        plt.colorbar()
-    #     if save:
-    #         np.save(f'{species}_coeff.npy', coeff)
+
     return np.max(abs((im - Z) / Z)), np.mean(abs((im - Z) / Z)), coeff
 
 
