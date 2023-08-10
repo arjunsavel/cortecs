@@ -1,4 +1,4 @@
-# compress_opacity
+# cortecs
 
 A Python package for compressing opacity functions with varying flexibility. Current methods include
 - polynomial fitting
