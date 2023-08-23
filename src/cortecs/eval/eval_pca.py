@@ -1,3 +1,6 @@
+import jax
+
+
 @jax.jit
 def eval_pca(temperature_ind, pressure_ind, vectors, pca_coeffs, n_components=3):
     """
@@ -21,5 +24,7 @@ def eval_pca(temperature_ind, pressure_ind, vectors, pca_coeffs, n_components=3)
 
     xsec_val = 0.0
     for component in range(n_components):
-        xsec_val += vectors[temperature_ind, component] * pca_coeffs[component, pressure_ind]
+        xsec_val += (
+            vectors[temperature_ind, component] * pca_coeffs[component, pressure_ind]
+        )
     return xsec_val
