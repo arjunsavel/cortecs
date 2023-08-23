@@ -3,7 +3,7 @@ this file holds the class describing opacity data. hmm...maybe I want the loader
 
 author: @arjunsavel
 """
-from io import *
+from cortecs.io import *
 
 class Opac(object):
     """

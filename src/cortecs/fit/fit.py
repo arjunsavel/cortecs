@@ -1,9 +1,9 @@
 """
 The high-level API for fitting. Requires the Opac function.
 """
-from fit_pca import *
-from fit_neural_net import *
-from fit_polynomial import *
+from cortecs.fit_pca import *
+from cortecs.fit_neural_net import *
+from cortecs.fit_polynomial import *
 from tqdm import tqdm
 import warnings
 from multiprocessing import Pool
