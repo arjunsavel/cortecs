@@ -20,14 +20,14 @@ that's the case, and I'd be happy to debug :)
 
 author: @arjunsavel
 
-so far, only works for exo-transmit chunks. Will need to be generalized for others.
+so far, only works for exo-transmit chunks. TODO: generalize for others.
 """
 
 import os
 
 import numpy as np
 from tqdm import tqdm
-import pdb
+
 
 def chunk_wavelengths(file, nchunks=None, wav_per_chunk=None, adjust_wavelengths=False):
     """
@@ -79,7 +79,6 @@ def chunk_wavelengths(file, nchunks=None, wav_per_chunk=None, adjust_wavelengths
 
     # read through all lines in the opacity file
     for x in tqdm(f1):
-
         if not x:
             continue
         commad = x.replace(" ", ",")
@@ -103,6 +102,7 @@ def chunk_wavelengths(file, nchunks=None, wav_per_chunk=None, adjust_wavelengths
     f.close()
     return
 
+
 def write_to_file(line, file, file_suffix):
     """
     Writes (appends, really) a line to a file.
@@ -123,6 +123,7 @@ def write_to_file(line, file, file_suffix):
     f.write(line)
     f.close()
 
+
 def get_header(file):
     """
     Gets the header of a file.
@@ -139,6 +140,7 @@ def get_header(file):
     f.close()
 
     return f1[0] + f1[1]
+
 
 def count_wavelengths(file):
     """
@@ -164,6 +166,7 @@ def count_wavelengths(file):
 
     return ticker
 
+
 def get_lams(file):
     """
     Takes in an opacity file and returns an array of all wavelengths within the file.
@@ -184,7 +187,6 @@ def get_lams(file):
 
     # read through all lines in the opacity file
     for x in f1:
-
         # check if blank line
         if not x:
             continue
@@ -195,6 +197,7 @@ def get_lams(file):
             wavelengths += [eval(x[:-1])]
     f.close()
     return np.array(wavelengths)
+
 
 def add_lams(max_lam_to_add_ind, file, next_file):
     """
@@ -225,7 +228,6 @@ def add_lams(max_lam_to_add_ind, file, next_file):
 
     # read through all lines in the opacity file
     for x in f1:
-
         # skip blank lines
         if not x:
             continue
@@ -241,6 +243,7 @@ def add_lams(max_lam_to_add_ind, file, next_file):
         f2.close()
         if ticker == max_lam_to_add_ind:
             return
+
 
 def add_previous(num_to_add, file, previous_file):
     """
@@ -309,7 +312,7 @@ def add_overlap(filename, v_max=11463.5):
         Modifies every 'filename*.dat' file.
     """
     for i in tqdm(
-            range(len(os.listdir()[:-1])), position=0, leave=True
+        range(len(os.listdir()[:-1])), position=0, leave=True
     ):  # don't include the last file
         file = filename + str(i) + ".dat"
 
@@ -331,13 +334,13 @@ def add_overlap(filename, v_max=11463.5):
 
         # add another 20 indices to be safe!
         max_lam_to_add_ind = (
-                np.argmin(np.abs(next_lams - (max_curr_lam + delta_lam))) + 20
+            np.argmin(np.abs(next_lams - (max_curr_lam + delta_lam))) + 20
         )
 
         add_lams(max_lam_to_add_ind, file, next_file)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pass
     # example workflow below!
     # os.chdir('/libra1/asavel/wasp_76b_opacities')

@@ -1,24 +1,30 @@
 """
 The high-level API for fitting. Requires the Opac function.
 """
-from cortecs.fit_pca import *
-from cortecs.fit_neural_net import *
-from cortecs.fit_polynomial import *
-from tqdm import tqdm
 import warnings
-from multiprocessing import Pool
 from functools import partial
+from multiprocessing import Pool
+
+from tqdm import tqdm
+
+from cortecs.fit_neural_net import *
+from cortecs.fit_pca import *
+from cortecs.fit_polynomial import *
+
 
 class Fitter(object):
     """
     fits the opacity data to a neural network.
     """
-    # make the dictionary of stuff here
-    method_dict = {'pca': fit_pca,
-                   'neural_net': fit_neural_net,
-                   'polynomial': fit_polynomial}
 
-    def __init__(self, Opac, method='pca', **fitter_kwargs):
+    # make the dictionary of stuff here
+    method_dict = {
+        "pca": fit_pca,
+        "neural_net": fit_neural_net,
+        "polynomial": fit_polynomial,
+    }
+
+    def __init__(self, Opac, method="pca", **fitter_kwargs):
         """
         todo: make list of opac
         fits the opacity data to a neural network.
@@ -40,14 +46,13 @@ class Fitter(object):
         :return: history, neural_network
         """
 
-
-        # iterate over the wavelengths. Todo: parallelize!
+        # iterate over the wavelengths.
         if not parallel:
             self.fit_serial()
         else:
             self.fit_parallel()
 
-        return # will I need to save and stuff like that?
+        return  # will I need to save and stuff like that?
 
     def fit_serial(self):
         """
@@ -81,8 +86,13 @@ class Fitter(object):
             num_processes = 3
             func = partial(self.func_fit, self.P, self.T, **self.fitter_kwargs)
 
-            self.pbar = tqdm(total=len(self.wl), position=0, leave=True, unit='chunk',
-                             desc='Fitting with {} method'.format(self.method))
+            self.pbar = tqdm(
+                total=len(self.wl),
+                position=0,
+                leave=True,
+                unit="chunk",
+                desc="Fitting with {} method".format(self.method),
+            )
 
             # these two lines are where the bulk of the multiprocessing happens
             p = Pool(num_processes)
@@ -90,12 +100,11 @@ class Fitter(object):
             for i in range(len(self.wl)):
                 p.apply_async(
                     func,
-                    args=(self.Opac.cross_section[:,:, i],),
-                    callback=self.update_pbar)
+                    args=(self.Opac.cross_section[:, :, i],),
+                    callback=self.update_pbar,
+                )
             p.close()
             p.join()
             self.pbar.close()
 
         return
-
-

@@ -100,4 +100,4 @@ def save_neural_network(neural_network, filename):
     return
 
 
-# todo: plot all!
+# todo: fit all!
