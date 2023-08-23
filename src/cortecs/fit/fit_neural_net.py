@@ -7,6 +7,8 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras import layers
 
+from cortecs.metric_plot import *
+
 # todo: loop over all wavelengths.
 
 
@@ -66,7 +68,7 @@ def fit_neural_net(
 
     history = neural_network.fit(
         input_array,
-        predict_data_flattened,  # totally fine to overfit!
+        predict_data_flattened,  # totally fine to overfit! we're not extrapolating, nor are we interpolating.
         verbose=verbose,
         epochs=epochs,
     )
