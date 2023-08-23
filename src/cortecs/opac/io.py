@@ -78,7 +78,37 @@ class loader_platon(loader_base):
     """
 
     # needs the numpy stuff
-    raise NotImplementedError
+
+    def load(self, cross_sec_filename, T_filename, P_filename, wl_filename):
+        """
+        loads in opacity data that's built for PLATON. To be passed on to Opac object.
+
+        The temperature grid, pressure grid, and wavelength grid are saved as separate files for PLATON.
+
+        Inputs
+        ------
+        filename : str
+            name of file to load
+        cross_sec_filename : str
+            name of cross section file
+        T_filename : str
+            name of temperature file
+        P_filename : str
+            name of pressure file
+        wl_filename : str
+            name of wavelength file
+        """
+        # todo: check wl units. They're in meters here.
+        # temperatures are in K.
+        # pressures are in Pa, I believe.
+        wl = np.load(wl_filename)
+        T = np.load(T_filename)
+        P = np.load(P_filename)
+        cross_section = np.load(
+            cross_sec_filename
+        )  # packaged as T x P x wl. todo: check packing
+
+        return wl, T, P, cross_section
 
 
 class loader_exotransmit(loader_base):
