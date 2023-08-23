@@ -1,26 +1,30 @@
 """
 Trains a neural network to fit the opacity data.
 """
+import keras
+import matplotlib.pyplot as plt
+import numpy as np
 import tensorflow as tf
 from tensorflow.keras import layers
-import keras
-import numpy as np
-import matplotlib.pyplot as plt
 
 # todo: loop over all wavelengths.
 
-def fit_neural_net(cross_section,
-                   P,
-                   T,
-                         n_layers=3,
-                         n_neurons=8,
-                         activation='sigmoid',
-                         learn_rate=0.04,
-                         loss='mean_squared_error',
-                         epochs=2000,
-                         verbose=1,
-                         sequential_model=None,
-                         plot=False):
+
+def fit_neural_net(
+    cross_section,
+    P,
+    T,
+    wl,
+    n_layers=3,
+    n_neurons=8,
+    activation="sigmoid",
+    learn_rate=0.04,
+    loss="mean_squared_error",
+    epochs=2000,
+    verbose=1,
+    sequential_model=None,
+    plot=False,
+):
     """
     trains a neural network to fit the opacity data.
     :param Opac: not an actual opac.
@@ -42,7 +46,7 @@ def fit_neural_net(cross_section,
         for i in range(n_layers):
             layers_list += [layers.Dense(n_neurons, activation=activation)]
 
-        layers_list += [layers.Dense(1)] # final layer to predict single value
+        layers_list += [layers.Dense(1)]  # final layer to predict single value
 
         neural_network = keras.Sequential(layers_list)
 
@@ -62,13 +66,16 @@ def fit_neural_net(cross_section,
 
     history = neural_network.fit(
         input_array,
-        predict_data_flattened, # totally fine to overfit!
-        verbose=verbose, epochs=epochs)
+        predict_data_flattened,  # totally fine to overfit!
+        verbose=verbose,
+        epochs=epochs,
+    )
 
     if plot:
         plot_loss(history)
 
     return history, neural_network
+
 
 def save_neural_network(neural_network, filename):
     """
@@ -90,18 +97,5 @@ def save_neural_network(neural_network, filename):
     np.savez(filename, all_weights, all_biases)
     return
 
+
 # todo: plot all!
-
-
-def plot_loss(history):
-    """
-    plots the loss from the history object. need to substantially rewrite
-    TODO: rcparams file to make things look nice, fontwise and such?
-    :param history:
-    :return:
-    """
-    plt.plot(history.history['loss'], label='loss', color='teal', lw=3)
-    plt.xlabel('Epoch', fontsize=20)
-    plt.ylabel('Error', fontsize=20) # need the units on this
-    plt.yscale('log')
-    plt.legend()

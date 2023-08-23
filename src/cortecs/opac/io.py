@@ -9,16 +9,17 @@ import h5py
 import numpy as np
 from tqdm import tqdm
 
+
 class loader_base(object):
     """
     loads in opacity data from various sources. To be passed on to Opac object.
     """
 
-    wl_key = 'wno'
-    T_key = 'T'
-    P_key = 'P'
-    cross_section_key = 'xsec'
-    wl_style = 'wno'
+    wl_key = "wno"
+    T_key = "T"
+    P_key = "P"
+    cross_section_key = "xsec"
+    wl_style = "wno"
 
     def __init__(self):
         """
@@ -29,33 +30,53 @@ class loader_base(object):
     def load(self, filename):
         """
         loads in opacity data from various sources. To be passed on to Opac object.
+
+        Inputs
+        ------
+        filename : str
+            name of file to load
+
+        Outputs
+        -------
+        wl : np.ndarray
+            wavelengths
+        T : np.ndarray
+            temperatures
+        P : np.ndarray
+            pressures
+        cross_section : np.ndarray
+            cross sections for the opacity
         """
 
-        hf = h5py.File(filename, 'r')
+        hf = h5py.File(filename, "r")
         wl = np.array(hf[self.wl_key], dtype=np.float64)
         T = np.array(hf[self.T_key], dtype=np.float64)
         P = np.array(hf[self.P_key], dtype=np.float64)
         cross_section = np.array(hf[self.cross_section_key], dtype=np.float64)
         hf.close()
 
-        if self.wl_style == 'wno':
+        if self.wl_style == "wno":
             wl = 1e4 / wl
         return wl, T, P, cross_section
+
 
 class loader_helios(loader_base):
     """
     loads in opacity data that are produced with the HELIOS ktable function.
     """
-    wl_key = 'wavelengths'
-    T_key = 'temperatures'
-    P_key = 'pressures'
-    cross_section_key = 'opacities'
-    wl_style = 'wl'
+
+    wl_key = "wavelengths"
+    T_key = "temperatures"
+    P_key = "pressures"
+    cross_section_key = "opacities"
+    wl_style = "wl"
+
 
 class loader_platon(loader_base):
     """
     loads in opacity data that are used with the PLATON code.
     """
+
     # needs the numpy stuff
     raise NotImplementedError
 
@@ -83,10 +104,10 @@ class loader_exotransmit(loader_base):
         t_line = f1[0]
         p_line = f1[1]
 
-        temperature_strings = t_line.split(' ')[:-1]
+        temperature_strings = t_line.split(" ")[:-1]
         T = np.array([eval(temp) for temp in temperature_strings])
 
-        pressure_strings = p_line.split(' ')[:-1]
+        pressure_strings = p_line.split(" ")[:-1]
         P = np.array([eval(pres) for pres in pressure_strings])
 
         del f1
@@ -107,12 +128,11 @@ class loader_exotransmit(loader_base):
         f = open(file)
         f1 = f.readlines()
 
-
         wavelengths = []
         opacities = []
 
         # read through all lines in the opacity file
-        for x in tqdm(f1, desc='reading wavelengths'):
+        for x in tqdm(f1, desc="reading wavelengths"):
             # check if blank line
             if not x:
                 continue
@@ -122,7 +142,7 @@ class loader_exotransmit(loader_base):
                 wavelengths += [eval(x[:-1])]
             else:
                 # the first entry in each opacity line is the pressure
-                opacity_string = commad.split(' ')[1:]
+                opacity_string = commad.split(" ")[1:]
                 opacity_vals = np.array([eval(opacity) for opacity in opacity_string])
                 opacities += [opacity_vals]
 
@@ -135,6 +155,3 @@ class loader_exotransmit(loader_base):
         T, P = self.get_t_p(filename)
 
         return wl, T, P, opacities
-
-
-
