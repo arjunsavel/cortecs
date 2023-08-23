@@ -34,6 +34,7 @@ INSTALL_REQUIRES = [
     "tensorflow",
     "keras",
     "matplotlib",
+    "pandas",
 ]
 
 ###################################################################

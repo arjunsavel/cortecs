@@ -10,6 +10,8 @@ Example instructions / workflow:
 >>> chunk_wavelengths_CIA(CIA_file, ref_file_base)
 And that should work!
 
+todo: generalize to PLATON CIA.
+
 author: @arjunsavel
 """
 import os
@@ -17,20 +19,9 @@ from glob import glob
 
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
 
-try:
-    from tqdm import tqdm
-except ImportError:
-    print(
-        """The current progress bar implementation uses the tqdm package.
-        If you would like to use this progress bar, please see
-        the tqdm installation instruction:
-        https://github.com/tqdm/tqdm#installation"""
-    )
-
-    def tqdm(iterator, **kwargs):
-        return iterator
-
+from cortecs.opac.chunking import *
 
 ######################### Pt. 1: Interpolation ####################################
 
@@ -63,6 +54,7 @@ def interpolate_CIA(CIA_file, reference_file):
 
     temperatures = []
     wavelengths = []
+    # todo: refactor. has to be a cleaner way to do this! infer the columns, etc.
     Hels = []
     HeHs = []
     CH4CH4s = []
@@ -186,6 +178,7 @@ def interpolate_CIA(CIA_file, reference_file):
             + "\n"
         ]
 
+    # todo: check the insert. and can pull wavelength grid.
     new_string.insert(
         0,
         "500.000 600.000 700.000 800.000 900.000 1000.000 1100.000 1200.000 1300.000 1400.000 1500.000 1600.000 1700.000 1800.000 1900.000 2000.000 2100.000 2200.000 2300.000 2400.000 2500.000 2600.000 2700.000 2800.000 2900.000 3000.000 3100.000 3200.000 3300.000 3400.000 3500.000 3600.000 3700.000 3800.000 3900.000 4000.000 4100.000 4200.000 4300.000 4400.000 4500.000 4600.000 4700.000 4800.000 4900.000 5000.000 \n",
@@ -308,7 +301,7 @@ def chunk_wavelengths_CIA(file, ref_file_base, numfiles):
 
 def get_wav_per_chunk(file_suffix, ref_file_base):
     """
-    Grabs the number of wavelengthz of a given chunk.
+    Grabs the number of wavelengths of a given chunk.
     Inputs
     ------
         :file_suffix: (int) number corresponding to the given chunk. e.g., 1.
@@ -371,11 +364,3 @@ def write_to_file(line, file, file_suffix, ntemps, numfiles):
     f = open(true_filename, "a")
     f.write(line)
     f.close()
-
-
-def get_header(file):
-    f = open(file)
-    f1 = f.readlines()
-    f.close()
-
-    return f1[0] + f1[1]
