@@ -2,9 +2,13 @@ import jax
 
 
 @jax.jit
-def eval_pca(temperature_ind, pressure_ind, vectors, pca_coeffs, n_components=3):
+def eval_pca(temperature_ind, pressure_ind, vectors, pca_coeffs):
     """
     Evaluates the PCA fit at a given temperature and pressure.
+
+    Unfortunately, not all GPUs will support a simpler dot product, I believe,
+    Also, we cannot loop over n_components explicitly because JAX
+    functions require static loop lengths.
 
     Inputs
     ------
@@ -23,6 +27,7 @@ def eval_pca(temperature_ind, pressure_ind, vectors, pca_coeffs, n_components=3)
     """
 
     xsec_val = 0.0
+    n_components = vectors.shape[1]
     for component in range(n_components):
         xsec_val += (
             vectors[temperature_ind, component] * pca_coeffs[component, pressure_ind]
