@@ -5,6 +5,8 @@ Reads opacity data from various sources.
 
 author: @arjunsavel
 """
+import pickle
+
 import h5py
 import numpy as np
 from tqdm import tqdm
@@ -77,8 +79,6 @@ class loader_platon(loader_base):
     loads in opacity data that are used with the PLATON code.
     """
 
-    # needs the numpy stuff
-
     def load(self, cross_sec_filename, T_filename, P_filename, wl_filename):
         """
         loads in opacity data that's built for PLATON. To be passed on to Opac object.
@@ -109,6 +109,42 @@ class loader_platon(loader_base):
         )  # packaged as T x P x wl. todo: check packing
 
         return wl, T, P, cross_section
+
+
+class loader_platon_cia(loader_base):
+    """
+    loads in opacity data that are used with the PLATON code's collision-induced absorption..
+    """
+
+    def load(self, cross_sec_filename, T_filename, wl_filename, species_name):
+        """
+        loads in opacity data that's built for PLATON. To be passed on to Opac object.
+
+        The temperature grid, pressure grid, and wavelength grid are saved as separate files for PLATON.
+
+        Inputs
+        ------
+        filename : str
+            name of file to load
+        cross_sec_filename : str
+            name of cross section file
+        T_filename : str
+            name of temperature file
+        wl_filename : str
+            name of wavelength file
+        species_name : tuples
+            name of two colliding species. E.g., ('H2', 'CH4'). todo: all at once?
+        """
+        # todo: check wl units. They're in meters here.
+        # temperatures are in K.
+        # pressures are in Pa, I believe.
+        wl = np.load(wl_filename)
+        T = np.load(T_filename)
+        data = pickle.load(
+            open(cross_sec_filename, "rb"), encoding="latin1"
+        )  # packaged as T x P x wl. todo: check packing
+        cross_section = data[species_name]
+        return wl, T, cross_section
 
 
 class loader_exotransmit(loader_base):

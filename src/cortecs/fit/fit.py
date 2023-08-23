@@ -15,6 +15,8 @@ from cortecs.fit_polynomial import *
 class Fitter(object):
     """
     fits the opacity data to a neural network.
+
+    todo: fit CIA. only on one dimension, because there's no pressure dependence.
     """
 
     # make the dictionary of stuff here
