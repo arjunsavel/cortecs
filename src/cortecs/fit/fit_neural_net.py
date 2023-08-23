@@ -12,6 +12,27 @@ from cortecs.metric_plot import *
 # todo: loop over all wavelengths.
 
 
+def unravel_data(x, y, z, tileboth=False):
+    """
+    unravels the data into a single column. takes log as well.
+
+    todo: move to a utils file?
+
+    Inputs
+    ------
+    x: array-like
+        first dimension of data.
+    y: array-like
+        second dimension of data.
+    z: array-like
+        third dimension of data.
+    """
+    if tileboth:
+        return np.tile(np.tile(np.log10(x), len(y)), len(z))
+
+    return np.tile(np.repeat(np.log10(x), len(y)), len(z))
+
+
 def fit_neural_net(
     cross_section,
     P,
@@ -58,8 +79,8 @@ def fit_neural_net(
     neural_network.compile(loss=loss, optimizer=tf.keras.optimizers.Adam(learn_rate))
 
     # unpack opacity data. todo: not repeat this for every wavelength!
-    P_unraveled = np.tile(np.repeat(np.log10(P), len(T)), len(wl))
-    T_unraveled = np.tile(np.tile(np.log10(T), len(P)), len(wl))
+    P_unraveled = unravel_data(P, T, wl)
+    T_unraveled = unravel_data(T, P, wl, tileboth=True)
     # lambda_unraveled = np.repeat(wl, len(P) * len(T))
 
     # todo: try to predict everything in one big net, not wavelength-independent?

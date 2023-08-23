@@ -94,6 +94,7 @@ def pre_fit_pca(opacity, nc=2):
 
 
 def fit_pca(cross_section, P, T, nc=3):
+    # todo: put the main script in this function!
     raise NotImplementedError
 
 
