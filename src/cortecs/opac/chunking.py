@@ -77,7 +77,7 @@ def chunk_wavelengths(file, nchunks=None, wav_per_chunk=None, adjust_wavelengths
     ticker = 0
     file_suffix = 0
 
-    # read through all lines in the opacity file
+    # read through all lines in the opacity file. todo: from already read in opacity?
     for x in tqdm(f1):
         if not x:
             continue
@@ -145,6 +145,7 @@ def get_header(file):
 def count_wavelengths(file):
     """
     parses through wavelength file to see how many wavelength points it has.
+    todo: can just get from the counting wavelengths?
 
         Inputs
         ------
