@@ -6,6 +6,8 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 [![CodeQL](https://github.com/arjunsavel/cortecs/actions/workflows/codeql.yml/badge.svg)](https://github.com/arjunsavel/cortecs/actions/workflows/codeql.yml)
+[![Documentation Status](https://readthedocs.org/projects/cortecs/badge/?version=latest)](https://cortecs.readthedocs.io/en/latest/?badge=latest)
+
 
 A Python package for decreasing the memory footprint of opacity functions. The primary functionality is compressing opacity functions with varying flexibility. Current methods include
 - polynomial fitting
