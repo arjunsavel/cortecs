@@ -1,4 +1,4 @@
-scope
+cortecs
 ==================================
 *cortecs* is a Python package for.
 
