@@ -27,24 +27,26 @@ bibliography: paper.bib
 
 # Summary
 
-The absorption and emission of light by exoplanet atmospheres encodes details of the atmospheric
-composition, temperature structure, and dynamics. Simulating these processes requires detailed knowledge
+The absorption and emission of light by exoplanet atmospheres encodes details of atmospheric
+composition, temperature structure, and dynamics. Fundamentally, simulating these processes requires detailed knowledge
 of the opacity of gases within an atmosphere. When modeling broad wavelength ranges, such opacity data for
-even a single gas can take up multiple gigabytes of memory. This feature can be a limiting
-factor in determining the number of gases to consider in a simulation, or even choosing the architecture of
-the system used for the simulation. We present `cortecs`, a Python tool for compressing
-opacity data used to compute spectra. `cortecs` provides flexible methods for fitting the
+even a single gas can take up multiple gigabytes of system memory. This aspect can be a limiting
+factor in determining the number of gases to consider in a simulation, or even in choosing the architecture of
+the system used for the simulation. Here, we present `cortecs`, a Python tool for compressing
+opacity data. `cortecs` provides flexible methods for fitting the
 temperature, pressure, and wavelength dependence of opacity data and for evaluating the opacity with accelerated,
-GPU-friendly methods. The package is developed on GitHub (https://github.com/arjunsavel/cortecs), and it is
+GPU-friendly methods. The package is developed on GitHub (<https://github.com/arjunsavel/cortecs>), and it is
 available for download with `pip` and `conda`.
 
 # Statement of need
-Observations with the latest high-resolution spectrographs [@mace2018igrins; @seifahrt2020sky; @pepe2021espresso]
+Observations with the latest high-resolution spectrographs [e.g., @mace2018igrins; @seifahrt2020sky; @pepe2021espresso]
 have motivated memory-intensive simulations of exoplanet atmospheres. `cortecs` enables these simulations with more
-gases and on a broader range of architectures by compressing opacity data.
+gases and on a broader range of computing architectures by compressing opacity data.
 
-Broadly, generating a spectrum to compare against recent cutting-edge high-resolution data requires evaluating the
-radiative transfer equation over tens of thousands of wavelength points. To decrease computational runtime,
+Broadly, generating a spectrum to compare against recent high-resolution data requires solving the
+radiative transfer equation over tens of thousands of wavelength points [e.g., @line:2021; @wardenier2023modelling;
+@beltz2023magnetic; @gandhi2023retrieval; @prinoth2023time; @maguire2023high].
+To decrease computational runtime,
 some codes have parallelized the problem on GPUs (e.g., @line:2021, @lee20223d). However, GPUs in general do not have large amounts of memory
 (e.g., @ito2017ooc_cudnn); only the cutting-edge, most expensive GPUs have memory in excess of 30 GB
 (such as the NVIDIA A100 or H100). Memory management is therefore a clear concern when producing
@@ -56,39 +58,39 @@ the IGRINS wavelength range [@mace2018igrins] takes up 2.5 GB of memory at a res
 that decreasing the amount of memory consumed by opacity data would strongly decrease the total amount of memory consumed
 by the radiative transfer calculation.
 
-The key to the solution is redundancy: While the wavelength dependence of opacity is sharp for many gases,
-the temperature and pressure dependencies are generally smooth and similar across wavelengths (cite a bunch of opacity papers).
+One solution is to isolate redundancy: While the wavelength dependence of opacity is sharp for many gases,
+the temperature and pressure dependencies are generally smooth and similar across wavelengths [e.g.,
+@barber2014exomol; @coles2019exomol; @polyansky2018exomol].
 This feature implies that the opacity data should be compressible without significant loss of
 accuracy at the spectrum level.
 
 
 # Methods
-`cortecs` seeks to compress redundant information by representing opacity not as the
-values themselves but as fits to the values. We provide three methods of increasing complexity (and flexibility) for
+`cortecs` seeks to compress redundant information by representing opacity data not as the
+opacity itself but as fits to the opacity. We provide three methods of increasing complexity (and flexibility) for
 compressing and decompressing opacity: polynomial-fitting, principal components analysis (PCA; e.g., @jolliffe2016principal)
 and neural networks (e.g., @alzubaidi2021review). Each compression method is paired
-with a decompression method that can be used to evaluate opacity values. These decompression methods are tailored
-for usage on GPUs and are accelerated with the `JAX` code transformation framework [@jax2018github].
+with a decompression method for evaluating opacity as a function of temperature, pressure, and wavelength. These decompression methods are tailored
+for GPUs and are accelerated with the `JAX` code transformation framework [@jax2018github].
 
 In addition to these compression/decompression methods, `cortecs` provides utility scripts for working with large opacity files.
 For instance, `cortecs` can convert opacity files between popular formats, "chunk" opacity files for parallel
 computations across CPUs, and add overlap between chunked files for calculations that include Doppler shifts.
 
 
-# Example: High-resolution retrieval of WASP-77Ab?
-As a proof of concept, we run a parameter inference code (a "retrieval") on the thermal emission spectrum of the
-fiducial hot Jupiter WASP-77Ab [@line:2021; @mansfield2022confirmation; @august2023confirmation] with
-`cortecs`-compressed opacity. The
-retrieval pairs PyMultiNest [@buchner2014x] sampling with the CHIMERA radiative transfer code [@line2013systematic].
-For this experiment, we use the PCA-based compression scheme implemented
-in `cortecs`.
+# Benchmark: High-resolution retrieval of WASP-77Ab
+As a proof of concept, we perform a parameter inference exercise (a "retrieval"; @madhusudhan2009temperature) on the high-resolution
+thermal emission spectrum of the
+fiducial hot Jupiter WASP-77Ab [@line:2021; @mansfield2022confirmation; @august2023confirmation] as observed at IGRINS.
+The retrieval pairs `PyMultiNest` [@buchner2014x] sampling with the `CHIMERA` radiative transfer code [@line2013systematic].
+For this experiment, we use the PCA-based compression scheme implemented in `cortecs`.
 
-We find that our compressed-opacity retrieval yields posterior distributions (as plotted by the `corner` package; @corner)
+Using `cortecs`, we compress the input opacity files by a factor of 13. Importantly, we find that our compressed-opacity retrieval yields posterior distributions (as plotted by the `corner` package; @corner)
 and Bayesian evidences that are consistent with those from the benchmark
-retrieval using uncompressed opacity  \autoref{fig:corner}. The results from this exercise indicate that our compression/decompression scheme
+retrieval using uncompressed opacity (\autoref{fig:corner}). The results from this exercise indicate that our compression/decompression scheme
 is accurate enough to be used in high-resolution retrievals.
 
-![The posterior distributions for our baseline WASP-77A retrieval (teal).
+![The posterior distributions for our baseline WASP-77A retrieval (teal)
 and our retrieval using opacities compressed by `cortecs` (gold). \label{fig:corner}](pca_compress.png)
 
 
