@@ -60,7 +60,7 @@ In addition to these compression/decompression methods, `cortecs` provides utili
 For instance, `cortecs` can convert opacity files between popular formats, "chunk" opacity files for parallel
 computations across CPUs, and add overlap between chunked files for calculations that include Doppler shifts.
 
-Test a citation `@line:2021`
+Test a citation [@line:2021]
 
 # Example: High-resolution retrieval of WASP-77Ab?
 As a proof of concept, we run a parameter inference code (a "retrieval") on the thermal emission spectrum of the
