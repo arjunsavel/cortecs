@@ -1,4 +1,5 @@
 # cortecs
+[![PyPI version](https://badge.fury.io/py/cortecs.svg)](https://badge.fury.io/py/cortecs)
 [![Tests](https://github.com/arjunsavel/cortecs/actions/workflows/python-package.yml/badge.svg)](https://github.com/arjunsavel/cortecs/actions/workflows/python-package.yml)
 [![codecov](https://codecov.io/gh/arjunsavel/cortecs/graph/badge.svg?token=90S3STBO5X)](https://codecov.io/gh/arjunsavel/cortecs)
 [![Maintainability](https://api.codeclimate.com/v1/badges/4eb53795313af153f4cd/maintainability)](https://codeclimate.com/github/arjunsavel/cortecs/maintainability)
