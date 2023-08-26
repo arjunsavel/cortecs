@@ -1,0 +1,13 @@
+numpy
+scipy
+jaxlib
+jax
+tqdm
+markupsafe==2.0.1
+nbsphinx
+sphinx_book_theme
+pandas
+keras
+tensorflow
+h5py
+mock
