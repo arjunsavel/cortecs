@@ -1,10 +1,8 @@
 cortecs
 ==================================
-*cortecs* is a Python package for.
+*cortecs* is a Python package for...
 
 *scope* is currently under development `on GitHub <https://github.com/arjunsavel/cortecs>`_ and is ready for beta users.
-
-
 
 
 
