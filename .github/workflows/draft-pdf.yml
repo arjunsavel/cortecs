@@ -1,3 +1,5 @@
+name: Paper compilation
+
 on: [push]
 
 jobs:
