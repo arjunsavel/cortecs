@@ -40,8 +40,9 @@ GPU-friendly methods.
 # Statement of need
 Recent advances in high-resolution spectroscopy of exoplanet atmospheres has required simulations of spectra over
 tens of thousands of wavelength points. To increase the speed of these computations, some models have parallelized
-the problem on GPUs (cite a bunch). However, GPUs in general do not have large amounts of memory; only the cutting-edge,
-expensive GPUs have memory in excess of 30 GB (cite). Memory management is therefore of concern when simulating
+the problem on GPUs (e.g., @line:2021, @lee20223d). However, GPUs in general do not have large amounts of memory
+(e.g., @ito2017ooc_cudnn); only the cutting-edge, most expensive GPUs have memory in excess of 30 GB
+(such as the NVIDIA A100 or H100). Memory management is therefore a clear concern when simulating
 high-resolution spectra.
 
 While the wavelength dependence of opacity is sharp for many gases, the temperature and pressure dependencies are generally smooth and
@@ -52,25 +53,31 @@ accuracy at the spectrum level.
 # Methods
 `cortecs` seeks to compress redundant information by representing opacity not as the
 values themselves but as fits to the values. We provide three methods of increasing complexity (and flexibility) for
-compressing and decompressing opacity: polynomial-fitting, PCA, and neural networks. Each compression method is paired
+compressing and decompressing opacity: polynomial-fitting, principal components analysis (PCA; e.g., @jolliffe2016principal)
+and neural networks (e.g., @alzubaidi2021review). Each compression method is paired
 with a decompression method that can be used to evaluate opacity values. These decompression methods are tailored
-for usage on GPUs and are accelerated with the `JAX` code transformation framework (cite).
+for usage on GPUs and are accelerated with the `JAX` code transformation framework [@jax2018github].
 
 In addition to these compression/decompression methods, `cortecs` provides utility scripts for working with large opacity files.
 For instance, `cortecs` can convert opacity files between popular formats, "chunk" opacity files for parallel
 computations across CPUs, and add overlap between chunked files for calculations that include Doppler shifts.
 
-Test a citation [@line:2021]
 
 # Example: High-resolution retrieval of WASP-77Ab?
 As a proof of concept, we run a parameter inference code (a "retrieval") on the thermal emission spectrum of the
-fiducial hot Jupiter WASP-77Ab (cite a bunch) with `cortecs`-compressed opacity. The retrieval pairs PyMultiNest sampling
-with the CHIMERA radiative transfer code (cite). For this experiment, we use the PCA-based compression scheme implemented
+fiducial hot Jupiter WASP-77Ab [@line:2021; @mansfield2022confirmation; @august2023confirmation] with
+`cortecs`-compressed opacity. The
+retrieval pairs PyMultiNest [@buchner2014x] sampling with the CHIMERA radiative transfer code [@line2013systematic].
+For this experiment, we use the PCA-based compression scheme implemented
 in `cortecs`.
 
-We find that our compressed-opacity retrieval yields posterior distributions and Bayesian evidences that are consistent with those from the benchmark
-retrieval using uncompressed opacity. The results from this exercise indicate that our compression/decompression scheme
+We find that our compressed-opacity retrieval yields posterior distributions (as plotted by the `corner` package; @corner)
+and Bayesian evidences that are consistent with those from the benchmark
+retrieval using uncompressed opacity  \autoref{fig:corner}. The results from this exercise indicate that our compression/decompression scheme
 is accurate enough to be used in high-resolution retrievals.
+
+![The posterior distributions for our baseline WASP-77A retrieval (teal).
+and our retrieval using opacities compressed by `cortecs` (gold). \label{fig:corner}](pca_compress.png)
 
 
 # Acknowledgements
