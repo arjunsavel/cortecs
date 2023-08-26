@@ -27,26 +27,38 @@ bibliography: paper.bib
 
 # Summary
 
-Observations of exoplanet atmospheres at a number of wavelengths encode details of the atmospheric
-composition, temperature structure, and dynamics. Simulating these observations requires knowledge
-of the opacity of gases within the atmosphere. When modeling broad wavelength ranges, opacity data for
-even a single gas species can take up multiple gigabytes of memory. This feature can be a limiting
-factor in determining the number of gases to consider in a simulation, or even the architecture of
-the computing system used to perform the simulation. We present `cortecs`, a tool for compressing
-opacity data used to simulate spectra. `cortecs` provides flexible methods for fitting the
-temperature and pressure dependence of opacity data and for evaluating the opacity with accelerated,
-GPU-friendly methods.
+The absorption and emission of light by exoplanet atmospheres encodes details of the atmospheric
+composition, temperature structure, and dynamics. Simulating these processes requires detailed knowledge
+of the opacity of gases within an atmosphere. When modeling broad wavelength ranges, such opacity data for
+even a single gas can take up multiple gigabytes of memory. This feature can be a limiting
+factor in determining the number of gases to consider in a simulation, or even choosing the architecture of
+the system used for the simulation. We present `cortecs`, a Python tool for compressing
+opacity data used to compute spectra. `cortecs` provides flexible methods for fitting the
+temperature, pressure, and wavelength dependence of opacity data and for evaluating the opacity with accelerated,
+GPU-friendly methods. The package is developed on GitHub (https://github.com/arjunsavel/cortecs), and it is
+available for download with `pip` and `conda`.
 
 # Statement of need
-Recent advances in high-resolution spectroscopy of exoplanet atmospheres has required simulations of spectra over
-tens of thousands of wavelength points. To increase the speed of these computations, some models have parallelized
-the problem on GPUs (e.g., @line:2021, @lee20223d). However, GPUs in general do not have large amounts of memory
+Observations with the latest high-resolution spectrographs [@mace2018igrins; @seifahrt2020sky; @pepe2021espresso]
+have motivated memory-intensive simulations of exoplanet atmospheres. `cortecs` enables these simulations with more
+gases and on a broader range of architectures by compressing opacity data.
+
+Broadly, generating a spectrum to compare against recent cutting-edge high-resolution data requires evaluating the
+radiative transfer equation over tens of thousands of wavelength points. To decrease computational runtime,
+some codes have parallelized the problem on GPUs (e.g., @line:2021, @lee20223d). However, GPUs in general do not have large amounts of memory
 (e.g., @ito2017ooc_cudnn); only the cutting-edge, most expensive GPUs have memory in excess of 30 GB
-(such as the NVIDIA A100 or H100). Memory management is therefore a clear concern when simulating
+(such as the NVIDIA A100 or H100). Memory management is therefore a clear concern when producing
 high-resolution spectra.
 
-While the wavelength dependence of opacity is sharp for many gases, the temperature and pressure dependencies are generally smooth and
-similar across wavelengths. This feature implies that the opacity data should be compressible without significant loss of
+How do we decrease the memory footprint of these calculations? By far the largest contributor to the memory footprint,
+at least as measured on disk, is the opacity data. For instance, the opacity data for a single gas species across
+the IGRINS wavelength range [@mace2018igrins] takes up 2.5 GB of memory at a resolution of 400,000. It stands to reason
+that decreasing the amount of memory consumed by opacity data would strongly decrease the total amount of memory consumed
+by the radiative transfer calculation.
+
+The key to the solution is redundancy: While the wavelength dependence of opacity is sharp for many gases,
+the temperature and pressure dependencies are generally smooth and similar across wavelengths (cite a bunch of opacity papers).
+This feature implies that the opacity data should be compressible without significant loss of
 accuracy at the spectrum level.
 
 
