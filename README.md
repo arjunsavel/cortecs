@@ -7,6 +7,7 @@
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 [![CodeQL](https://github.com/arjunsavel/cortecs/actions/workflows/codeql.yml/badge.svg)](https://github.com/arjunsavel/cortecs/actions/workflows/codeql.yml)
 [![Documentation Status](https://readthedocs.org/projects/cortecs/badge/?version=latest)](https://cortecs.readthedocs.io/en/latest/?badge=latest)
+[![Paper compilation](https://github.com/arjunsavel/cortecs/actions/workflows/draft-pdf.yml/badge.svg)](https://github.com/arjunsavel/cortecs/actions/workflows/draft-pdf.yml)
 
 
 A Python package for decreasing the memory footprint of opacity functions. The primary functionality is compressing opacity functions with varying flexibility. Current methods include
