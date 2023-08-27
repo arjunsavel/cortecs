@@ -1,6 +1,7 @@
 """
 tests all of the fitting functions.
 """
+import unittest
 from cortecs.fit import *
 
 
