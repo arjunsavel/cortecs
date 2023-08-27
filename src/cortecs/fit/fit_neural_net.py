@@ -7,7 +7,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras import layers
 
-from cortecs.metric_plot import *
+from cortecs.fit.metric_plot import *
 
 # todo: loop over all wavelengths.
 
