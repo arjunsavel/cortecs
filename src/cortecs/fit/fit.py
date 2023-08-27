@@ -34,6 +34,10 @@ class Fitter(object):
         """
         self.Opac = Opac
         self.fitter_kwargs = fitter_kwargs
+
+        if method not in self.method_dict.keys():
+            raise ValueError("method {} not supported".format(method))
+
         self.method = method
 
         self.fit_func = self.method_dict[self.method]

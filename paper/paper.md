@@ -44,8 +44,8 @@ have motivated memory-intensive simulations of exoplanet atmospheres. `cortecs` 
 gases and on a broader range of computing architectures by compressing opacity data.
 
 Broadly, generating a spectrum to compare against recent high-resolution data requires solving the
-radiative transfer equation over tens of thousands of wavelength points [@line:2021; @wardenier:2023; e.g.,
-@beltz:2023; @gandhi:2023; @prinoth:2023; @maguire:2023].
+radiative transfer equation over tens of thousands of wavelength points [e.g.,
+@beltz:2023; @line:2021; @wardenier:2023;  @gandhi:2023; @prinoth:2023; @maguire:2023].
 To decrease computational runtime,
 some codes have parallelized the problem on GPUs [e.g., @line:2021; @lee:2022]. However, GPUs cannot in general hold large amounts of
 data in-memory [e.g., @ito:2017]; only the cutting-edge, most expensive GPUs have memory in excess of 30 GB
