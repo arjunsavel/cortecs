@@ -2,7 +2,7 @@
 tests all of the fitting functions.
 """
 import unittest
-from cortecs.fit import *
+from cortecs.fit.fit import *
 
 
 class TestFitter(unittest.TestCase):
