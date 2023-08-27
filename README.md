@@ -10,6 +10,8 @@
 [![Documentation Status](https://readthedocs.org/projects/cortecs/badge/?version=latest)](https://cortecs.readthedocs.io/en/latest/?badge=latest)
 [![Paper compilation](https://github.com/arjunsavel/cortecs/actions/workflows/draft-pdf.yml/badge.svg)](https://github.com/arjunsavel/cortecs/actions/workflows/draft-pdf.yml)
 ![GitHub repo size](https://img.shields.io/github/repo-size/arjunsavel/cortecs)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/cortecs)
+
 
 
 
