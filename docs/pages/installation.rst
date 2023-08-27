@@ -1,0 +1,37 @@
+Installation
+============
+
+Installing with pip
+-----------------------
+`cortecs` is distributed on `PyPI <https://pypi.org/>`_. It can be installed with
+
+.. code-block:: bash
+
+    pip install cortecs
+
+Installing from source
+-----------------------
+
+`cortecs` is developed on `GitHub <https://github.com/arjunsavel/cortecs>`_. If you received the code as a tarball or zip, skip to below the :code:`git clone` line. It is recommended to run the below lines in a fresh `conda <https://docs.conda.io/projects/conda/en/latest/user-guide/concepts/environments.html>`_ environment.
+
+.. code-block:: bash
+
+    python3 -m pip install -U pip
+    python3 -m pip install -U setuptools setuptools_scm pep517
+    git clone https://github.com/arjunsavel/cortecs.git
+    cd cortecs
+    python3 -m pip install -e .
+
+
+We plan to distribute `cortecs` through conda, as well.
+
+Test the installation
+---------------------
+
+To ensure that the installation has been performed smoothly, feel free to run the unit and integration tests included with the package. The entire test suite should take on the order of 10 minutes to run. In the process, a few (~2) gigabytes of data will be downloaded from this project's associated Dropbox files; they'll be automatically deleted once the test suite is finished.
+
+From the outermost :code:`cortecs` directory, run
+
+.. code-block:: bash
+
+    python3 -m unittest discover src
