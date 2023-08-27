@@ -7,9 +7,9 @@ from multiprocessing import Pool
 
 from tqdm import tqdm
 
-from cortecs.fit_neural_net import *
-from cortecs.fit_pca import *
-from cortecs.fit_polynomial import *
+from cortecs.fit.fit_neural_net import *
+from cortecs.fit.fit_pca import *
+from cortecs.fit.fit_polynomial import *
 
 
 class Fitter(object):
