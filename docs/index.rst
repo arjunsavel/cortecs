@@ -2,8 +2,7 @@ cortecs
 ==================================
 *cortecs* is a Python package for compressing opacity files used in radiative transfer. We offer a few different
 types of compression methods with a range of flexibility, from polynomial to neural networks. We also provide utility
-functions for working with opacity files, such as chunking and interpolating them. This code is open-sourced
-under the MIT license.
+functions for working with opacity files, such as chunking and interpolating them onto different grids.
 
 *scope* is currently under development `on GitHub <https://github.com/arjunsavel/cortecs>`_ and is ready for beta users.
 If there are any issues with the code, please feel free to `report them <https://github.com/arjunsavel/cortecs/issues>`_
