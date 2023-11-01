@@ -16,7 +16,7 @@ on the GitHub page.
    :caption: Getting Started
 
    pages/installation
-   pages/quickstart
+   pages/Quickstart
 
 
 

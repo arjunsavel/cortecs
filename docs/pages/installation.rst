@@ -12,7 +12,10 @@ Installing with pip
 Installing from source
 -----------------------
 
-`cortecs` is developed on `GitHub <https://github.com/arjunsavel/cortecs>`_. If you received the code as a tarball or zip, skip to below the :code:`git clone` line. It is recommended to run the below lines in a fresh `conda <https://docs.conda.io/projects/conda/en/latest/user-guide/concepts/environments.html>`_ environment.
+`cortecs` is developed on `GitHub <https://github.com/arjunsavel/cortecs>`_.
+If you received the code as a tarball or zip, feel free to skip the first two lines; they essentially download the source code.
+We recommend running the below lines in a fresh `conda <https://docs.conda.io/projects/conda/en/latest/user-guide/concepts/environments.html>`_ environment
+to avoid package dependency isues.
 
 .. code-block:: bash
 
@@ -23,12 +26,12 @@ Installing from source
     python3 -m pip install -e .
 
 
-We plan to distribute `cortecs` through conda, as well.
+We plan to distribute `cortecs` through conda as well at a later date.
 
 Test the installation
 ---------------------
 
-To ensure that the installation has been performed smoothly, feel free to run the unit and integration tests included with the package. The entire test suite should take on the order of 10 minutes to run. In the process, a few (~2) gigabytes of data will be downloaded from this project's associated Dropbox files; they'll be automatically deleted once the test suite is finished.
+To ensure that the installation has been performed smoothly, feel free to run the unit and integration tests included with the package.
 
 From the outermost :code:`cortecs` directory, run
 
