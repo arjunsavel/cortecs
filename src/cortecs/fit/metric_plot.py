@@ -62,6 +62,3 @@ def plot_quantity(species_quantity_dict, quantity="mean", log=True, nbins=20):
 
     plt.legend()
     plt.title("Fitting quality: " + quantity)
-
-
-# todo: histograms, etc.

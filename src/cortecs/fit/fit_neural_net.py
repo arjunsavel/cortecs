@@ -9,7 +9,10 @@ from tensorflow.keras import layers
 
 from cortecs.fit.metric_plot import *
 
+
 # todo: loop over all wavelengths.
+def prep_neural_net(cross_section):
+    pass
 
 
 def unravel_data(x, y, z, tileboth=False):

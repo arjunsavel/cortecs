@@ -1,10 +1,11 @@
 """
-The high-level API for fitting. Requires the Opac function.
+The high-level API for fitting. Requires the Opac object.
 """
 import warnings
 from functools import partial
 from multiprocessing import Pool
 
+import numpy as np
 from tqdm import tqdm
 
 from cortecs.fit.fit_neural_net import *
@@ -26,13 +27,19 @@ class Fitter(object):
         "polynomial": fit_polynomial,
     }
 
-    def __init__(self, Opac, method="pca", **fitter_kwargs):
+    prep_method_dict = {
+        "pca": prep_pca,
+        "neural_net": prep_neural_net,
+        "polynomial": prep_polynomial,
+    }
+
+    def __init__(self, opac, method="pca", **fitter_kwargs):
         """
         todo: make list of opac
         fits the opacity data to a neural network.
         :param Opac: Opac object
         """
-        self.Opac = Opac
+        self.opac = opac
         self.fitter_kwargs = fitter_kwargs
 
         if method not in self.method_dict.keys():
@@ -41,6 +48,10 @@ class Fitter(object):
         self.method = method
 
         self.fit_func = self.method_dict[self.method]
+
+        self.wl = self.opac.wl
+        self.P = self.opac.P
+        self.T = self.opac.T
 
         return
 
@@ -53,6 +64,8 @@ class Fitter(object):
         """
 
         # iterate over the wavelengths.
+        prep_method = self.prep_method_dict[self.method]
+        self.prep_res = prep_method(self.opac.cross_section, **self.fitter_kwargs)
         if not parallel:
             self.fit_serial()
         else:
@@ -66,13 +79,23 @@ class Fitter(object):
         :return:
         todo: keep in mind that the PCA method is not actually independent of wavelength.
         """
-        # so maybe have some pre-fit function defined here for everything, but it only does something for PCA.
 
         # loop over the wavelengths and fit
+        res = []
         with warnings.catch_warnings():
             for i, w in tqdm(enumerate(self.wl), total=len(self.wl)):
-                cross_section = self.Opac.cross_section[:, :, i]
-                self.fit_func(cross_section, self.P, self.T, **self.fitter_kwargs)
+                cross_section = self.opac.cross_section[:, :, i]
+                res += [
+                    self.fit_func(
+                        cross_section,
+                        self.P,
+                        self.T,
+                        self.prep_res,
+                        **self.fitter_kwargs
+                    )
+                ]
+
+        self.fitter_results = [self.prep_res, np.array(res)]
 
         return
 
