@@ -14,5 +14,5 @@ class TestEvalPca(unittest.TestCase):
         test_pca_coeffs = np.load("src/cortecs/tests/test_pca_coeffs.npy")
         test_pca_vectors = np.load("src/cortecs/tests/test_pca_vectors.npy")
 
-        test_val = eval_pca(0, 0, test_pca_vectors, test_pca_coeffs)
+        test_val = eval_pca_ind_wav(0, 0, test_pca_vectors, test_pca_coeffs)
         np.testing.assert_almost_equal(test_val, known_value, decimal=5)
