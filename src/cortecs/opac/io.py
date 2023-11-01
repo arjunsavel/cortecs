@@ -11,6 +11,8 @@ import h5py
 import numpy as np
 from tqdm import tqdm
 
+AMU = 1.6605390666e-24  # atomic mass unit in cgs. From astropy!
+
 
 class loader_base(object):
     """
@@ -79,7 +81,41 @@ class loader_platon(loader_base):
     loads in opacity data that are used with the PLATON code.
     """
 
-    def load(self, cross_sec_filename, T_filename, P_filename, wl_filename):
+    # atomic weights of molecules
+    species_weight_dict = {
+        "CO": 28.01,
+        "H2O": 18.015,
+        "CH4": 16.04,
+        "NH3": 17.031,
+        "CO2": 44.009,
+        "HCN": 27.026,
+        "C2H2": 26.038,
+        "H2S": 34.08,
+        "PH3": 33.997,
+        "VO": 66.94,
+        "TiO": 63.866,
+        "Na": 22.99,
+        "K": 39.098,
+        "FeH": 55.845,
+        "H2": 2.016,
+        "He": 4.003,
+        "H-": 1.008,
+        "H": 1.008,
+        "He+": 4.003,
+        "H+": 1.008,
+        "e-": 0.00054858,
+        "H2+": 2.016,
+        "H2-": 2.016,
+        "H3+": 3.024,
+        "H3-": 3.024,
+        "H2O+": 18.015,
+        "H2O-": 18.015,
+        "CH4+": 16.04,
+        "CH4-": 16.04,
+        "C2H4": 28.054,
+    }
+
+    def load(self, cross_sec_filename, T_filename="", P_filename="", wl_filename=""):
         """
         loads in opacity data that's built for PLATON. To be passed on to Opac object.
 
@@ -107,6 +143,20 @@ class loader_platon(loader_base):
         cross_section = np.load(
             cross_sec_filename
         )  # packaged as T x P x wl. todo: check packing
+        # cross-section units for fitting...? keep the same internally.
+        species = cross_sec_filename.split("_")[-1].split(".")[0]
+        try:
+            self.species_weight = self.species_weight_dict[species]
+        except:
+            raise KeyError(
+                f"Species {species} read from filename and not found in species_weight_dict. Please add it."
+            )
+        cross_section = cross_section * AMU * self.species_weight * 1e-4
+        # and now make it log10
+        cross_section = np.log10(cross_section)
+
+        # and set the infs to -104
+        cross_section[~np.isfinite(cross_section)] = -104.0
 
         return wl, T, P, cross_section
 

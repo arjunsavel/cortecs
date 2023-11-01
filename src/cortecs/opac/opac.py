@@ -3,7 +3,7 @@ this file holds the class describing opacity data. hmm...maybe I want the loader
 
 author: @arjunsavel
 """
-from cortecs.io import *
+from cortecs.opac.io import *
 
 
 class Opac(object):
@@ -22,7 +22,11 @@ class Opac(object):
         "exotransmit": loader_exotransmit,
     }
 
-    def __init__(self, filename, loader="chimera"):
+    wl = None
+    T = None
+    P = None
+
+    def __init__(self, filename, loader="chimera", load_kwargs={}):
         """
         wraps around the loaders.
 
@@ -38,9 +42,9 @@ class Opac(object):
         nothing
         """
         self.filename = filename
-        load_obj = loader_base()
-        self.wl, self.T, self.P, self.cross_section = load_obj.load(
-            filename, loader=loader
+        self.load_obj = self.method_dict[loader]()
+        self.wl, self.T, self.P, self.cross_section = self.load_obj.load(
+            filename, **load_kwargs
         )
 
         self.n_wav, self.n_t, self.n_p = len(self.wl), len(self.T), len(self.P)
