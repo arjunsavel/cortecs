@@ -1,8 +1,9 @@
 import jax
+import numpy as np
 
 
 @jax.jit
-def eval_pca(temperature_ind, pressure_ind, vectors, pca_coeffs):
+def eval_pca_ind_wav(temperature_ind, pressure_ind, vectors, pca_coeffs):
     """
     Evaluates the PCA fit at a given temperature and pressure.
 
@@ -33,3 +34,27 @@ def eval_pca(temperature_ind, pressure_ind, vectors, pca_coeffs):
             vectors[temperature_ind, component] * pca_coeffs[component, pressure_ind]
         )
     return xsec_val
+
+
+def eval_pca(temperature, pressure, wavelength, T, P, wl, fitter_results):
+    """
+    Evaluates the PCA fit at a given temperature, pressure, and wavelength.
+
+
+    Inputs
+    ------
+    temperature: float
+        The temperature to evaluate at.
+    pressure: float
+        The pressure to evaluate at.
+    wavelength: float
+        The wavelength to evaluate at.
+
+    """
+    temperature_ind = np.where(np.isclose(T, temperature))[0][0]
+    pressure_ind = np.where(np.isclose(P, pressure))[0][0]
+    wavelength_ind = np.where(np.isclose(wl, wavelength))[0][0]
+    pca_vectors, pca_coeffs_all_wl = fitter_results
+    pca_coeffs = pca_coeffs_all_wl[wavelength_ind, :, :]
+
+    return eval_pca_ind_wav(temperature_ind, pressure_ind, pca_vectors, pca_coeffs)
