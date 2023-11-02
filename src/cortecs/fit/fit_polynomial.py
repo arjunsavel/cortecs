@@ -51,27 +51,4 @@ def fit_polynomial(Z, P, T, prep_res, plot=False, save=False):
 
     coeff, r, rank, s = np.linalg.lstsq(A, B, rcond=-1)
 
-    # TT, PP = np.meshgrid(np.log10(T), np.log10(P), copy=False)
-
-    # z2 = (
-    #     np.ones_like(TT),
-    #     TT,
-    #     PP,
-    #     TT**2,
-    #     TT**2 * PP,
-    #     TT**2 * PP**2,
-    #     TT * PP**2,
-    #     TT * PP,
-    #     TT * PP**3,
-    #     PP**4,
-    #     PP**5,
-    #     PP**6,
-    #     PP**7,
-    #     PP**12,
-    #     TT * PP**9,
-    #     np.power(TT, 1 / 4),
-    # )
-
-    # im = np.tensordot(z2, coeff, axes=([0], [0])).T
-
     return coeff
