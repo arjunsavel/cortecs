@@ -29,7 +29,7 @@ bibliography: paper.bib
 
 The absorption and emission of light by exoplanet atmospheres encode details of atmospheric
 composition, temperature, and dynamics. Fundamentally, simulating these processes requires detailed knowledge
-of the opacity of gases within an atmosphere. When modeling broad wavelength ranges, such opacity data for
+of the opacity of gases within an atmosphere. When modeling broad wavelength ranges at high resolution, such opacity data for
 even a single gas can take up multiple gigabytes of system memory. This aspect can be a limiting
 factor in determining the number of gases to consider in a simulation, or even in choosing the architecture of
 the system used for the simulation. Here, we present `cortecs`, a Python tool for compressing
@@ -40,11 +40,12 @@ available for download with `pip` and `conda`.
 
 # Statement of need
 Observations with the latest high-resolution spectrographs [e.g., @mace:2018; @seifahrt:2020; @pepe:2021]
-have motivated memory-intensive simulations of exoplanet atmospheres. `cortecs` enables these simulations with more
+have motivated memory-intensive simulations of exoplanet atmospheres at high spectral resolution.
+`cortecs` enables these simulations with more
 gases and on a broader range of computing architectures by compressing opacity data.
 
 Broadly, generating a spectrum to compare against recent high-resolution data requires solving the
-radiative transfer equation over tens of thousands of wavelength points [e.g.,
+radiative transfer equation over tens of thousands of wavelength points [e.g., @savel:2022;
 @beltz:2023; @line:2021; @wardenier:2023;  @gandhi:2023; @prinoth:2023; @maguire:2023].
 To decrease computational runtime,
 some codes have parallelized the problem on GPUs [e.g., @line:2021; @lee:2022]. However, GPUs cannot in general hold large amounts of
@@ -54,7 +55,7 @@ high-resolution spectra.
 
 How do we decrease the memory footprint of these calculations? By far the largest contributor to the memory footprint,
 at least as measured on disk, is the opacity data. For instance, the opacity data for a single gas species across
-the IGRINS wavelength range [@mace:2018] takes up 2.5 GB of memory at a resolution of 400,000. It stands to reason
+the IGRINS wavelength range [@mace:2018] takes up 2.5 GB of memory at float64 precision and at a resolution of 400,000. It stands to reason
 that decreasing the amount of memory consumed by opacity data would strongly decrease the total amount of memory consumed
 by the radiative transfer calculation.
 
@@ -67,15 +68,15 @@ accuracy at the spectrum level.
 
 # Methods
 `cortecs` seeks to compress redundant information by representing opacity data not as the
-opacity itself but as fits to the opacity. We provide three methods of increasing complexity (and flexibility) for
+opacity itself but as fits to the opacity as a function of temperature and pressure. We provide three methods of increasing complexity (and flexibility) for
 compressing and decompressing opacity: polynomial-fitting, principal components analysis [PCA, e.g., @jolliffe:2016]
 and neural networks [e.g., @alzubaidi:2021]. Each compression method is paired
 with a decompression method for evaluating opacity as a function of temperature, pressure, and wavelength. These decompression methods are tailored
 for GPUs and are accelerated with the `JAX` code transformation framework [@jax:2018].
 
 In addition to these compression/decompression methods, `cortecs` provides utility scripts for working with large opacity files.
-For instance, `cortecs` can convert opacity files between popular formats, "chunk" opacity files for parallel
-computations across CPUs, and add overlap between chunked files for calculations that include Doppler shifts.
+For instance, `cortecs` can convert opacity files between popular formats, break opacity files into
+wavelength "chunks" for parallel computations across CPUs, and add overlap between chunked files for calculations that include Doppler shifts.
 
 
 # Benchmark: High-resolution retrieval of WASP-77Ab
