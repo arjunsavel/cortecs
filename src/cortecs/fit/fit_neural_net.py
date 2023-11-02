@@ -1,8 +1,9 @@
 """
 Trains a neural network to fit the opacity data.
 """
+import pickle
+
 import keras
-import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras import layers
@@ -15,7 +16,7 @@ def prep_neural_net(cross_section):
     pass
 
 
-def unravel_data(x, y, z, tileboth=False):
+def unravel_data(x, y, z=None, tileboth=False):
     """
     unravels the data into a single column. takes log as well.
 
@@ -30,6 +31,11 @@ def unravel_data(x, y, z, tileboth=False):
     z: array-like
         third dimension of data.
     """
+
+    if type(z) == type(None):
+        if tileboth:
+            return np.tile(np.log10(x), len(y))
+        return np.repeat(np.log10(x), len(y))
     if tileboth:
         return np.tile(np.tile(np.log10(x), len(y)), len(z))
 
@@ -41,13 +47,14 @@ def fit_neural_net(
     P,
     T,
     wl,
+    all_wl=False,
     n_layers=3,
     n_neurons=8,
     activation="sigmoid",
     learn_rate=0.04,
     loss="mean_squared_error",
     epochs=2000,
-    verbose=1,
+    verbose=0,
     sequential_model=None,
     plot=False,
 ):
@@ -79,15 +86,19 @@ def fit_neural_net(
     else:
         neural_network = sequential_model
 
-    neural_network.compile(loss=loss, optimizer=tf.keras.optimizers.Adam(learn_rate))
+    # running the legacy Adam optimizer for the Mac folks!
+    neural_network.compile(
+        loss=loss, optimizer=tf.keras.optimizers.legacy.Adam(learn_rate)
+    )
 
     # unpack opacity data. todo: not repeat this for every wavelength!
+    if all_wl:
+        raise NotImplementedError("todo: implement all_wl")
     P_unraveled = unravel_data(P, T, wl)
     T_unraveled = unravel_data(T, P, wl, tileboth=True)
-    # lambda_unraveled = np.repeat(wl, len(P) * len(T))
 
     # todo: try to predict everything in one big net, not wavelength-independent?
-    input_array = np.column_stack([T_unraveled, P_unraveled])
+    input_array = np.column_stack([P_unraveled, T_unraveled])
     predict_data_flattened = cross_section.flatten()
 
     history = neural_network.fit(
@@ -114,14 +125,16 @@ def save_neural_network(neural_network, filename):
     all_weights = []
     all_biases = []
 
-    for layer in n_layers:
+    for layer in range(n_layers):
         layer_weights = neural_network.layers[layer].get_weights()[0]
         layer_biases = neural_network.layers[layer].get_weights()[1]
         all_weights += [layer_weights]
         all_biases += [layer_biases]
 
-    np.savez(filename, all_weights, all_biases)
+    # save all_weights and all_biases to a pickle
+    with open(filename, "wb") as f:
+        pickle.dump([all_weights, all_biases], f)
+
+    # now, let's read it back in and make sure it's the same.
+
     return
-
-
-# todo: fit all!

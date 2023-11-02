@@ -6,20 +6,26 @@ maybe call all of these eval_poly.py, eval_neural_net.py, etc.?
 author: @arjunsavel
 """
 import jax
-import numpy as np
+import jax.numpy as jnp
 from jax import lax
 
 
 @jax.jit
-def feed_forward(x, n_layers, weights, biases):
+def feed_forward_equal_layer_sizes(x, n_layers, weights, biases):
     """
     feed forward neural network. this is a function that takes in the input, weights, and biases and returns the output.
 
-    This can probably be optimized, to be honest.
-    :param x:
-    :param weights:
-    :param biases:
-    :return:
+    This function only works if all layers have the same size.
+
+    Inputs
+    ------
+    x: array-like
+        the input to the neural network.
+    n_layers: int
+        the number of layers in the neural network.
+    weights: list
+        the weights of the neural network.
+    biases: list
     """
 
     def inner_function(i, x):
@@ -30,7 +36,46 @@ def feed_forward(x, n_layers, weights, biases):
     return res
 
 
-@jax.jit
-def eval_neural_net(x, n_layers, weights, biases):
-    res = feed_forward(x[0], n_layers, weights, biases)
+def feed_forward(x, n_layers, weights, biases):
+    """
+    feed forward neural network. this is a function that takes in the input, weights, and biases and returns the output.
+
+
+    Inputs
+    ------
+    x: array-like
+        the input to the neural network.
+    n_layers: int
+        the number of layers in the neural network.
+    weights: list
+        the weights of the neural network.
+    biases: list
+    """
+    res = x
+    for i in range(n_layers - 1):
+        res = jax.nn.sigmoid(res.dot(weights[i]) + biases[i])
+    res = res.dot(weights[-1]) + biases[-1]
+    return res
+
+
+# @jax.jit
+def eval_neural_net(T, P, n_layers, weights, biases):
+    """
+    evaluates the neural network at a given temperature and pressure.
+
+    Inputs
+    ------
+    T: float
+        The temperature to evaluate at.
+    P: float
+        The pressure to evaluate at.
+    n_layers: int
+        The number of layers in the neural network.
+    weights: list
+        The weights of the neural network.
+    biases: list
+        The biases of the neural network.
+    """
+    x = jnp.array([jnp.log10(T), jnp.log10(P)])
+    res = feed_forward(x, n_layers, weights, biases)
     return res
