@@ -125,3 +125,25 @@ class TestIntegration(unittest.TestCase):
         res1 = eval_neural_net(100, 1e-4, n_layers, all_weights, all_biases)
         res2 = predictions[0]
         self.assertTrue(np.isclose(res1, res2) and median_err < 10)
+
+    def test_polynomial(self):
+        """
+        basically from the tutorial. just check that it runs and that it's close to the expected value.
+        :return:
+        """
+        load_kwargs = {
+            "T_filename": self.T_filename,
+            "P_filename": self.P_filename,
+            "wl_filename": self.wl_filename,
+        }
+        opac_obj = Opac(
+            self.cross_sec_filename, loader="platon", load_kwargs=load_kwargs
+        )
+        fitter = Fitter(opac_obj, method="polynomial")
+        evaluator = Evaluator(opac_obj, fitter)
+        temperature = 300.0
+        pressure = 100
+        wavelength = 2.99401875e-05
+
+        res = evaluator.eval(pressure, temperature, wavelength)
+        self.assertTrue(np.isclose(res, 1.3991368e-05, atol=1e-8))
