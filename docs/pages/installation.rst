@@ -26,7 +26,7 @@ to avoid package dependency isues.
     python3 -m pip install -e .
 
 
-We plan to distribute `cortecs` through conda as well at a later date.
+We plan to distribute `cortecs` through `conda` as well at a later date.
 
 Test the installation
 ---------------------

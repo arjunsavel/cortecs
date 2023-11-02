@@ -1,9 +1,17 @@
 import jax
-import numpy as np
+import jax.numpy as jnp
 
 
 @jax.jit
-def eval_polynomial(T, P, xsec, j):
+def eval_polynomial(
+    temperature,
+    pressure,
+    wavelength,
+    temperatures,
+    pressures,
+    wavelengths,
+    fitter_results,
+):
     """
     evaluates the polynomial at a given temperature and pressure.
 
@@ -24,8 +32,11 @@ def eval_polynomial(T, P, xsec, j):
         The cross section at the given temperature and pressure.
 
     """
-    TT = np.log10(T)
-    PP = np.log10(P)
+    TT = jnp.log10(temperature)
+    PP = jnp.log10(pressure)
+    coeffs = fitter_results[1]
+
+    j = jnp.argmin(jnp.abs(wavelengths - wavelength))
 
     z2 = (
         1.0,
@@ -49,7 +60,6 @@ def eval_polynomial(T, P, xsec, j):
 
     xsec_int = 0.0
     for k in range(Nterms):
-        xsec_int += z2[k] * xsec[k, j]
-    xsec_int = 10**xsec_int  # we were keeping track of log opacity!
+        xsec_int += z2[k] * coeffs[j, k]
 
     return xsec_int

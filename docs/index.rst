@@ -18,6 +18,7 @@ on the GitHub page.
    pages/installation
    pages/Quickstart
    pages/fitting_nn
+   pages/fitting_polynomial
 
 
 

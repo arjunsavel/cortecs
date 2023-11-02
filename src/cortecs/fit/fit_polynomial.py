@@ -1,15 +1,16 @@
 import jax
+import jax.numpy as jnp
 import numpy as np
 
 # todo: loop over all wavelengths.
 
 
-def prep_polynomial(cross_section, wavelength_ind):
+def prep_polynomial(cross_section, **kargs):
     pass
 
 
-@jax.jit
-def fit_polynomial(wavelength_ind, plot=False, species="H2", save=False):
+# @jax.jit
+def fit_polynomial(Z, P, T, prep_res, plot=False, save=False):
     """
     todo: actually take in the Opac object.
     fits a polynomial to the opacity data.
@@ -19,19 +20,14 @@ def fit_polynomial(wavelength_ind, plot=False, species="H2", save=False):
     :param save:
     :return:
     """
-    xsecarr = species_dict[species]
-
-    single_pres_single_temp = xsecarr[:, :, wavelength_ind].copy()
-    X, Y = np.meshgrid(np.log10(T), np.log10(P), copy=False)
-    #     X, Y = np.meshgrid(T, P, copy=False)
-    Z = single_pres_single_temp
+    X, Y = jnp.meshgrid(jnp.log10(T), jnp.log10(P), copy=True)
 
     X = X.flatten()
     Y = Y.flatten()
 
     # took out the y**2 term
 
-    A = np.array(
+    A = jnp.array(
         [
             X * 0 + 1,
             X,
@@ -55,27 +51,27 @@ def fit_polynomial(wavelength_ind, plot=False, species="H2", save=False):
 
     coeff, r, rank, s = np.linalg.lstsq(A, B, rcond=-1)
 
-    TT, PP = np.meshgrid(np.log10(T), np.log10(P), copy=False)
+    # TT, PP = np.meshgrid(np.log10(T), np.log10(P), copy=False)
 
-    z2 = (
-        np.ones_like(TT),
-        TT,
-        PP,
-        TT**2,
-        TT**2 * PP,
-        TT**2 * PP**2,
-        TT * PP**2,
-        TT * PP,
-        TT * PP**3,
-        PP**4,
-        PP**5,
-        PP**6,
-        PP**7,
-        PP**12,
-        TT * PP**9,
-        np.power(TT, 1 / 4),
-    )
+    # z2 = (
+    #     np.ones_like(TT),
+    #     TT,
+    #     PP,
+    #     TT**2,
+    #     TT**2 * PP,
+    #     TT**2 * PP**2,
+    #     TT * PP**2,
+    #     TT * PP,
+    #     TT * PP**3,
+    #     PP**4,
+    #     PP**5,
+    #     PP**6,
+    #     PP**7,
+    #     PP**12,
+    #     TT * PP**9,
+    #     np.power(TT, 1 / 4),
+    # )
 
-    im = np.tensordot(z2, coeff, axes=([0], [0]))
+    # im = np.tensordot(z2, coeff, axes=([0], [0])).T
 
-    return np.max(abs((im - Z) / Z)), np.mean(abs((im - Z) / Z)), coeff
+    return coeff
