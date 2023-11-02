@@ -140,6 +140,7 @@ class TestIntegration(unittest.TestCase):
             self.cross_sec_filename, loader="platon", load_kwargs=load_kwargs
         )
         fitter = Fitter(opac_obj, method="polynomial")
+        fitter.fit()
         evaluator = Evaluator(opac_obj, fitter)
         temperature = 300.0
         pressure = 100
