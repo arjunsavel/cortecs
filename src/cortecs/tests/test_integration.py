@@ -26,22 +26,26 @@ sys.path.insert(0, os.path.abspath("."))
 
 
 class TestIntegration(unittest.TestCase):
+    T_filename = os.path.abspath(".") + "/src/cortecs/tests/temperatures.npy"
+    P_filename = os.path.abspath(".") + "/src/cortecs/tests/pressures.npy"
+    wl_filename = os.path.abspath(".") + "/src/cortecs/tests/wavelengths.npy"
+    cross_sec_filename = (
+        os.path.abspath(".") + "/src/cortecs/tests/absorb_coeffs_C2H4.npy"
+    )
+
     def test_quickstart(self):
         """
         basically just the quickstart notebook. check that error < 10%.
         """
-        T_filename = os.path.abspath(".") + "/src/cortecs/tests/temperatures.npy"
-        P_filename = os.path.abspath(".") + "/src/cortecs/tests/pressures.npy"
-        wl_filename = os.path.abspath(".") + "/src/cortecs/tests/wavelengths.npy"
-        cross_sec_filename = (
-            os.path.abspath(".") + "/src/cortecs/tests/absorb_coeffs_C2H4.npy"
-        )
+
         load_kwargs = {
-            "T_filename": T_filename,
-            "P_filename": P_filename,
-            "wl_filename": wl_filename,
+            "T_filename": self.T_filename,
+            "P_filename": self.P_filename,
+            "wl_filename": self.wl_filename,
         }
-        opac_obj = Opac(cross_sec_filename, loader="platon", load_kwargs=load_kwargs)
+        opac_obj = Opac(
+            self.cross_sec_filename, loader="platon", load_kwargs=load_kwargs
+        )
         fitter = Fitter(opac_obj, wav_ind=-2, nc=3)
         fitter.fit()
 
@@ -73,18 +77,14 @@ class TestIntegration(unittest.TestCase):
         """
         basically just the neural net notebook. check that error < 10%.
         """
-        T_filename = "temperatures.npy"
-        P_filename = "pressures.npy"
-        wl_filename = "wavelengths.npy"
-
-        cross_sec_filename = "absorb_coeffs_C2H4.npy"
-
         load_kwargs = {
-            "T_filename": T_filename,
-            "P_filename": P_filename,
-            "wl_filename": wl_filename,
+            "T_filename": self.T_filename,
+            "P_filename": self.P_filename,
+            "wl_filename": self.wl_filename,
         }
-        opac_obj = Opac(cross_sec_filename, loader="platon", load_kwargs=load_kwargs)
+        opac_obj = Opac(
+            self.cross_sec_filename, loader="platon", load_kwargs=load_kwargs
+        )
         fitter = Fitter(opac_obj, method="neural_net")
         res = cortecs.fit.fit_neural_net.fit_neural_net(
             fitter.opac.cross_section[:, :, -2],
