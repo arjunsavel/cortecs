@@ -12,13 +12,20 @@ def prep_polynomial(cross_section, **kargs):
 # @jax.jit
 def fit_polynomial(Z, P, T, prep_res, plot=False, save=False):
     """
-    todo: actually take in the Opac object.
     fits a polynomial to the opacity data.
-    :param wavelength_ind:
-    :param plot:
-    :param species:
-    :param save:
-    :return:
+
+    Inputs
+    -------
+        :Z: (n_temp x n_pres) it's an array.
+        :P: pressure grid
+        :T: temperature grid
+        :prep_res: (n_temp x n_pres) PCA components
+        :plot: (bool) whether to plot the fit.
+        :save: (bool) whether to save the fit.
+
+    Returns
+    -------
+        :coeff: (nc x pixels) PCA coefficients
     """
     X, Y = jnp.meshgrid(jnp.log10(T), jnp.log10(P), copy=True)
 
@@ -47,8 +54,9 @@ def fit_polynomial(Z, P, T, prep_res, plot=False, save=False):
             np.power(X, 1 / 4),
         ]
     ).T
+
     B = Z.flatten()
 
-    coeff, r, rank, s = np.linalg.lstsq(A, B, rcond=-1)
+    coeff, _, _, _ = np.linalg.lstsq(A, B, rcond=-1)
 
     return coeff
