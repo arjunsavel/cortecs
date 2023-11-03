@@ -17,6 +17,7 @@ def optimize_neural_net(
     min_neurons=2,
     max_layers=3,
     max_neurons=13,
+    min_learn_rate=0.01,
     max_learn_rate=0.1,
 ):
     """
@@ -53,7 +54,7 @@ def optimize_neural_net(
     n_layers_range = np.linspace(min_layers, max_layers, n_steps)
     n_neurons_range = np.linspace(min_neurons, max_neurons, n_steps)
     activation_range = ["sigmoid", "relu"]
-    learn_rate_range = np.geomspace(0.01, 0.1, 0.01, n_steps)
+    learn_rate_range = np.geomspace(min_learn_rate, max_learn_rate, n_steps)
 
     n_layers_grid, n_neurons_grid, activation_grid, learn_rate_grid = np.meshgrid(
         n_layers_range, n_neurons_range, activation_range, learn_rate_range
