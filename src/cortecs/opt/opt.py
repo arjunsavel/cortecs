@@ -25,21 +25,27 @@ class Optimizer(object):
         """
         method = fitter.method
         self.opac = fitter.opac
-        self.load_obj = fitter.load_obj
         self.wl = fitter.wl
         self.P = fitter.P
         self.T = fitter.T
         self.fitter = fitter
         self.optim_kwargs = optim_kwargs
-        self.optim_func_kwargs = self.fitter.optim_func_kwargs
 
         self.opt_func = self.method_dict[method]
         return
 
-    def optimize(self):
+    def optimize(self, max_size, max_evaluations, **kwargs):
         """
         optimizes the fit.
         :return:
         """
-        self.best_params = self.opt_func()
+        self.best_params = self.opt_func(
+            max_size,
+            max_evaluations,
+            self.opac.cross_section,
+            self.P,
+            self.T,
+            self.wl,
+            **kwargs
+        )
         return

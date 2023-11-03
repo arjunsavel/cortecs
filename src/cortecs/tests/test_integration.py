@@ -15,6 +15,7 @@ from cortecs.opac.opac import *
 from cortecs.fit.fit import *
 from cortecs.fit.fit_pca import *
 from cortecs.eval.eval import *
+from cortecs.opt.opt import *
 import pickle
 
 seed = 42
@@ -148,3 +149,50 @@ class TestIntegration(unittest.TestCase):
 
         res = evaluator.eval(pressure, temperature, wavelength)
         self.assertTrue(np.isclose(res, 1.3991368e-05, atol=1e-8))
+
+    def test_optimize(self):
+        """
+        just the tutorial. once more!
+        :return:
+        """
+        # reset random seed
+        np.random.seed(seed)
+        tf.random.set_seed(seed)
+        load_kwargs = {
+            "T_filename": self.T_filename,
+            "P_filename": self.P_filename,
+            "wl_filename": self.wl_filename,
+        }
+        opac_obj = Opac(
+            self.cross_sec_filename, loader="platon", load_kwargs=load_kwargs
+        )
+        fitter = Fitter(opac_obj, method="neural_net")
+        res = cortecs.fit.fit_neural_net.fit_neural_net(
+            fitter.opac.cross_section[:, :, -2],
+            fitter.opac.T,
+            fitter.opac.P,
+            None,
+            all_wl=False,
+            n_layers=3,
+            n_neurons=8,
+            activation="sigmoid",
+            learn_rate=0.04,
+            loss="mean_squared_error",
+            epochs=4000,
+            verbose=0,
+            sequential_model=None,
+            plot=False,
+        )
+        optimizer = Optimizer(fitter)
+        max_size = 1.6
+        max_evaluations = 8
+        optimizer.optimize(max_size, max_evaluations)
+        self.assertTrue(
+            optimizer.best_params
+            == {
+                "n_layers": 2,
+                "n_neurons": 2.0,
+                "activation": "relu",
+                "learn_rate": 0.01,
+            }
+        )

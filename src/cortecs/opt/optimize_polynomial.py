@@ -1,2 +1,2 @@
-def optimize_pca(*args, **kwargs):
+def optimize_polynomial(*args, **kwargs):
     raise NotImplementedError

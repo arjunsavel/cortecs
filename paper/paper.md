@@ -88,7 +88,7 @@ For this experiment, we use the PCA-based compression scheme implemented in `cor
 
 Using `cortecs`, we compress the input opacity files by a factor of 13. Importantly, we find that our compressed-opacity retrieval yields posterior distributions [as plotted by the `corner` package, @corner:2016]
 and Bayesian evidences that are consistent with those from the benchmark
-retrieval using uncompressed opacity (\autoref{fig:corner}). The results from this exercise indicate that our compression/decompression scheme
+retrieval using uncompressed opacity (\autoref{fig:corner}) within a comparable runtime. The results from this exercise indicate that our compression/decompression scheme
 is accurate enough to be used in high-resolution retrievals.
 
 ![The posterior distributions for our baseline WASP-77A retrieval (teal)
