@@ -81,7 +81,7 @@ def do_pca(cube, nc=3):
         print("SVD did not converge.")
         return
 
-    return xMat, fStd, fNorm, beta, s, vh, u
+    return xMat, standardized_cube, fNorm, beta, s, vh, u
 
 
 def fit_pca(cross_section, P, T, xMat, nc=3, wav_ind=1):
