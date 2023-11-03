@@ -19,6 +19,7 @@ on the GitHub page.
    pages/Quickstart
    pages/fitting_nn
    pages/fitting_polynomial
+   pages/optimizing
 
 
 
