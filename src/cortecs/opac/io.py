@@ -197,6 +197,42 @@ class loader_platon_cia(loader_base):
         return wl, T, cross_section
 
 
+class loader_exotransmit_cia(loader_base):
+    """
+    loads in opacity data that are used with the PLATON code's collision-induced absorption..
+    """
+
+    def load(self, cross_sec_filename, T_filename, wl_filename, species_name):
+        """
+        loads in opacity data that's built for PLATON. To be passed on to Opac object.
+
+        The temperature grid, pressure grid, and wavelength grid are saved as separate files for PLATON.
+
+        Inputs
+        ------
+        filename : str
+            name of file to load
+        cross_sec_filename : str
+            name of cross section file
+        T_filename : str
+            name of temperature file
+        wl_filename : str
+            name of wavelength file
+        species_name : tuples
+            name of two colliding species. E.g., ('H2', 'CH4'). todo: all at once?
+        """
+        # todo: check wl units. They're in meters here.
+        # temperatures are in K.
+        # pressures are in Pa, I believe.
+        wl = np.load(wl_filename)
+        T = np.load(T_filename)
+        data = pickle.load(
+            open(cross_sec_filename, "rb"), encoding="latin1"
+        )  # packaged as T x P x wl. todo: check packing
+        cross_section = data[species_name]
+        return wl, T, cross_section
+
+
 class loader_exotransmit(loader_base):
     """
     loads in opacity data in the exo-transmit format. This format is also used by PLATON, I believe.
@@ -271,3 +307,6 @@ class loader_exotransmit(loader_base):
         T, P = self.get_t_p(filename)
 
         return wl, T, P, opacities
+
+
+# todo: write a writer for each of these.

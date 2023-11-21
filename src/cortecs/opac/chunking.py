@@ -28,6 +28,8 @@ import os
 import numpy as np
 from tqdm import tqdm
 
+from cortecs.opac.opac import *
+
 
 def chunk_wavelengths(file, nchunks=None, wav_per_chunk=None, adjust_wavelengths=False):
     """
@@ -103,7 +105,7 @@ def chunk_wavelengths(file, nchunks=None, wav_per_chunk=None, adjust_wavelengths
     return
 
 
-def write_to_file(line, file, file_suffix):
+def write_to_file(line, file, file_suffix, numfiles=None):
     """
     Writes (appends, really) a line to a file.
 
@@ -118,10 +120,27 @@ def write_to_file(line, file, file_suffix):
     Side effects:
         Writes a line to a file!
     """
+    if type(numfiles) != type(None):
+        file_suffix = (file_suffix) % numfiles
+
     true_filename = f"{file[:-4] + str(file_suffix) + '.dat'}"
     f = open(true_filename, "a")
     f.write(line)
     f.close()
+
+
+def get_temp_grid(file, progress=False, filetype="opacity"):
+    """
+    gets just the temperature grid of a file.
+    :param file:
+    :return:
+    """
+    if filetype == "cia":
+        raise NotImplementedError("cia files not yet supported!")
+    opac = Opac(file, loader="exotransmit")
+    temp = opac.T.copy()
+    del opac
+    return temp
 
 
 def get_header(file):
@@ -168,36 +187,50 @@ def count_wavelengths(file):
     return ticker
 
 
-def get_lams(file):
+def get_lams(file, progress=False, filetype="opacity"):
     """
-    Takes in an opacity file and returns an array of all wavelengths within the file.
-
-    Inputs:
-        :file: (str) path to opacity file.
-
-    Outputs:
-        :wavelengths: (numpy.array) individual wavelength points within the opacity file [m]
-
-    todo: refactor so this isn't largely replicated in io.
+    Returns the wavelength grid used in an opacity file.
+    Inputs
+    -------
+        :file: (str) path to opacity file with the wavelength grid of interest. e.g.,
+                    'opacFe/opacFe.dat'
+        :progress: (bool) whether or not to include a progress bar (if tqdm is installed).
+                    Useful for the biggest opacity file!
+    Outputs
+    -------
+        :wav_grid: (np.array) wavelength values for which the opacity file had been
+                    computed.
     """
+
+    wav_grid = []
+
     f = open(file)
     f1 = f.readlines()
+    f.close()
 
-    ticker = 0
-    wavelengths = []
+    if progress:
+        iterator = tqdm(f1[2:], desc="Grabbing wavelength grid")
+    else:
+        iterator = f1[2:]
 
-    # read through all lines in the opacity file
-    for x in f1:
-        # check if blank line
+    # read through all lines in the opacity file; first few lines are header!
+    for x in iterator:
+        # skip blank lines
         if not x:
             continue
+        commad = ",".join(x.split())
 
         # check if a wavelength line
-        commad = x.replace(" ", ",")
-        if len(np.array([eval(commad)]).flatten()) == 1:
-            wavelengths += [eval(x[:-1])]
-    f.close()
-    return np.array(wavelengths)
+        if filetype == "CIA":
+            constraint = len(np.array([eval(commad)]).flatten()) > 1
+        elif filetype == "opacity":
+            constraint = len(np.array([eval(commad)]).flatten()) == 1
+        else:
+            raise ValueError("filetype not recognized!")
+
+        if constraint:
+            wav_grid += [np.array([eval(commad)]).flatten()[0]]
+    return wav_grid
 
 
 def add_lams(max_lam_to_add_ind, file, next_file):

@@ -84,9 +84,10 @@ class Opac_cia(Opac):
 
     method_dict = {
         "platon_cia": loader_platon_cia,
+        "exotransmit_cia": loader_exotransmit_cia,
     }
 
-    def __init__(self, filename, loader="chimera"):
+    def __init__(self, filename, loader="platon_cia"):
         """
         wraps around the loaders.
 
@@ -104,6 +105,7 @@ class Opac_cia(Opac):
         self.filename = filename
         load_obj = loader_base()
         self.wl, self.T, self.cross_section = load_obj.load(filename, loader=loader)
+        # at least for the exotransmit case, we have...wl x temp.
 
         self.n_wav, self.n_t = len(self.wl), len(self.T)
 

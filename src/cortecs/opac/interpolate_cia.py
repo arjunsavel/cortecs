@@ -26,11 +26,188 @@ from cortecs.opac.chunking import *
 ######################### Pt. 1: Interpolation ####################################
 
 
-def interpolate_CIA(CIA_file, reference_file):
+def get_n_species(CIA_file, verbose=False):
+    """
+    Returns the number of species in a CIA file.
+    Inputs
+    -------
+        :CIA_file: (str) path to CIA file. e.g., 'opacCIA/opacCIA.dat'
+    Outputs
+    -------
+        :n_species: (int) number of species in the CIA file.
+    """
+
+    f = open(CIA_file)
+    f1 = f.readlines()
+    f.close()
+    # the third line fshould be the first normal one.
+
+    line = f1[3]
+    n_species = len(line.split()[1:])
+
+    if verbose:
+        print(f"Number of species in CIA file {CIA_file}: {n_species}")
+        if n_species == 8:
+            print(
+                "Species are likely: H-el, He-H, CH4-CH4, H2-He, H2-CH4, H2-H, H2-H2, CO2-CO2"
+            )
+        elif n_species == 14:
+            print(
+                "Species are likely:  H2-H2, H2-He, H2-H, H2-CH4, CH4-Ar, CH4-CH4, CO2-CO2, He-H, N2-CH4, N2-H2, N2-N2, O2-CO2, O2-N2, O2-O2)"
+            )
+    return n_species
+
+
+def get_empty_species_dict(CIA_file, verbose=False):
+    """
+    returns a species dictioanry given a CIA file
+    :param CIA_file:
+    :param verbose:
+    :return:
+    """
+    n_species = get_n_species(CIA_file, verbose=verbose)
+    if n_species == 8:
+        # todo: refactor. has to be a cleaner way to do this! infer the columns, etc.
+        Hels = []
+        HeHs = []
+        CH4CH4s = []
+        H2Hes = []
+        H2CH4s = []
+        H2Hs = []
+        H2H2s = []
+        CO2CO2s = []
+
+        # python > 3.6 has ordered dictionaries!
+        species_dict = {
+            "Hels": Hels,
+            "HeHs": HeHs,
+            "CH4CH4s": CH4CH4s,
+            "H2Hes": H2Hes,
+            "H2CH4s": H2CH4s,
+            "H2Hs": H2Hs,
+            "H2H2s": H2H2s,
+            "CO2CO2s": CO2CO2s,
+        }
+
+    elif n_species == 14:
+        H2H2s = []
+        H2Hes = []
+        H2Hs = []
+        H2CH4s = []
+        CH4Ar = []
+        CH4CH4s = []
+        CO2CO2s = []
+        HeHs = []
+        N2CH4s = []
+        N2H2s = []
+        N2N2s = []
+        O2CO2s = []
+        O2N2s = []
+        O2O2s = []
+        species_dict = {
+            "H2H2s": H2H2s,
+            "H2Hes": H2Hes,
+            "H2Hs": H2Hs,
+            "H2CH4s": H2CH4s,
+            "CH4Ar": CH4Ar,
+            "CH4CH4s": CH4CH4s,
+            "CO2CO2s": CO2CO2s,
+            "HeHs": HeHs,
+            "N2CH4s": N2CH4s,
+            "N2H2s": N2H2s,
+            "N2N2s": N2N2s,
+            "O2CO2s": O2CO2s,
+            "O2N2s": O2N2s,
+            "O2O2s": O2O2s,
+        }
+    else:
+        print("Number of species in CIA file not recognized. Check the file!")
+        species_dict = {}
+        species_keys = np.arange(n_species)
+        for species_key in species_keys:
+            species_dict[species_key] = []
+    return species_dict
+
+
+def read_cia(CIA_file, verbose=False):
+    """
+    Reads in a CIA file.
+    Inputs
+    ------
+        :CIA_file: (str) path to CIA file. e.g., 'opacCIA/opacCIA.dat'
+    Outputs
+    -------
+        :df: (pd.DataFrame) dataframe with the CIA data.
+    """
+
+    f = open(CIA_file)
+    f1 = f.readlines()
+    f.close()
+
+    temperatures = []
+    wavelengths = []
+
+    species_dict = get_empty_species_dict(CIA_file, verbose=verbose)
+
+    # read through all lines in the CIA file
+    for line in tqdm(f1[1:], desc="Reading CIA file"):
+        if not line or line == "\n":
+            continue  # don't want it to break!
+        if len(line.split(" ")) == 1 and line != "\n":  # this is a new temperature
+            temperature = eval(line[:-1])
+            continue  # nothing else on this line
+        values = [eval(value) for value in line.split(" ")[::3][:-1]]
+        temperatures += [temperature]
+        wavelengths += [values[0]]
+
+        for species_ind, species in enumerate(species_dict.keys()):
+            species_dict[species] += [values[species_ind + 1]]
+
+    # hm. how to do this with different numbers of species?
+    df = pd.DataFrame(
+        {
+            "temp": temperatures,
+            "wav": wavelengths,
+        }
+    )
+    for species in species_dict.keys():
+        df[species] = species_dict[species]
+
+    return df
+
+
+def check_temp_grid(df, real_temperature_grid, CIA_file):
+    """
+    Checks that the temperature grid of the CIA file is the same as the reference file.
+    Inputs
+    ------
+        :df: (pd.DataFrame) dataframe with the CIA data.
+        :real_temperature_grid: (np.array) temperature values for which the opacity file had been
+                    computed.
+    Outputs
+    -------
+        None
+    Side effects
+    -------------
+        Raises a ValueError if the temperature grid is not the same.
+    """
+
+    for temp in real_temperature_grid:
+        if temp not in df.temp.unique():
+            print(
+                f"Temperature {temp} not in CIA file {CIA_file}! Cannot interpolate in temperature yet. Will set these values to 0."
+            )
+    return
+
+
+def interpolate_CIA(CIA_file, reference_file, outfile=None):
     """
     Interpolates a CIA file to a higher resolution, using the wavelength grid
     of a reference file. Note: This function assumes that the CIA file has
     Hels, HeHs, CH4CH4s, H2Hes, H2CH4s, H2Hs, H2H2s, and CO2CO2s.
+
+    TODO: add 2d interpolation.
+
     Inputs
     ------
         :CIA_file: (str) path to CIA file to be interpolated. e.g.,
@@ -46,90 +223,36 @@ def interpolate_CIA(CIA_file, reference_file):
         to higher resolution.
     """
 
-    real_wavelength_grid = get_wav_grid(reference_file, progress=True)
-
-    f = open(CIA_file)
-    f1 = f.readlines()
-    f.close()
-
-    temperatures = []
-    wavelengths = []
-    # todo: refactor. has to be a cleaner way to do this! infer the columns, etc.
-    Hels = []
-    HeHs = []
-    CH4CH4s = []
-    H2Hes = []
-    H2CH4s = []
-    H2Hs = []
-    H2H2s = []
-    CO2CO2s = []
-
-    # read through all lines in the CIA file
-    for line in tqdm(f1[1:], desc="Reading CIA file"):
-        if not line or line == "\n":
-            continue  # don't want it to break!
-        if len(line.split(" ")) == 1 and line != "\n":  # this is a new temperature
-            temperature = eval(line[:-1])
-            continue  # nothing else on this line
-        values = [eval(value) for value in line.split(" ")[::3][:-1]]
-        temperatures += [temperature]
-        wavelengths += [values[0]]
-        Hels += [values[1]]
-        HeHs += [values[2]]
-        CH4CH4s += [values[3]]
-        H2Hes += [values[4]]
-        H2CH4s += [values[5]]
-        H2Hs += [values[6]]
-        H2H2s += [values[7]]
-        CO2CO2s += [values[8]]
-
-    # easier to slice with a dataframe later on
-    df = pd.DataFrame(
-        {
-            "temp": temperatures,
-            "wav": wavelengths,
-            "Hel": Hels,
-            "HeH": HeHs,
-            "CH4CH4": CH4CH4s,
-            "H2He": H2Hes,
-            "H2CH4": H2CH4s,
-            "H2H": H2Hs,
-            "H2H2": H2H2s,
-            "CO2CO2": CO2CO2s,
-        }
+    real_wavelength_grid = get_lams(reference_file, progress=True, filetype="opacity")
+    # need to put it on the right temperature grid, too!
+    real_temperature_grid = get_temp_grid(
+        reference_file, progress=True, filetype="opacity"
     )
 
-    # perform interpolation
+    df = read_cia(CIA_file)
 
-    interped_Hels = []
-    interped_HeHs = []
-    interped_CH4CH4s = []
-    interped_H2Hes = []
-    interped_H2CH4s = []
-    interped_H2Hs = []
-    interped_H2H2s = []
-    interped_CO2CO2s = []
+    check_temp_grid(df, real_temperature_grid, CIA_file)
+
+    species_dict_interped = get_empty_species_dict(CIA_file)
     interped_wavelengths = []
     interped_temps = []
 
-    for unique_temp in tqdm(df.temp.unique()):
-        sub_df = df[df.temp == unique_temp]
+    # perform interpolation
+    for unique_temp in tqdm(real_temperature_grid, desc="Interpolating"):
+        if unique_temp not in df.temp.unique():
+            for species_key in species_dict_interped.keys():
+                species_dict_interped[species_key] += list(
+                    np.ones_like(real_wavelength_grid) * 0.0
+                )
 
-        # convert to lists so that they're neatly nested lists
-        interped_Hels += list(np.interp(real_wavelength_grid, sub_df.wav, sub_df.Hel))
-        interped_HeHs += list(np.interp(real_wavelength_grid, sub_df.wav, sub_df.HeH))
-        interped_CH4CH4s += list(
-            np.interp(real_wavelength_grid, sub_df.wav, sub_df.CH4CH4)
-        )
-        interped_H2Hes += list(np.interp(real_wavelength_grid, sub_df.wav, sub_df.H2He))
-        interped_H2CH4s += list(
-            np.interp(real_wavelength_grid, sub_df.wav, sub_df.H2CH4)
-        )
-        interped_H2Hs += list(np.interp(real_wavelength_grid, sub_df.wav, sub_df.H2H))
-        interped_H2H2s += list(np.interp(real_wavelength_grid, sub_df.wav, sub_df.H2H2))
-        interped_CO2CO2s += list(
-            np.interp(real_wavelength_grid, sub_df.wav, sub_df.CO2CO2)
-        )
+        else:
+            sub_df = df[df.temp == unique_temp]
+
+            # convert to lists so that they're neatly nested lists
+            for species_key in species_dict_interped.keys():
+                species_dict_interped[species_key] += list(
+                    np.interp(real_wavelength_grid, sub_df.wav, sub_df[species_key])
+                )
 
         interped_wavelengths += real_wavelength_grid
         interped_temps += list(np.ones_like(real_wavelength_grid) * unique_temp)
@@ -138,98 +261,44 @@ def interpolate_CIA(CIA_file, reference_file):
 
     new_string = []
 
+    # this is pretty gross below : (
+    reference_species = species_dict_interped[list(species_dict_interped.keys())[0]]
+
+    # todo: include the different temperature range on which to interpolate.
+
     buffer = "   "  # there's a set of spaces between each string!
-    for i in tqdm(range(len(interped_Hels))):
+    for i in tqdm(range(len(reference_species))):
         # the first line gets different treatment!
         if i == 0:
-            temp = 500
+            temp = np.min(
+                interped_temps
+            )  # add the LOWEST temperature in the temperature grid!
             new_string += ["{:.12e}".format(temp) + "\n"]
         if interped_temps[i] != temp:
             temp = interped_temps[i]
             new_string += ["{:.12e}".format(temp) + "\n"]
-        wavelength = "{:.12e}".format(interped_wavelengths[i])
-        Hel_string = "{:.12e}".format(interped_Hels[i])
-        HeH_string = "{:.12e}".format(interped_HeHs[i])
-        CH4CH4_string = "{:.12e}".format(interped_CH4CH4s[i])
-        H2He_string = "{:.12e}".format(interped_H2Hes[i])
-        H2CH4_string = "{:.12e}".format(interped_H2CH4s[i])
-        H2H_string = "{:.12e}".format(interped_H2Hs[i])
-        H2H2_string = "{:.12e}".format(interped_H2H2s[i])
-        CO2CO2_string = "{:.12e}".format(interped_CO2CO2s[i])
-        new_string += [
-            wavelength
-            + buffer
-            + Hel_string
-            + buffer
-            + HeH_string
-            + buffer
-            + CH4CH4_string
-            + buffer
-            + H2He_string
-            + buffer
-            + H2CH4_string
-            + buffer
-            + H2H_string
-            + buffer
-            + H2H2_string
-            + buffer
-            + CO2CO2_string
-            + buffer
-            + "\n"
-        ]
+        wavelength_string = "{:.12e}".format(interped_wavelengths[i])
+
+        line_string = wavelength_string + buffer
+
+        for species_key in species_dict_interped.keys():
+            line_string += (
+                "{:.12e}".format(species_dict_interped[species_key][i]) + buffer
+            )
+
+        new_string += [line_string + "\n"]
 
     # todo: check the insert. and can pull wavelength grid.
-    new_string.insert(
-        0,
-        "500.000 600.000 700.000 800.000 900.000 1000.000 1100.000 1200.000 1300.000 1400.000 1500.000 1600.000 1700.000 1800.000 1900.000 2000.000 2100.000 2200.000 2300.000 2400.000 2500.000 2600.000 2700.000 2800.000 2900.000 3000.000 3100.000 3200.000 3300.000 3400.000 3500.000 3600.000 3700.000 3800.000 3900.000 4000.000 4100.000 4200.000 4300.000 4400.000 4500.000 4600.000 4700.000 4800.000 4900.000 5000.000 \n",
-    )
-    new_file = CIA_file.split(".dat")[0]
-    new_file += "_highres.dat"
-    f2 = open(new_file, "w")
+    temp_string = " ".join(str(temp) for temp in real_temperature_grid) + " \n"
+    new_string.insert(0, temp_string)
+    if type(outfile) == type(None):
+        outfile = CIA_file.split(".dat")[0]
+        outfile += "_highres.dat"
+    f2 = open(outfile, "w")
     f2.writelines(new_string)
     f2.close()
 
     return
-
-
-def get_wav_grid(file, progress=False):
-    """
-    Returns the wavelength grid used in an opacity file.
-    Inputs
-    -------
-        :file: (str) path to opacity file with the wavelength grid of interest. e.g.,
-                    'opacFe/opacFe.dat'
-        :progress: (bool) whether or not to include a progress bar (if tqdm is installed).
-                    Useful for the biggest opacity file!
-    Outputs
-    -------
-        :wav_grid: (np.array) wavelength values for which the opacity file had been
-                    computed.
-    """
-
-    wav_grid = []
-
-    f = open(file)
-    f1 = f.readlines()
-    f.close()
-
-    if progress:
-        iterator = tqdm(f1[2:], desc="Grabbing wavelength grid")
-    else:
-        iterator = f1[2:]
-
-    # read through all lines in the opacity file; first few lines are header!
-    for x in iterator:
-        # skip blank lines
-        if not x:
-            continue
-        commad = x.replace(" ", ",")
-
-        # check if a wavelength line
-        if len(np.array([eval(commad)]).flatten()) == 1:
-            wav_grid += [np.array([eval(commad)]).flatten()[0]]
-
-    return wav_grid
 
 
 ######################### Pt. 2: Chunking ####################################
@@ -288,8 +357,8 @@ def chunk_wavelengths_CIA(file, ref_file_base, numfiles):
             true_file_suffix = (file_suffix) % numfiles
             wav_per_chunk = chunk_list[true_file_suffix]
 
-            write_to_file(temperature, file, file_suffix, ntemps, numfiles)
-        write_to_file(line, file, file_suffix, ntemps, numfiles)  # just writes line
+            write_to_file(temperature, file, file_suffix, numfiles),
+        write_to_file(line, file, file_suffix, numfiles)  # just writes line
 
     true_header = header[0]
 
@@ -314,7 +383,7 @@ def get_wav_per_chunk(file_suffix, ref_file_base):
 
     file = ref_file_base + str(file_suffix) + ".dat"
 
-    real_wavelength_grid = get_wav_grid(file)
+    real_wavelength_grid = get_lams(file, filetype="opacity")
 
     len_grid = len(real_wavelength_grid)
 
@@ -341,26 +410,3 @@ def prepend_line(file_name, line):
     os.remove(file_name)
     # Rename dummy file as the original file
     os.rename(dummy_file, file_name)
-
-
-def write_to_file(line, file, file_suffix, ntemps, numfiles):
-    """
-    Writes a line to a file.
-    Inputs
-    ------
-        :line: (str) line to be written.
-        :file: (str) path to file being chunked. e.g., opacCIA_highres.dat
-        :file_suffix: (int) number of chunk.
-        :ntemps: (int) number of temperatures in grid.
-    Outputs
-    --------
-        None
-    Side effects
-    -------------
-        Writes a line to a file!
-    """
-    true_file_suffix = (file_suffix) % numfiles
-    true_filename = f"{file[:-4] + str(true_file_suffix) + '.dat'}"
-    f = open(true_filename, "a")
-    f.write(line)
-    f.close()
