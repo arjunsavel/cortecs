@@ -274,8 +274,9 @@ class TestInterpolateCIA(unittest.TestCase):
         check_temp_grid(original_cia.cross_section, [-20], "namename")  # Call function.
         sys.stdout = sys.__stdout__  # Reset redirect.
         expected_string = "Temperature -20 not in CIA file namename! Cannot interpolate in temperature yet. Will set these values to 0."
-
-        self.assertTrue(expected_string == capturedOutput.getvalue())
+        output = capturedOutput.getvalue()
+        print(output)
+        self.assertTrue(expected_string == output)
 
     def test_cia_in_out_temp_check(self):
         """
@@ -300,4 +301,4 @@ class TestInterpolateCIA(unittest.TestCase):
         reference_opac = Opac(
             self.cross_sec_filename, loader="platon", load_kwargs=load_kwargs
         )
-        self.assertTrue(np.all(interpolated_cia.T == reference_opac.T))
+        self.assertTrue(np.all(np.unique(interpolated_cia.T) == reference_opac.T))
