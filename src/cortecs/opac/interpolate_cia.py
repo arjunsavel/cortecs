@@ -85,7 +85,7 @@ def interpolate_CIA(
     check_temp_grid(df, real_temperature_grid, CIA_file)
 
     if reference_opac.wl.max() > df.wav.max() or reference_opac.wl.min() < df.wav.min():
-        raise ValueError(
+        print(
             "Reference file has a larger wavelength grid than CIA file. Will fill with zeros."
         )
 
