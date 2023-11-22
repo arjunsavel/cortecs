@@ -79,7 +79,7 @@ class TestOpac(unittest.TestCase):
         opac_test2 = Opac_cia(
             self.cia_filename, loader="exotransmit_cia", view="full_frame"
         )
-        initial_copy = copy.copy(opac_test2)
+        initial_copy = copy.deepcopy(opac_test2)
         opac_test = Opac_cia(
             self.cia_filename, loader="exotransmit_cia", view="full_frame"
         )
