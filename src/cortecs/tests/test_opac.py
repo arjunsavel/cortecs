@@ -85,10 +85,6 @@ class TestOpac(unittest.TestCase):
         )
         opac_test.cross_section["other_col"] = opac_test.cross_section["temp"] * 13
         opac_test2.join_cross_section(opac_test)
-        print("testing column lengths")
-        print(len(initial_copy.cross_section.columns))
-        print(len(opac_test2.cross_section.columns))
-        print(opac_test2.cross_section.columns)
 
         self.assertTrue(
             len(initial_copy.cross_section.columns) + 1
@@ -280,6 +276,7 @@ class TestInterpolateCIA(unittest.TestCase):
         expected_string = "Temperature -20 not in CIA file namename! Cannot interpolate in temperature yet. Will set these values to 0."
         output = capturedOutput.getvalue()
         print(output)
+        print(expected_string)
         self.assertTrue(expected_string in output)
 
     def test_cia_in_out_temp_check(self):
