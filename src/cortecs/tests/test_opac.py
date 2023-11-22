@@ -16,7 +16,7 @@ class TestOpac(unittest.TestCase):
     tests the Opac object.
     """
 
-    cia_filename = os.path.abspath(".") + "/src/cortecs/tests/test_output_cia.dat"
+    cia_filename = os.path.abspath(".") + "/src/cortecs/tests/test_opac_cia.dat"
 
     def test_wrong_method(self):
         """
@@ -135,7 +135,7 @@ class TestOpac(unittest.TestCase):
 
 
 class TestIO(unittest.TestCase):
-    cia_filename = os.path.abspath(".") + "/src/cortecs/tests/test_output_cia.dat"
+    cia_filename = os.path.abspath(".") + "/src/cortecs/tests/test_opac_cia.dat"
 
     def test_write_cia_same_cross_section(self):
         """
@@ -202,7 +202,7 @@ class TestInterpolateCIA(unittest.TestCase):
     cross_sec_filename = (
         os.path.abspath(".") + "/src/cortecs/tests/absorb_coeffs_C2H4.npy"
     )
-    cia_filename = os.path.abspath(".") + "/src/cortecs/tests/test_output_cia.dat"
+    cia_filename = os.path.abspath(".") + "/src/cortecs/tests/test_opac_cia.dat"
 
     def test_interpolate_cia_within_bounds(self):
         """
