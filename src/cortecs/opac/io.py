@@ -468,7 +468,12 @@ class writer_exotransmit_cia(writer_base):
 
         new_string = []
 
-        species_dict_interped = opac.cross_section.to_dict()
+        # don't want to write temp and wav
+        columns = list(opac.cross_section.columns)
+        columns.remove("temp")
+        columns.remove("wav")
+
+        species_dict_interped = opac.cross_section[columns].to_dict()
         interped_temps = opac.T
         interped_wavelengths = opac.wl
 
@@ -493,8 +498,12 @@ class writer_exotransmit_cia(writer_base):
             line_string = wavelength_string + buffer
 
             for species_key in species_dict_interped.keys():
+                # again, this works because python dicts are ordered in 3.6+
                 line_string += (
-                    "{:.12e}".format(species_dict_interped[species_key][i]) + buffer
+                    "{:.12e}".format(
+                        list(species_dict_interped[species_key].values())[i]
+                    )
+                    + buffer
                 )
 
             new_string += [line_string + "\n"]

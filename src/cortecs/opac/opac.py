@@ -44,7 +44,7 @@ class Opac(object):
         nothing
         """
         self.filename = filename
-        self.load_obj = self.method_dict[loader]()
+        self.load_obj = self._get_loader(loader)
         self.wl, self.T, self.P, self.cross_section = self.load_obj.load(
             filename, **load_kwargs
         )
@@ -72,7 +72,7 @@ class Opac(object):
                     self.method_dict.keys()
                 )
             )
-        return self.method_dict[loader_name]
+        return self.method_dict[loader_name]()
 
     # todo: implement the copy and deepcopy methods.
     def copy(self):
@@ -112,8 +112,8 @@ class Opac_cia(Opac):
         nothing
         """
         self.filename = filename
-        self.load_obj = self.method_dict[loader]()
-        self.wl, self.T, self.cross_section = self.load_obj.load(filename)
+        self.load_obj = self._get_loader(loader)
+        self.wl, self.T, self.cross_section = self.load_obj.load(self.filename)
 
         # at least for the exotransmit case, we have...wl x temp.
         if view == "full_frame":
