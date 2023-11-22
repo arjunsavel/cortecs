@@ -214,7 +214,11 @@ class TestInterpolateCIA(unittest.TestCase):
         :return:
         """
         interpolate_CIA(
-            self.cia_filename, reference_file, outfile="test_interpolate.dat"
+            self.cia_filename,
+            self.cross_sec_filename,
+            loader="platon",
+            outfile="test_interpolate.dat",
+            loader_kwargs=loader_kwargs,
         )
         interpolated_cia = Opac_cia(
             "test_interpolate.dat", loader="exotransmit_cia", view="full_frame"
@@ -273,11 +277,22 @@ class TestInterpolateCIA(unittest.TestCase):
         when interpolating, i should have the same temperature grid as the reference opacity file.
         :return:
         """
+        loader_kwargs = {
+            "T_filename": self.T_filename,
+            "P_filename": self.P_filename,
+            "wl_filename": self.wl_filename,
+        }
         interpolate_CIA(
-            self.cia_filename, reference_file, outfile="test_interpolate.dat"
+            self.cia_filename,
+            self.cross_sec_filename,
+            loader="platon",
+            outfile="test_interpolate.dat",
+            loader_kwargs=loader_kwargs,
         )
         interpolated_cia = Opac_cia(
             "test_interpolate.dat", loader="exotransmit_cia", view="full_frame"
         )
-        reference_opac = Opac(reference_file, loader="platon")
+        reference_opac = Opac(
+            self.cross_sec_filename, loader="platon", loader_kwargs=loader_kwargs
+        )
         self.assertTrue(np.all(interpolated_cia.T == reference_opac.T))
