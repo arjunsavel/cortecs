@@ -277,7 +277,7 @@ class TestInterpolateCIA(unittest.TestCase):
         output = capturedOutput.getvalue()
         print(output)
         print(expected_string)
-        self.assertTrue(expected_string in output)
+        self.assertTrue(output in expected_string)
 
     def test_cia_in_out_temp_check(self):
         """
