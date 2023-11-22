@@ -22,158 +22,9 @@ import pandas as pd
 from tqdm import tqdm
 
 from cortecs.opac.chunking import *
+from cortecs.opac.io import *
 
 ######################### Pt. 1: Interpolation ####################################
-
-
-def get_n_species(CIA_file, verbose=False):
-    """
-    Returns the number of species in a CIA file.
-    Inputs
-    -------
-        :CIA_file: (str) path to CIA file. e.g., 'opacCIA/opacCIA.dat'
-    Outputs
-    -------
-        :n_species: (int) number of species in the CIA file.
-    """
-
-    f = open(CIA_file)
-    f1 = f.readlines()
-    f.close()
-    # the third line fshould be the first normal one.
-
-    line = f1[3]
-    n_species = len(line.split()[1:])
-
-    if verbose:
-        print(f"Number of species in CIA file {CIA_file}: {n_species}")
-        if n_species == 8:
-            print(
-                "Species are likely: H-el, He-H, CH4-CH4, H2-He, H2-CH4, H2-H, H2-H2, CO2-CO2"
-            )
-        elif n_species == 14:
-            print(
-                "Species are likely:  H2-H2, H2-He, H2-H, H2-CH4, CH4-Ar, CH4-CH4, CO2-CO2, He-H, N2-CH4, N2-H2, N2-N2, O2-CO2, O2-N2, O2-O2)"
-            )
-    return n_species
-
-
-def get_empty_species_dict(CIA_file, verbose=False):
-    """
-    returns a species dictioanry given a CIA file
-    :param CIA_file:
-    :param verbose:
-    :return:
-    """
-    n_species = get_n_species(CIA_file, verbose=verbose)
-    if n_species == 8:
-        # todo: refactor. has to be a cleaner way to do this! infer the columns, etc.
-        Hels = []
-        HeHs = []
-        CH4CH4s = []
-        H2Hes = []
-        H2CH4s = []
-        H2Hs = []
-        H2H2s = []
-        CO2CO2s = []
-
-        # python > 3.6 has ordered dictionaries!
-        species_dict = {
-            "Hels": Hels,
-            "HeHs": HeHs,
-            "CH4CH4s": CH4CH4s,
-            "H2Hes": H2Hes,
-            "H2CH4s": H2CH4s,
-            "H2Hs": H2Hs,
-            "H2H2s": H2H2s,
-            "CO2CO2s": CO2CO2s,
-        }
-
-    elif n_species == 14:
-        H2H2s = []
-        H2Hes = []
-        H2Hs = []
-        H2CH4s = []
-        CH4Ar = []
-        CH4CH4s = []
-        CO2CO2s = []
-        HeHs = []
-        N2CH4s = []
-        N2H2s = []
-        N2N2s = []
-        O2CO2s = []
-        O2N2s = []
-        O2O2s = []
-        species_dict = {
-            "H2H2s": H2H2s,
-            "H2Hes": H2Hes,
-            "H2Hs": H2Hs,
-            "H2CH4s": H2CH4s,
-            "CH4Ar": CH4Ar,
-            "CH4CH4s": CH4CH4s,
-            "CO2CO2s": CO2CO2s,
-            "HeHs": HeHs,
-            "N2CH4s": N2CH4s,
-            "N2H2s": N2H2s,
-            "N2N2s": N2N2s,
-            "O2CO2s": O2CO2s,
-            "O2N2s": O2N2s,
-            "O2O2s": O2O2s,
-        }
-    else:
-        print("Number of species in CIA file not recognized. Check the file!")
-        species_dict = {}
-        species_keys = np.arange(n_species)
-        for species_key in species_keys:
-            species_dict[species_key] = []
-    return species_dict
-
-
-def read_cia(CIA_file, verbose=False):
-    """
-    Reads in a CIA file.
-    Inputs
-    ------
-        :CIA_file: (str) path to CIA file. e.g., 'opacCIA/opacCIA.dat'
-    Outputs
-    -------
-        :df: (pd.DataFrame) dataframe with the CIA data.
-    """
-
-    f = open(CIA_file)
-    f1 = f.readlines()
-    f.close()
-
-    temperatures = []
-    wavelengths = []
-
-    species_dict = get_empty_species_dict(CIA_file, verbose=verbose)
-
-    # read through all lines in the CIA file
-    for line in tqdm(f1[1:], desc="Reading CIA file"):
-        if not line or line == "\n":
-            continue  # don't want it to break!
-        if len(line.split(" ")) == 1 and line != "\n":  # this is a new temperature
-            temperature = eval(line[:-1])
-            continue  # nothing else on this line
-        values = [eval(value) for value in line.split(" ")[::3][:-1]]
-        temperatures += [temperature]
-        wavelengths += [values[0]]
-
-        for species_ind, species in enumerate(species_dict.keys()):
-            species_dict[species] += [values[species_ind + 1]]
-
-    # hm. how to do this with different numbers of species?
-    df = pd.DataFrame(
-        {
-            "temp": temperatures,
-            "wav": wavelengths,
-        }
-    )
-    for species in species_dict.keys():
-        df[species] = species_dict[species]
-
-    return df
 
 
 def check_temp_grid(df, real_temperature_grid, CIA_file):
@@ -207,7 +58,7 @@ def interpolate_CIA(CIA_file, reference_file, outfile=None):
     Hels, HeHs, CH4CH4s, H2Hes, H2CH4s, H2Hs, H2H2s, and CO2CO2s.
 
     TODO: add 2d interpolation.
-
+    TODO: load in any file type.
     Inputs
     ------
         :CIA_file: (str) path to CIA file to be interpolated. e.g.,
@@ -222,14 +73,13 @@ def interpolate_CIA(CIA_file, reference_file, outfile=None):
         Creates a file with "hires" attached to the end of CIA_file that has been interpolated
         to higher resolution.
     """
+    reference_opac = Opac(reference_file, loader="exotransmit")
 
-    real_wavelength_grid = get_lams(reference_file, progress=True, filetype="opacity")
+    real_wavelength_grid = reference_opac.wl
     # need to put it on the right temperature grid, too!
-    real_temperature_grid = get_temp_grid(
-        reference_file, progress=True, filetype="opacity"
-    )
+    real_temperature_grid = reference_opac.T
 
-    df = read_cia(CIA_file)
+    df = Opac_cia(CIA_file, loader="exotransmit_cia", view="full_frame").cross_section
 
     check_temp_grid(df, real_temperature_grid, CIA_file)
 
@@ -254,17 +104,16 @@ def interpolate_CIA(CIA_file, reference_file, outfile=None):
                     np.interp(real_wavelength_grid, sub_df.wav, sub_df[species_key])
                 )
 
-        interped_wavelengths += real_wavelength_grid
+        interped_wavelengths += list(real_wavelength_grid)
         interped_temps += list(np.ones_like(real_wavelength_grid) * unique_temp)
 
     # write to a new file
 
+    # todo: remove this redundant code.
     new_string = []
 
     # this is pretty gross below : (
     reference_species = species_dict_interped[list(species_dict_interped.keys())[0]]
-
-    # todo: include the different temperature range on which to interpolate.
 
     buffer = "   "  # there's a set of spaces between each string!
     for i in tqdm(range(len(reference_species))):

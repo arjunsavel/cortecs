@@ -66,7 +66,9 @@ def chunk_wavelengths(file, nchunks=None, wav_per_chunk=None, adjust_wavelengths
         )
 
     if not wav_per_chunk:
-        num_wavelengths = count_wavelengths(file)
+        opac = Opac(file, loader="exotransmit")
+        num_wavelengths = len(opac.wl)
+        del opac  # clean it up
         wav_per_chunk = round(num_wavelengths / nchunks)
 
     header = get_header(file)
@@ -129,20 +131,6 @@ def write_to_file(line, file, file_suffix, numfiles=None):
     f.close()
 
 
-def get_temp_grid(file, progress=False, filetype="opacity"):
-    """
-    gets just the temperature grid of a file.
-    :param file:
-    :return:
-    """
-    if filetype == "cia":
-        raise NotImplementedError("cia files not yet supported!")
-    opac = Opac(file, loader="exotransmit")
-    temp = opac.T.copy()
-    del opac
-    return temp
-
-
 def get_header(file):
     """
     Gets the header of a file.
@@ -159,78 +147,6 @@ def get_header(file):
     f.close()
 
     return f1[0] + f1[1]
-
-
-def count_wavelengths(file):
-    """
-    parses through wavelength file to see how many wavelength points it has.
-    todo: can just get from the counting wavelengths?
-
-        Inputs
-        ------
-                :file: (str) path to file to be parsed
-    Outputs
-    --------
-        :ticker: (int) number of wavelength points in the file.
-    """
-    ticker = 0
-    f = open(file)
-    f1 = f.readlines()
-    ticker = 0
-    f.close()
-    for x in tqdm(f1):
-        commad = x.replace(" ", ",")
-        #     print(eval(commad)) # don't actually use this -- floating point error!
-        if len(np.array([eval(commad)]).flatten()) == 1:  # aha! here's the marker.
-            ticker += 1
-
-    return ticker
-
-
-def get_lams(file, progress=False, filetype="opacity"):
-    """
-    Returns the wavelength grid used in an opacity file.
-    Inputs
-    -------
-        :file: (str) path to opacity file with the wavelength grid of interest. e.g.,
-                    'opacFe/opacFe.dat'
-        :progress: (bool) whether or not to include a progress bar (if tqdm is installed).
-                    Useful for the biggest opacity file!
-    Outputs
-    -------
-        :wav_grid: (np.array) wavelength values for which the opacity file had been
-                    computed.
-    """
-
-    wav_grid = []
-
-    f = open(file)
-    f1 = f.readlines()
-    f.close()
-
-    if progress:
-        iterator = tqdm(f1[2:], desc="Grabbing wavelength grid")
-    else:
-        iterator = f1[2:]
-
-    # read through all lines in the opacity file; first few lines are header!
-    for x in iterator:
-        # skip blank lines
-        if not x:
-            continue
-        commad = ",".join(x.split())
-
-        # check if a wavelength line
-        if filetype == "CIA":
-            constraint = len(np.array([eval(commad)]).flatten()) > 1
-        elif filetype == "opacity":
-            constraint = len(np.array([eval(commad)]).flatten()) == 1
-        else:
-            raise ValueError("filetype not recognized!")
-
-        if constraint:
-            wav_grid += [np.array([eval(commad)]).flatten()[0]]
-    return wav_grid
 
 
 def add_lams(max_lam_to_add_ind, file, next_file):
@@ -353,11 +269,14 @@ def add_overlap(filename, v_max=11463.5):
         next_file = filename + str(i + 1) + ".dat"
 
         # go into file n to determine the delta lambda
-
-        curr_lams = get_lams(file)
+        opac = Opac(file, loader="exotransmit")
+        curr_lams = opac.wl
+        del opac
 
         try:
-            next_lams = get_lams(next_file)
+            opac = Opac(next_file, loader="exotransmit")
+            next_lams = opac.wl
+            del opac
         except FileNotFoundError:
             print(f"{next_file} not found. Moving on!")
             continue
