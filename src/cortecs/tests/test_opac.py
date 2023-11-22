@@ -273,11 +273,12 @@ class TestInterpolateCIA(unittest.TestCase):
         sys.stdout = capturedOutput  # Redirect stdout.
         check_temp_grid(original_cia.cross_section, [-20], "namename")  # Call function.
         sys.stdout = sys.__stdout__  # Reset redirect.
-        expected_string = "Temperature -20 not in CIA file namename! Cannot interpolate in temperature yet. Will set these values to 0."
+        expected_string = "Temperature -20 not in CIA file namename! Cannot interpolate in temperature yet. Will set these values to 0.\n"
         output = capturedOutput.getvalue()
+        # pdb.set_trace()
         print(output)
         print(expected_string)
-        self.assertTrue(output in expected_string)
+        self.assertTrue(output == expected_string)
 
     def test_cia_in_out_temp_check(self):
         """
