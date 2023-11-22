@@ -51,7 +51,7 @@ def check_temp_grid(df, real_temperature_grid, CIA_file):
 
 
 def interpolate_CIA(
-    CIA_file, reference_file, outfile=None, loader="exotransmit", loader_kwargs={}
+    CIA_file, reference_file, outfile=None, loader="exotransmit", load_kwargs={}
 ):
     """
     Interpolates a CIA file to a higher resolution, using the wavelength grid
@@ -74,7 +74,7 @@ def interpolate_CIA(
         Creates a file with "hires" attached to the end of CIA_file that has been interpolated
         to higher resolution.
     """
-    reference_opac = Opac(reference_file, loader=loader, **loader_kwargs)
+    reference_opac = Opac(reference_file, loader=loader, load_kwargs=load_kwargs)
 
     real_wavelength_grid = reference_opac.wl
     # need to put it on the right temperature grid, too!

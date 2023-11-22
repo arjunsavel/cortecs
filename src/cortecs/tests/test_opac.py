@@ -116,7 +116,7 @@ class TestOpac(unittest.TestCase):
         opac_test = Opac_cia(
             self.cia_filename, loader="exotransmit_cia", view="full_frame"
         )
-        opac_test.wav = [23]
+        opac_test.wl = [23]
         self.assertRaises(ValueError, opac_test2.join_cross_section, opac_test)
 
     def test_cia_opac_final_grid(self):
@@ -174,7 +174,7 @@ class TestIO(unittest.TestCase):
             "test_written_cia.dat", loader="exotransmit_cia", view="full_frame"
         )
         self.assertTrue(
-            opac_test.T.equals(opac_reread.temp)
+            opac_test.cross_section.temp.equals(opac_reread.cross_section.temp)
             and np.all(opac_test.T == opac_reread.T)
         )
 
@@ -194,7 +194,7 @@ class TestIO(unittest.TestCase):
             "test_written_cia.dat", loader="exotransmit_cia", view="full_frame"
         )
         self.assertTrue(
-            np.all(opac_test.wl == opac_reread.wl)
+            opac_test.cross_section.wav.equals(opac_reread.cross_section.wav)
             and np.all(opac_test.wl == opac_reread.wl)
         )
 
@@ -213,12 +213,17 @@ class TestInterpolateCIA(unittest.TestCase):
         I'm linearly interpolating. If I'm within the bounds of the data, I should get the same answer.
         :return:
         """
+        load_kwargs = {
+            "T_filename": self.T_filename,
+            "P_filename": self.P_filename,
+            "wl_filename": self.wl_filename,
+        }
         interpolate_CIA(
             self.cia_filename,
             self.cross_sec_filename,
             loader="platon",
             outfile="test_interpolate.dat",
-            loader_kwargs=loader_kwargs,
+            load_kwargs=load_kwargs,
         )
         interpolated_cia = Opac_cia(
             "test_interpolate.dat", loader="exotransmit_cia", view="full_frame"
@@ -277,7 +282,7 @@ class TestInterpolateCIA(unittest.TestCase):
         when interpolating, i should have the same temperature grid as the reference opacity file.
         :return:
         """
-        loader_kwargs = {
+        load_kwargs = {
             "T_filename": self.T_filename,
             "P_filename": self.P_filename,
             "wl_filename": self.wl_filename,
@@ -287,12 +292,12 @@ class TestInterpolateCIA(unittest.TestCase):
             self.cross_sec_filename,
             loader="platon",
             outfile="test_interpolate.dat",
-            loader_kwargs=loader_kwargs,
+            load_kwargs=load_kwargs,
         )
         interpolated_cia = Opac_cia(
             "test_interpolate.dat", loader="exotransmit_cia", view="full_frame"
         )
         reference_opac = Opac(
-            self.cross_sec_filename, loader="platon", loader_kwargs=loader_kwargs
+            self.cross_sec_filename, loader="platon", load_kwargs=load_kwargs
         )
         self.assertTrue(np.all(interpolated_cia.T == reference_opac.T))
