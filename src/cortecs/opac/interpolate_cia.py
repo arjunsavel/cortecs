@@ -59,7 +59,6 @@ def interpolate_CIA(
     Hels, HeHs, CH4CH4s, H2Hes, H2CH4s, H2Hs, H2H2s, and CO2CO2s.
 
     TODO: add 2d interpolation.
-    TODO: load in any file type.
     Inputs
     ------
         :CIA_file: (str) path to CIA file to be interpolated. e.g.,
@@ -77,12 +76,18 @@ def interpolate_CIA(
     reference_opac = Opac(reference_file, loader=loader, load_kwargs=load_kwargs)
 
     real_wavelength_grid = reference_opac.wl
+
     # need to put it on the right temperature grid, too!
     real_temperature_grid = reference_opac.T
 
     df = Opac_cia(CIA_file, loader="exotransmit_cia", view="full_frame").cross_section
 
     check_temp_grid(df, real_temperature_grid, CIA_file)
+
+    if reference_opac.wl.max() > df.wav.max() or reference_opac.wl.min() < df.wav.min():
+        raise ValueError(
+            "Reference file has a larger wavelength grid than CIA file. Will fill with zeros."
+        )
 
     species_dict_interped = get_empty_species_dict(CIA_file)
     interped_wavelengths = []
