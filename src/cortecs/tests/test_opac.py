@@ -9,6 +9,8 @@ import copy
 import os
 import numpy as np
 from cortecs.opac.interpolate_cia import *
+import io
+import sys
 
 
 class TestOpac(unittest.TestCase):
@@ -23,8 +25,10 @@ class TestOpac(unittest.TestCase):
         If I pass a method that isn't sypported, an error should be raised.
         :return:
         """
-        Opac = ""  # don't need a whole method here
-        self.assertRaises(ValueError, Opac, "wrongmethod")
+        with self.assertRaises(ValueError):
+            opac_test = Opac_cia(
+                self.cia_filename, loader="wrongmethod", view="full_frame"
+            )
 
     def test_cia_opac_instantiated(self):
         """
@@ -80,7 +84,7 @@ class TestOpac(unittest.TestCase):
             self.cia_filename, loader="exotransmit_cia", view="full_frame"
         )
         opac_test.cross_section["other_col"] = opac_test.cross_section["temp"] * 13
-        opac_test2.join_cross_section(opac_test.cross_section)
+        opac_test2.join_cross_section(opac_test)
 
         self.assertTrue(
             len(initial_copy.cross_section.columns) + 1
@@ -112,7 +116,7 @@ class TestOpac(unittest.TestCase):
         opac_test = Opac_cia(
             self.cia_filename, loader="exotransmit_cia", view="full_frame"
         )
-        opac_test.wl = [23]
+        opac_test.wav = [23]
         self.assertRaises(ValueError, opac_test2.join_cross_section, opac_test)
 
     def test_cia_opac_final_grid(self):
@@ -128,7 +132,7 @@ class TestOpac(unittest.TestCase):
             self.cia_filename, loader="exotransmit_cia", view="full_frame"
         )
         opac_test.cross_section["other_col"] = opac_test.cross_section["temp"] * 13
-        opac_test2.join_cross_section(opac_test.cross_section)
+        opac_test2.join_cross_section(opac_test)
         self.assertTrue(
             len(initial_copy.cross_section) == len(opac_test2.cross_section)
         )
@@ -170,7 +174,7 @@ class TestIO(unittest.TestCase):
             "test_written_cia.dat", loader="exotransmit_cia", view="full_frame"
         )
         self.assertTrue(
-            opac_test.temp.equals(opac_reread.temp)
+            opac_test.T.equals(opac_reread.temp)
             and np.all(opac_test.T == opac_reread.T)
         )
 
@@ -190,7 +194,7 @@ class TestIO(unittest.TestCase):
             "test_written_cia.dat", loader="exotransmit_cia", view="full_frame"
         )
         self.assertTrue(
-            opac_test.wl.equals(opac_reread.wl)
+            np.all(opac_test.wl == opac_reread.wl)
             and np.all(opac_test.wl == opac_reread.wl)
         )
 
@@ -256,8 +260,13 @@ class TestInterpolateCIA(unittest.TestCase):
         original_cia = Opac_cia(
             self.cia_filename, loader="exotransmit_cia", view="full_frame"
         )
-        with self.assertRaises(ValueError):
-            check_temp_grid(original_cia.cross_section, [-20, -23], "namename")
+        capturedOutput = io.StringIO()  # Create StringIO.
+        sys.stdout = capturedOutput  # Redirect stdout.
+        check_temp_grid(original_cia.cross_section, [-20], "namename")  # Call function.
+        sys.stdout = sys.__stdout__  # Reset redirect.
+        expected_string = "Temperature -20 not in CIA file namename! Cannot interpolate in temperature yet. Will set these values to 0."
+
+        self.assertTrue(expected_string == capturedOutput.getvalue())
 
     def test_cia_in_out_temp_check(self):
         """
