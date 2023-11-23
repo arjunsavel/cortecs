@@ -256,7 +256,6 @@ class TestInterpolateCIA(unittest.TestCase):
             (original_cia.cross_section["wav"] == closest_below_wl)
             & (original_cia.cross_section["temp"] == test_temp)
         ].values[0]
-        pdb.set_trace()
         # check that the interpolated value is between the two.
         self.assertTrue(
             closest_below_val <= test_val <= closest_above_val
