@@ -153,11 +153,12 @@ class loader_platon(loader_base):
                 f"Species {species} read from filename and not found in species_weight_dict. Please add it."
             )
         cross_section = cross_section * AMU * self.species_weight * 1e-4
+
+        # set a floor to the opacities
+        cross_section[np.less(cross_section, 1e-104)] = 1e-104
+
         # and now make it log10
         cross_section = np.log10(cross_section)
-
-        # and set the infs to -104
-        cross_section[~np.isfinite(cross_section)] = -104.0
 
         return wl, T, P, cross_section
 
