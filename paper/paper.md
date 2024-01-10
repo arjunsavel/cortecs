@@ -36,7 +36,7 @@ the system used for the simulation. Here, we present `cortecs`, a Python tool fo
 opacity data. `cortecs` provides flexible methods for fitting the
 temperature, pressure, and wavelength dependencies of opacity data and for evaluating the opacity with accelerated,
 GPU-friendly methods. The package is actively developed on GitHub (<https://github.com/arjunsavel/cortecs>), and it is
-available for download with `pip` and `conda`.
+available for download with `pip`.
 
 # Statement of need
 Observations with the latest high-resolution spectrographs [e.g., @mace:2018; @seifahrt:2020; @pepe:2021]
@@ -55,7 +55,7 @@ high-resolution spectra.
 
 How do we decrease the memory footprint of these calculations? By far the largest contributor to the memory footprint,
 at least as measured on disk, is the opacity data. For instance, the opacity data for a single gas species across
-the IGRINS wavelength range [@mace:2018] takes up 2.5 GB of memory at float64 precision and at a resolution of 400,000. It stands to reason
+the wavelength range of the IGRINS spectrograph [@mace:2018] takes up 2.5 GB of memory at float64 precision and at a resolution of 400,000. It stands to reason
 that decreasing the amount of memory consumed by opacity data would strongly decrease the total amount of memory consumed
 by the radiative transfer calculation.
 
@@ -91,7 +91,7 @@ and Bayesian evidences that are consistent with those from the benchmark
 retrieval using uncompressed opacity (\autoref{fig:corner}) within a comparable runtime. The results from this exercise indicate that our compression/decompression scheme
 is accurate enough to be used in high-resolution retrievals.
 
-![The posterior distributions for our baseline WASP-77A retrieval (teal)
+![The posterior distributions for our baseline WASP-77Ab retrieval (teal)
 and our retrieval using opacities compressed by `cortecs` (gold). \label{fig:corner}](pca_compress.png)
 
 
