@@ -291,32 +291,3 @@ def add_overlap(filename, v_max=11463.5):
         )
 
         add_lams(max_lam_to_add_ind, file, next_file)
-
-
-if __name__ == "__main__":
-    pass
-    # example workflow below!
-    # os.chdir('/libra1/asavel/wasp_76b_opacities')
-    # species_list = [  # 'O',
-    #     # 'Mn_plus',
-    #     # 'Si',
-    #     # 'Cu',
-    #     # 'Cr_plus',
-    #     # 'V_plus',
-    #     # 'Ga',
-    #     # 'Rb',
-    #     # 'Sr_plus',
-    #     # 'Sr',
-    #     # 'Y_plus',
-    #     # 'Y',
-    #     # 'Sc',
-    #     'Sc_plus',
-    #     'Al',
-    #     'Co']
-    # for species in tqdm(species_list):
-    #     os.chdir('opac' + species)
-    #     file = f'opac{species}.dat'
-    #     chunk_wavelengths(file, wav_per_chunk=2598)
-    #     filename = file.split('.')[0]
-    #     add_overlap(filename)
-    #     os.chdir('..')
