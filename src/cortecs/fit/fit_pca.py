@@ -1,7 +1,6 @@
 import warnings
 
 import numpy as np
-from tqdm import tqdm
 
 
 def standardize_cube(input_array):
@@ -51,8 +50,7 @@ def fit_mlr(cube, X):
     term1 = np.linalg.inv(np.dot(X.T, X))
     term2 = np.dot(term1, X.T)
     beta = np.dot(term2, Y)
-    fNorm = Y / np.dot(X, beta)
-    return fNorm, beta
+    return beta
 
 
 def do_pca(cube, nc=3):
@@ -76,12 +74,11 @@ def do_pca(cube, nc=3):
     try:
         xMat, s, vh, u = do_svd(standardized_cube, nc, nx)
 
-        fNorm, beta = fit_mlr(cube, xMat)
     except np.linalg.LinAlgError:
         print("SVD did not converge.")
         return
 
-    return xMat, standardized_cube, fNorm, beta, s, vh, u
+    return xMat, standardized_cube, s, vh, u
 
 
 def fit_pca(cross_section, P, T, xMat, nc=3, wav_ind=1):
@@ -126,5 +123,5 @@ def prep_pca(cross_section, wav_ind=-1, nc=2):
             "all values are the same at this wavelength index! Try a different one."
         )
 
-    xMat, fStd, fNorm, beta, s, vh, u = do_pca(single_pres_single_temp, nc)
+    xMat, fStd, s, vh, u = do_pca(single_pres_single_temp, nc)
     return xMat
