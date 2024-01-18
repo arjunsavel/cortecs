@@ -17,14 +17,20 @@ def eval_polynomial(
 
     Inputs
     ------
-    T: float
-        The temperature to evaluate at.
-    P: float
-        The pressure to evaluate at.
-    xsec: array
-        The cross section coefficients.
-    j: int
-        The index of the wavelength to evaluate at.
+    temperature: float
+        temperature in K.
+    pressure: float
+        pressure in bar.
+    wavelength: float
+        wavelength in microns.
+    temperatures: array-like
+        temperature grid.
+    pressures: array-like
+        pressure grid.
+    wavelengths: array-like
+        wavelength grid.
+    fitter_results: array-like
+        the PCA coefficients.
 
     Returns
     -------
