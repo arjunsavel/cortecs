@@ -1,4 +1,6 @@
-import warnings
+"""
+Module for performing PCA regression on opacity functions.
+"""
 
 import numpy as np
 
@@ -9,11 +11,11 @@ def standardize_cube(input_array):
 
     Inputs
     -------
-        :input_array: (n_exp x pixels) it's an array.
+        :input_array: (ntemperature x npressure) array for PCA.
 
     Returns
     -------
-        :standardized_cube: (n_exp x pixels) standardized array for PCA.
+        :standardized_cube: (ntemperature x npressure) standardized (mean-substracted, standard deviation-divided) array for PCA.
     """
     nf, nx = input_array.shape
     mat = input_array.copy()
@@ -30,7 +32,14 @@ def standardize_cube(input_array):
 
 def do_svd(standardized_cube, nc, nx):
     """
-    Does the SVD on the standardized flux cube.
+    Does the SVD (singular value decomposition) on the standardized cube.
+
+    Inputs
+    -------
+        :standardized_cube: (ntemperature x npressure) standardized (mean-substracted, standard deviation-divided) array for PCA.
+        :nc: (int) number of PCA components to keep in the reconstruction. Increasing the number of components can make the reconstruction
+        of opacity data more accurate, but it can also lead to overfitting and make the model size larger (i.e.,
+        decrease the compression factor).
 
     """
 
@@ -44,7 +53,19 @@ def do_svd(standardized_cube, nc, nx):
 
 def fit_mlr(cube, X):
     """
-    Fits the MLR to the flux cube with the PCA outputs and normalizes accordingly.
+    todo: check array shapes.
+    Fits the MLR (multiple linear regression) to the input cube with the PCA outputs and normalizes accordingly.
+
+    Inputs
+    -------
+        :cube: (ntemp x npressure) array being fit with PCA. Generally, this is the opacity data at a single
+        wavelength as a function of temperature and pressure.
+        :X: (npressure x ncomponents) PCA components. these are set by functions such as `do_pca`.
+
+    Returns
+    -------
+        :beta: (ncomponents x ntemp) PCA coefficients. These are the coefficients that are used to reconstruct the
+        opacity data at a later stage (e.g., within an atmospheric forward model). They represent the "compressed" opacity.
     """
     Y = np.moveaxis(cube.copy(), 0, -1)
     term1 = np.linalg.inv(np.dot(X.T, X))
@@ -59,9 +80,11 @@ def do_pca(cube, nc=3):
 
     Inputs
     -------
-        :wav_for_pca: (n_exp x pixels) it's an array.
-        :flux_for_pca: it's the same.
-        :nc: (int) number of PCA components to keep.
+        :cube: (ntemperature x npressure) array being fit with PCA. Generally, this is the opacity data at a single
+        wavelength as a function of temperature and pressure.
+        :nc: (int) number of PCA components to keep. Increasing the number of components can make the reconstruction
+        of opacity data more accurate, but it can also lead to overfitting and make the model size larger (i.e.,
+        decrease the compression factor).
 
     """
 
@@ -81,17 +104,20 @@ def do_pca(cube, nc=3):
     return xMat, standardized_cube, s, vh, u
 
 
-def fit_pca(cross_section, P, T, xMat, nc=3, wav_ind=1):
+def fit_pca(cross_section, P, T, xMat, nc=3, wav_ind=1, savename=None):
     """
     Fits the PCA to the opacity data.
 
     Inputs
     -------
-        :cross_section: (n_exp x pixels) it's an array.
+        :cross_section: (ntemp x npressure) the array of cross-sections being fit.
         :P: pressure grid
         :T: temperature grid
-        :nc: (int) number of PCA components to keep.
+        :nc: (int) number of PCA components to keep. Increasing the number of components can make the reconstruction
+        of opacity data more accurate, but it can also lead to overfitting and make the model size larger (i.e.,
+        decrease the compression factor).
         :wav_ind: (int) index of wavelength to fit.
+        :savename: (str) if not None, the PCA components will be saved to this filename.
 
     Returns
     -------
@@ -99,29 +125,58 @@ def fit_pca(cross_section, P, T, xMat, nc=3, wav_ind=1):
         :beta: (nc x pixels) PCA coefficients
     """
 
-    _, beta = fit_mlr(cross_section, xMat)
+    beta = fit_mlr(cross_section, xMat)
     return beta
 
 
-def prep_pca(cross_section, wav_ind=-1, nc=2):
+def prep_pca(cross_section, wav_ind=-1, nc=2, force_fit_constant=False):
     """
-    Prepares the opacity data for PCA.
+    Prepares the opacity data for PCA. That is, it calculates the PCA components to be fit along the entire
+    dataset by fitting the PCA to a single wavelength.
+
+    todo: perform type checking for inputs.
 
     Inputs
     -------
-        :cross_section: (n_exp x pixels) it's an array.
-        :wav_ind: (int) index of wavelength to fit.
-        :nc: (int) number of PCA components to keep.
+        :cross_section: (ntemp x npressure x nwavelength) the array of cross-sections being fit.
+        :wav_ind: (int) index of wavelength to fit. Ideally, this should be fit to a wavelength that has somewhat
+        representative temperature--pressure structure to the opacity function. If there is *no* temperature or wavelength
+        dependence at this wavelength index but strong dependence elsewhere, for instance, the opacity function will
+        be poorly reconstructed.
+        :nc: (int) number of PCA components to keep. Increasing the number of components can make the reconstruction
+        of opacity data more accurate, but it can also lead to overfitting and make the model size larger (i.e.,
+        decrease the compression factor).
+        :force_fit_constant: (bool) if True, will allow the PCA to fit an opacity function without temperature and pressure
+        dependence. This usually isn't recommended, if these PCA vectors are to e used to fit other wavelengths that
+        *do* have temperature and pressure dependence.
 
     Returns
     -------
         :xMat: (n_exp x nc) PCA components
     """
     single_pres_single_temp = cross_section[:, :, wav_ind]
-    if np.all(single_pres_single_temp == single_pres_single_temp[0, 0]):
+    if (
+        np.all(single_pres_single_temp == single_pres_single_temp[0, 0])
+        and not force_fit_constant
+    ):
         raise ValueError(
             "all values are the same at this wavelength index! Try a different one."
         )
 
     xMat, fStd, s, vh, u = do_pca(single_pres_single_temp, nc)
     return xMat
+
+
+def save_pca(savename, fit_results):
+    """
+    Saves the PCA components and coefficients to files
+
+    Inputs
+    -------
+        :savename: (str) if not None, the PCA components will be saved to this filename.
+        :fit_results: contains the PCA coeefficients and vectors.
+    """
+    # pdb.set_trace()
+    vectors, beta = fit_results
+    np.save(savename + "_coeffs.npy", beta)
+    np.save(savename + "_vectors.npy", vectors)
