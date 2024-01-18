@@ -149,6 +149,7 @@ def save_neural_net(filename, fit_results):
     -------
         :None:
     """
+    neural_network = fit_results[1]
     n_layers = len(neural_network.layers)
     all_weights = []
     all_biases = []
@@ -160,7 +161,7 @@ def save_neural_net(filename, fit_results):
         all_biases += [layer_biases]
 
     # save all_weights and all_biases to a pickle
-    with open(filename, "wb") as f:
+    with open(filename + ".pkl", "wb") as f:
         pickle.dump([all_weights, all_biases], f)
 
     # now, let's read it back in and make sure it's the same.

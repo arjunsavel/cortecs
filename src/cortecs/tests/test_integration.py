@@ -117,7 +117,7 @@ class TestIntegration(unittest.TestCase):
             / predictions.reshape(ntemp, npres)
         )
         median_err = np.median(np.abs(percent_errors))
-        save_neural_network(neural_network, "test_nn.pkl")
+        fitter.save("test_nn")
         with open("test_nn.pkl", "rb") as f:
             all_weights, all_biases = pickle.load(f)
 
