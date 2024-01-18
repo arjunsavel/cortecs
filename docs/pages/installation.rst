@@ -25,6 +25,13 @@ to avoid package dependency isues.
     cd cortecs
     python3 -m pip install -e .
 
+If you plan on using the neural network-based compression method of `cortecs`, run the last line as
+
+.. code-block:: bash
+
+    python3 -m pip install -e .[neural_networks]
+
+
 
 We plan to distribute `cortecs` through `conda` as well at a later date.
 
