@@ -1,4 +1,7 @@
-import jax
+"""
+Module for fitting polynomial functions in temperature and pressure to opacity functions.
+"""
+
 import jax.numpy as jnp
 import numpy as np
 
@@ -10,7 +13,13 @@ def prep_polynomial(cross_section, **kargs):
 
 
 # @jax.jit
-def fit_polynomial(Z, P, T, prep_res, plot=False, save=False):
+def fit_polynomial(
+    Z,
+    P,
+    T,
+    prep_res,
+    plot=False,
+):
     """
     fits a polynomial to the opacity data.
 
@@ -21,7 +30,7 @@ def fit_polynomial(Z, P, T, prep_res, plot=False, save=False):
         :T: temperature grid
         :prep_res: (n_temp x n_pres) PCA components
         :plot: (bool) whether to plot the fit.
-        :save: (bool) whether to save the fit.
+        :savename: (str) if not None, the PCA components will be saved to this filename.
 
     Returns
     -------
@@ -60,3 +69,15 @@ def fit_polynomial(Z, P, T, prep_res, plot=False, save=False):
     coeff, _, _, _ = np.linalg.lstsq(A, B, rcond=-1)
 
     return coeff
+
+
+def save_polynomial(savename, coeff):
+    """
+    Saves the polynomial coefficients to a file.
+
+    Inputs
+    -------
+        :savename: (str) if not None, the PCA components will be saved to this filename.
+        :coeff: (nc x ntemp) PCA coefficients
+    """
+    np.savetxt(savename + ".txt", coeff)
