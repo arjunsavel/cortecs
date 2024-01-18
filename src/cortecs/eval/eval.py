@@ -42,7 +42,32 @@ class Evaluator(object):
     def eval(self, temperature, pressure, wavelength):
         """
         evaluates the opacity data.
+
+        Inputs
+        ------
+        temperature: float
+            The temperature to evaluate at.
+        pressure: float
+            The pressure to evaluate at.
+        wavelength: float
+            The wavelength to evaluate at.
+
+        Outputs
+        -------
+        eval_result: float
+            The evaluated opacity.
         """
+        if temperature > self.T.max() or temperature < self.T.min():
+            raise ValueError(
+                f"Temperature {temperature} is outside the range of the data."
+            )
+        if pressure > self.P.max() or pressure < self.P.min():
+            raise ValueError(f"Pressure {pressure} is outside the range of the data.")
+        if wavelength > self.wl.max() or wavelength < self.wl.min():
+            raise ValueError(
+                f"Wavelength {wavelength} is outside the range of the data."
+            )
+
         eval_result = self.eval_func(
             temperature,
             pressure,
@@ -51,11 +76,13 @@ class Evaluator(object):
             self.P,
             self.wl,
             self.fitter_results,
-            **self.eval_kwargs
+            **self.eval_kwargs,
         )
         # we need to recast the units if PLATON was used.
-        if type(self.load_obj) == loader_platon:
+        if isinstance(self.load_obj, loader_platon):
             eval_result = 10**eval_result
             eval_result = eval_result / self.load_obj.species_weight / AMU / 1e-4
+            if eval_result == 0:
+                eval_result = 1e-104  # todo: fix this inf situation
 
         return eval_result
