@@ -33,8 +33,6 @@ INSTALL_REQUIRES = [
     "jax",
     "tqdm",
     "h5py",
-    "tensorflow",
-    "keras",
     "matplotlib",
     "pandas",
 ]
@@ -88,6 +86,12 @@ if __name__ == "__main__":
         python_requires=">3.8.0",
         classifiers=CLASSIFIERS,
         include_package_data=True,
+        extras_require={
+            "neural_networks": [
+                "tensorflow",
+                "keras",
+            ]
+        },
         install_requires=INSTALL_REQUIRES,
         options={"bdist_wheel": {"universal": "1"}},
     )
