@@ -67,3 +67,26 @@ Opac
     :members:
     :undoc-members:
     :show-inheritance:
+
+
+Optimize
+-------
+.. automodule:: cortecs.opt.opt
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. automodule:: cortecs.opt.optimize_neural_net
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. automodule:: cortecs.opt.optimize_pca
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. automodule:: cortecs.opt.optimize_polynomial
+    :members:
+    :undoc-members:
+    :show-inheritance:
