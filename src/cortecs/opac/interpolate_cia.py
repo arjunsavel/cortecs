@@ -83,7 +83,7 @@ def interpolate_cia(
     # need to put it on the right temperature grid, too!
     real_temperature_grid = reference_opac.T
 
-    df = Opac_cia(CIA_file, loader="exotransmit_cia", view="full_frame").cross_section
+    df = Opac_cia(cia_file, loader="exotransmit_cia", view="full_frame").cross_section
 
     check_temp_grid(df, real_temperature_grid, cia_file)
 
@@ -151,7 +151,7 @@ def interpolate_cia(
     temp_string = " ".join(str(temp) for temp in real_temperature_grid) + " \n"
     new_string.insert(0, temp_string)
     if isinstance(outfile, type(None)):
-        outfile = CIA_file.split(".dat")[0]
+        outfile = cia_file.split(".dat")[0]
         outfile += "_highres.dat"
     f2 = open(outfile, "w")
     f2.writelines(new_string)
