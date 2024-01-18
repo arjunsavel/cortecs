@@ -31,8 +31,13 @@ We plan to distribute `cortecs` through `conda` as well at a later date.
 Test the installation
 ---------------------
 
-To ensure that the installation has been performed smoothly, feel free to run the unit and integration tests included with the package.
+To ensure that the installation has been performed smoothly, run
 
+.. code-block:: bash
+
+    python3 -c 'import cortecs'
+
+To ensure the code is working as expected, feel free to run the unit and integration tests included with the package.
 From the outermost :code:`cortecs` directory, run
 
 .. code-block:: bash
