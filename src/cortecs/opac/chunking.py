@@ -86,16 +86,12 @@ def chunk_wavelengths(file, nchunks=None, wav_per_chunk=None, adjust_wavelengths
         if not x:
             continue
         commad = x.replace(" ", ",")
-        try:
-            if len(np.array([eval(commad)]).flatten()) == 1:  # if a wavelength line
-                ticker += 1
-            elif (
-                len(x.split(" ")) == 48 and adjust_wavelengths
-            ):  # this is ntemp, I believe
-                x = adjust_wavelength_unit(x, 1e-4, style="full")
+
+        if len(np.array([eval(commad)]).flatten()) == 1:  # if a wavelength line
+            ticker += 1
+        elif len(x.split(" ")) == 48 and adjust_wavelengths:  # this is ntemp, I believe
+            x = adjust_wavelength_unit(x, 1e-4, style="full")
         #                pass # don't need to adust wavelengths anymore!
-        except:
-            pdb.set_trace()
 
         if ticker == wav_per_chunk:
             file_suffix += 1  # start writing to different file
@@ -122,7 +118,7 @@ def write_to_file(line, file, file_suffix, numfiles=None):
     Side effects:
         Writes a line to a file!
     """
-    if type(numfiles) != type(None):
+    if not isinstance(numfiles, type(None)):
         file_suffix = (file_suffix) % numfiles
 
     true_filename = f"{file[:-4] + str(file_suffix) + '.dat'}"
