@@ -214,7 +214,7 @@ class TestInterpolateCIA(unittest.TestCase):
             "P_filename": self.P_filename,
             "wl_filename": self.wl_filename,
         }
-        interpolate_CIA(
+        interpolate_cia(
             self.cia_filename,
             self.cross_sec_filename,
             loader="platon",
@@ -287,7 +287,7 @@ class TestInterpolateCIA(unittest.TestCase):
             "P_filename": self.P_filename,
             "wl_filename": self.wl_filename,
         }
-        interpolate_CIA(
+        interpolate_cia(
             self.cia_filename,
             self.cross_sec_filename,
             loader="platon",
