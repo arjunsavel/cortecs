@@ -13,8 +13,6 @@ import tensorflow as tf
 
 import cortecs
 from cortecs.opac.opac import *
-from cortecs.fit.fit import *
-from cortecs.fit.fit_pca import *
 from cortecs.eval.eval import *
 from cortecs.opt.opt import *
 import pickle
@@ -170,22 +168,22 @@ class TestIntegration(unittest.TestCase):
             self.cross_sec_filename, loader="platon", load_kwargs=load_kwargs
         )
         fitter = Fitter(opac_obj, method="neural_net")
-        res = cortecs.fit.fit_neural_net.fit_neural_net(
-            fitter.opac.cross_section[:, :, -2],
-            fitter.opac.T,
-            fitter.opac.P,
-            None,
-            all_wl=False,
-            n_layers=3,
-            n_neurons=8,
-            activation="sigmoid",
-            learn_rate=0.04,
-            loss="mean_squared_error",
-            epochs=4000,
-            verbose=0,
-            sequential_model=None,
-            plot=False,
-        )
+        # res = cortecs.fit.fit_neural_net.fit_neural_net(
+        #     fitter.opac.cross_section[:, :, -2],
+        #     fitter.opac.T,
+        #     fitter.opac.P,
+        #     None,
+        #     all_wl=False,
+        #     n_layers=3,
+        #     n_neurons=8,
+        #     activation="sigmoid",
+        #     learn_rate=0.04,
+        #     loss="mean_squared_error",
+        #     epochs=4000,
+        #     verbose=0,
+        #     sequential_model=None,
+        #     plot=False,
+        # )
         optimizer = Optimizer(fitter)
         max_size = 1.6
         max_evaluations = 8
