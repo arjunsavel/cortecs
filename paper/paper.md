@@ -88,10 +88,10 @@ That is, it may require so many parameters to fit the opacity function that the 
 # Methods
 `cortecs` seeks to compress redundant information by representing opacity data not as the
 opacity itself but as fits to the opacity as a function of temperature and pressure. We generally refer to this process
-as ``compression'' as opposed to ``fitting'' to emphasize that we do not seek to construct physically motivated,
+as ''compression'' as opposed to ''fitting'' to emphasize that we do not seek to construct physically motivated,
 predictive, or comprehensible models of the opacity function. Rather, we simply seek representations of the opacity function
-that consume less RAM/VRAM. The compression methods we use are ``lossy,’’ in that the original opacity data cannot be exactly recovered with our methods.
-We find that the loss of accuracy is tolerable for at least the hot Jupiter application (see Benchmark below).
+that consume less RAM/VRAM. The compression methods we use are ''lossy''' --- the original opacity data cannot be exactly recovered with our methods.
+We find that the loss of accuracy is tolerable for at least the hot Jupiter emission spectroscopy application (see Benchmark below).
 
 We provide three methods of increasing complexity (and flexibility) for
 compressing and decompressing opacity: polynomial-fitting, principal components analysis [PCA, e.g., @jolliffe:2016]
@@ -100,10 +100,10 @@ neural network; the user can specify the desired hyperparameters, such as number
 and activation function. Alternatively, any `keras` [@chollet:2015] model can be passed to the fitter. Each compression method is paired
 with a decompression method for evaluating opacity as a function of temperature, pressure, and wavelength. These decompression methods are tailored
 for GPUs and are accelerated with the `JAX` code transformation framework [@jax:2018]. An example of this reconstruction
-is shown in \autoref{fig:dependencies}.
+is shown in \autoref{fig:example}.
 
-![The posterior distributions for our baseline WASP-77Ab retrieval (teal)
-and our retrieval using opacities compressed by `cortecs` (gold). \label{fig:corner}](pca_compress.png)
+![The original opacity functions (solid lines) and their `cortecs` reconstructions (dotted lines) over a large
+wavelength range and at multiple temperatures and pressures.\label{fig:example}](example_application.png)
 
 
 # Workflow
