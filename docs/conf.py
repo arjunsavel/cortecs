@@ -20,8 +20,6 @@ import os
 import re
 import sys
 
-import mock
-
 # MOCK_MODULES = [
 #     "numpy",
 #     "scipy",
