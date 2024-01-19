@@ -28,7 +28,6 @@ CLASSIFIERS = [
 # todo: pin to requirements
 INSTALL_REQUIRES = [
     "numpy",
-    "scipy",
     "jaxlib",
     "jax",
     "tqdm",
