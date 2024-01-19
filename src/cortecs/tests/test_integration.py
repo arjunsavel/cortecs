@@ -12,7 +12,6 @@ import random
 import tensorflow as tf
 
 import cortecs
-from cortecs.opac.opac import *
 from cortecs.eval.eval import *
 from cortecs.opt.opt import *
 import pickle

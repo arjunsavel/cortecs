@@ -66,7 +66,7 @@ def initialize_species_dict(species_dict, wavelength_grid):
     """
     for species_key in species_dict.keys():
         species_dict[species_key] += list(np.ones_like(wavelength_grid) * 0.0)
-    return
+    return species_dict
 
 
 def add_line_string_species(line_string, species_dict, i, buffer):
@@ -87,7 +87,7 @@ def add_line_string_species(line_string, species_dict, i, buffer):
     """
     for species_key in species_dict.keys():
         line_string += "{:.12e}".format(species_dict[species_key][i]) + buffer
-    return
+    return line_string
 
 
 def interpolate_cia(
@@ -138,7 +138,9 @@ def interpolate_cia(
     # perform interpolation
     for unique_temp in tqdm(real_temperature_grid, desc="Interpolating"):
         if unique_temp not in df.temp.unique():
-            initialize_species_dict(species_dict_interped, real_wavelength_grid)
+            species_dict_interped = initialize_species_dict(
+                species_dict_interped, real_wavelength_grid
+            )
 
         else:
             sub_df = df[df.temp == unique_temp]
@@ -177,7 +179,9 @@ def interpolate_cia(
 
         line_string = wavelength_string + buffer
 
-        add_line_string_species(line_string, species_dict_interped, i, buffer)
+        line_string = add_line_string_species(
+            line_string, species_dict_interped, i, buffer
+        )
 
         new_string += [line_string + "\n"]
 
