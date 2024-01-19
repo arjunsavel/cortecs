@@ -104,7 +104,7 @@ def do_pca(cube, nc=3):
     return xMat, standardized_cube, s, vh, u
 
 
-def fit_pca(cross_section, P, T, xMat, nc=3, wav_ind=1, savename=None):
+def fit_pca(cross_section, P, T, xMat):
     """
     Fits the PCA to the opacity data.
 
