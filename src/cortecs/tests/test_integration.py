@@ -122,7 +122,16 @@ class TestIntegration(unittest.TestCase):
             all_weights, all_biases = pickle.load(f)
 
         n_layers = len(all_weights)
-        res1 = eval_neural_net(100, 1e-4, n_layers, all_weights, all_biases)
+        res1 = eval_neural_net(
+            100,
+            1e-4,
+            fitter.opac.T,
+            fitter.opac.P,
+            fitter.opac.wl,
+            n_layers,
+            all_weights,
+            all_biases,
+        )
         res2 = predictions[0]
         self.assertTrue(np.isclose(res1, res2) and median_err < 10)
 
