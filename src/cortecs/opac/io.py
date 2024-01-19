@@ -509,30 +509,17 @@ class writer_exotransmit_cia(writer_base):
         # todo: include the different temperature range on which to interpolate.
 
         buffer = "   "  # there's a set of spaces between each string!
+        temp = 0.0  # initial value
         for i in tqdm(range(len(reference_species)), desc="Writing file"):
-            # the first line gets different treatment!
-            if i == 0:
-                temp = np.min(
-                    interped_temps
-                )  # add the LOWEST temperature in the temperature grid!
-                new_string += ["{:.12e}".format(temp) + "\n"]
-            if interped_temps[i] != temp:
-                temp = interped_temps[i]
-                new_string += ["{:.12e}".format(temp) + "\n"]
-            wavelength_string = "{:.12e}".format(interped_wavelengths[i])
-
-            line_string = wavelength_string + buffer
-
-            for species_key in species_dict_interped.keys():
-                # again, this works because python dicts are ordered in 3.6+
-                line_string += (
-                    "{:.12e}".format(
-                        list(species_dict_interped[species_key].values())[i]
-                    )
-                    + buffer
-                )
-
-            new_string += [line_string + "\n"]
+            new_string, temp = self.append_line_string(
+                new_string,
+                i,
+                interped_temps,
+                interped_wavelengths,
+                species_dict_interped,
+                buffer,
+                temp,
+            )
 
         # todo: check the insert. and can pull wavelength grid.
         temp_string = (
@@ -543,5 +530,39 @@ class writer_exotransmit_cia(writer_base):
         f2 = open(outfile, "w")
         f2.writelines(new_string)
         f2.close()
+
+    def append_line_string(
+        self,
+        new_string,
+        i,
+        interped_temps,
+        interped_wavelengths,
+        species_dict_interped,
+        buffer,
+        temp,
+    ):
+        # the first line gets different treatment!
+        if i == 0:
+            temp = np.min(
+                interped_temps
+            )  # add the LOWEST temperature in the temperature grid!
+            new_string += ["{:.12e}".format(temp) + "\n"]
+        if interped_temps[i] != temp:
+            temp = interped_temps[i]
+            new_string += ["{:.12e}".format(temp) + "\n"]
+        wavelength_string = "{:.12e}".format(interped_wavelengths[i])
+
+        line_string = wavelength_string + buffer
+
+        for species_key in species_dict_interped.keys():
+            # again, this works because python dicts are ordered in 3.6+
+            line_string += (
+                "{:.12e}".format(list(species_dict_interped[species_key].values())[i])
+                + buffer
+            )
+
+        new_string += [line_string + "\n"]
+
+        return new_string, temp
 
     # todo: maybe the loader objects should also take an opac object. for parallel structure : )
