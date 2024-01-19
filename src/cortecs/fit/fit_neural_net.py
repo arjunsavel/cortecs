@@ -47,7 +47,6 @@ def fit_neural_net(
     P,
     T,
     wl,
-    all_wl=False,
     n_layers=3,
     n_neurons=8,
     activation="sigmoid",
@@ -67,8 +66,6 @@ def fit_neural_net(
         :P: (array) pressure grid corresponding to the cross-sections.
         :T: (array) temperature grid corresponding to the cross-sections.
         :wl: (array) wavelength grid corresponding to the cross-sections.
-        :all_wl: (bool) whether to fit all wavelengths at once, as opposed to saving a new neural network for each
-                wavelength point. This is not yet implemented — it appears to require quite large models.
         :n_layers: (int) number of layers in the neural network. Increasing this number increases the flexibility
                 of the model, but it also increases the number of parameters that need to be fit — and hence the model
                 size and training time.
@@ -92,6 +89,8 @@ def fit_neural_net(
     -------
         :history: the history object from the keras fit method
         :neural_network: the trained neural network
+
+    todo: implement all_wl
     """
 
     if sequential_model is None:
@@ -112,8 +111,6 @@ def fit_neural_net(
     )
 
     # unpack opacity data. todo: not repeat this for every wavelength!
-    if all_wl:
-        raise NotImplementedError("todo: implement all_wl")
     P_unraveled = unravel_data(P, T, wl)
     T_unraveled = unravel_data(T, P, wl, tileboth=True)
 
