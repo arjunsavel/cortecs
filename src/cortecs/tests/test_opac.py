@@ -26,18 +26,14 @@ class TestOpac(unittest.TestCase):
         :return:
         """
         with self.assertRaises(ValueError):
-            opac_test = Opac_cia(
-                self.cia_filename, loader="wrongmethod", view="full_frame"
-            )
+            _ = Opac_cia(self.cia_filename, loader="wrongmethod", view="full_frame")
 
     def test_cia_opac_instantiated(self):
         """
         does an error get thrown when I'm just trying to make a little opacCIA object?
         :return:
         """
-        opac_test = Opac_cia(
-            self.cia_filename, loader="exotransmit_cia", view="full_frame"
-        )
+        _ = Opac_cia(self.cia_filename, loader="exotransmit_cia", view="full_frame")
         self.assertTrue(True)
 
     def test_cia_opac_join(self):
@@ -218,7 +214,7 @@ class TestInterpolateCIA(unittest.TestCase):
             "P_filename": self.P_filename,
             "wl_filename": self.wl_filename,
         }
-        interpolate_CIA(
+        interpolate_cia(
             self.cia_filename,
             self.cross_sec_filename,
             loader="platon",
@@ -291,7 +287,7 @@ class TestInterpolateCIA(unittest.TestCase):
             "P_filename": self.P_filename,
             "wl_filename": self.wl_filename,
         }
-        interpolate_CIA(
+        interpolate_cia(
             self.cia_filename,
             self.cross_sec_filename,
             loader="platon",

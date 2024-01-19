@@ -84,7 +84,7 @@ def optimize_neural_net(
             None,
             n_layers=n_layers,
             n_neurons=n_neurons,
-            activation="sigmoid",
+            activation=activation,
             learn_rate=learn_rate,
             loss="mean_squared_error",
             epochs=2000,

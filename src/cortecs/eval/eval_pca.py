@@ -1,3 +1,7 @@
+"""
+For evaluating the PCA fit at a given temperature, pressure, and wavelength.
+"""
+
 import jax
 import numpy as np
 

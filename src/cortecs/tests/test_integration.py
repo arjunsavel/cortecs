@@ -13,8 +13,6 @@ import tensorflow as tf
 
 import cortecs
 from cortecs.opac.opac import *
-from cortecs.fit.fit import *
-from cortecs.fit.fit_pca import *
 from cortecs.eval.eval import *
 from cortecs.opt.opt import *
 import pickle
@@ -119,12 +117,21 @@ class TestIntegration(unittest.TestCase):
             / predictions.reshape(ntemp, npres)
         )
         median_err = np.median(np.abs(percent_errors))
-        save_neural_network(neural_network, "test_nn.pkl")
+        cortecs.fit.fit_neural_net.save_neural_net("test_nn", res)
         with open("test_nn.pkl", "rb") as f:
             all_weights, all_biases = pickle.load(f)
 
         n_layers = len(all_weights)
-        res1 = eval_neural_net(100, 1e-4, n_layers, all_weights, all_biases)
+        res1 = eval_neural_net(
+            100,
+            1e-4,
+            fitter.opac.T,
+            fitter.opac.P,
+            fitter.opac.wl,
+            n_layers,
+            all_weights,
+            all_biases,
+        )
         res2 = predictions[0]
         self.assertTrue(np.isclose(res1, res2) and median_err < 10)
 
@@ -170,32 +177,33 @@ class TestIntegration(unittest.TestCase):
             self.cross_sec_filename, loader="platon", load_kwargs=load_kwargs
         )
         fitter = Fitter(opac_obj, method="neural_net")
-        res = cortecs.fit.fit_neural_net.fit_neural_net(
-            fitter.opac.cross_section[:, :, -2],
-            fitter.opac.T,
-            fitter.opac.P,
-            None,
-            all_wl=False,
-            n_layers=3,
-            n_neurons=8,
-            activation="sigmoid",
-            learn_rate=0.04,
-            loss="mean_squared_error",
-            epochs=4000,
-            verbose=0,
-            sequential_model=None,
-            plot=False,
-        )
+        # res = cortecs.fit.fit_neural_net.fit_neural_net(
+        #     fitter.opac.cross_section[:, :, -2],
+        #     fitter.opac.T,
+        #     fitter.opac.P,
+        #     None,
+        #     all_wl=False,
+        #     n_layers=3,
+        #     n_neurons=8,
+        #     activation="sigmoid",
+        #     learn_rate=0.04,
+        #     loss="mean_squared_error",
+        #     epochs=4000,
+        #     verbose=0,
+        #     sequential_model=None,
+        #     plot=False,
+        # )
         optimizer = Optimizer(fitter)
         max_size = 1.6
         max_evaluations = 8
         optimizer.optimize(max_size, max_evaluations)
+        # print(optimizer.best_params)
         self.assertTrue(
             optimizer.best_params
             == {
                 "n_layers": 2,
                 "n_neurons": 2.0,
-                "activation": "relu",
+                "activation": "sigmoid",
                 "learn_rate": 0.01,
             }
         )

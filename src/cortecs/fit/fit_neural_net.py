@@ -8,7 +8,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras import layers
 
-from cortecs.fit.metric_plot import *
+from cortecs.fit.metrics import *
 
 
 # todo: loop over all wavelengths.
@@ -18,7 +18,7 @@ def prep_neural_net(cross_section):
 
 def unravel_data(x, y, z=None, tileboth=False):
     """
-    unravels the data into a single column. takes log as well.
+    unravels the data into a single column. takes log the log of quantities as well.
 
     todo: move to a utils file?
 
@@ -32,7 +32,7 @@ def unravel_data(x, y, z=None, tileboth=False):
         third dimension of data.
     """
 
-    if type(z) == type(None):
+    if isinstance(z, type(None)):
         if tileboth:
             return np.tile(np.log10(x), len(y))
         return np.repeat(np.log10(x), len(y))
@@ -60,20 +60,40 @@ def fit_neural_net(
 ):
     """
     trains a neural network to fit the opacity data.
-    :param Opac: not an actual opac.
-    :param n_layers:
-    :param n_neurons:
-    :param activation:
-    :param learn_rate:
-    :param loss:
-    :param epochs:
-    :param verbose:
-    :param sequential_model: if not None (and instead a sequential object), this overwrites the other neural net
-                            parameters.
-    :return:
+
+    Inputs
+    -------
+        :cross_section: (ntemp x npressure) the array of cross-sections being fit.
+        :P: (array) pressure grid corresponding to the cross-sections.
+        :T: (array) temperature grid corresponding to the cross-sections.
+        :wl: (array) wavelength grid corresponding to the cross-sections.
+        :all_wl: (bool) whether to fit all wavelengths at once, as opposed to saving a new neural network for each
+                wavelength point. This is not yet implemented — it appears to require quite large models.
+        :n_layers: (int) number of layers in the neural network. Increasing this number increases the flexibility
+                of the model, but it also increases the number of parameters that need to be fit — and hence the model
+                size and training time.
+        :n_neurons: (int) number of neurons in each layer. Increasing this number increases the flexibility
+                of the model, but it also increases the number of parameters that need to be fit — and hence the model
+                size and training time.
+        :activation: (str) activation function to use. See the keras documentation for more information:
+                https://keras.io/api/layers/activations/
+        :learn_rate: (float) learning rate for the optimizer. Increasing this number can help the model converge faster,
+                but it can also cause the model to diverge.
+        :loss: (str) loss function to use. See the keras documentation for more information:
+                https://keras.io/api/losses/
+        :epochs: (int) number of epochs to train for. Increasing this number can help the model converge better,
+                but it primarily makes the training time longer.
+        :verbose: (int) verbosity of the training.
+        :sequential_model: (keras.Sequential) if not None, this is the neural network to be trained.
+        :plot: (bool) whether to plot the loss.
+
+
+    Returns
+    -------
         :history: the history object from the keras fit method
         :neural_network: the trained neural network
     """
+
     if sequential_model is None:
         layers_list = []
         for i in range(n_layers):
@@ -114,13 +134,22 @@ def fit_neural_net(
     return history, neural_network
 
 
-def save_neural_network(neural_network, filename):
+def save_neural_net(filename, fit_results):
     """
     saves the neural network to a file.
-    :param neural_network:
-    :param filename:
-    :return:
+
+
+    Inputs
+    -------
+        :filename: (str) filename to save the neural network to.
+        :fit_results: (keras.Sequential) the neural network to save.
+
+
+    Returns
+    -------
+        :None:
     """
+    neural_network = fit_results[1]
     n_layers = len(neural_network.layers)
     all_weights = []
     all_biases = []
@@ -132,7 +161,7 @@ def save_neural_network(neural_network, filename):
         all_biases += [layer_biases]
 
     # save all_weights and all_biases to a pickle
-    with open(filename, "wb") as f:
+    with open(filename + ".pkl", "wb") as f:
         pickle.dump([all_weights, all_biases], f)
 
     # now, let's read it back in and make sure it's the same.

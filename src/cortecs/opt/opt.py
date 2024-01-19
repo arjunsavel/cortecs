@@ -1,5 +1,5 @@
 """
-for optimizing the fits.
+Holds object for optimizing the fits.
 """
 
 from cortecs.opt.optimize_neural_net import *

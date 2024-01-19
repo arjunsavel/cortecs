@@ -4,10 +4,10 @@ resolution and subsequently chunk it up.
 Example instructions / workflow:
 >>> reference_file = '../opacFe/opacFe.dat'
 >>> CIA_file = 'opacCIA.dat'
->>> interpolate_CIA(CIA_file, reference_file)
+>>> interpolate_cia(CIA_file, reference_file)
 >>> CIA_file = 'opacCIA_highres.dat'
 >>> ref_file_base = '../opacFe/opacFe'
->>> chunk_wavelengths_CIA(CIA_file, ref_file_base)
+>>> chunk_wavelengths_cia(CIA_file, ref_file_base)
 And that should work!
 
 todo: generalize to PLATON CIA.
@@ -23,10 +23,10 @@ from tqdm import tqdm
 from cortecs.opac.chunking import *
 from cortecs.opac.io import *
 
-######################### Pt. 1: Interpolation ####################################
+# Pt. 1: Interpolation
 
 
-def check_temp_grid(df, real_temperature_grid, CIA_file):
+def check_temp_grid(df, real_temperature_grid, cia_file):
     """
     Checks that the temperature grid of the CIA file is the same as the reference file.
     Inputs
@@ -45,13 +45,14 @@ def check_temp_grid(df, real_temperature_grid, CIA_file):
     for temp in real_temperature_grid:
         if temp not in df.temp.unique():
             print(
-                f"Temperature {temp} not in CIA file {CIA_file}! Cannot interpolate in temperature yet. Will set these values to 0."
+                f"Temperature {temp} not in CIA file {cia_file}!"
+                + f" Cannot interpolate in temperature yet. Will set these values to 0."
             )
     return
 
 
-def interpolate_CIA(
-    CIA_file, reference_file, outfile=None, loader="exotransmit", load_kwargs={}
+def interpolate_cia(
+    cia_file, reference_file, outfile=None, loader="exotransmit", load_kwargs=None
 ):
     """
     Interpolates a CIA file to a higher resolution, using the wavelength grid
@@ -73,6 +74,8 @@ def interpolate_CIA(
         Creates a file with "hires" attached to the end of CIA_file that has been interpolated
         to higher resolution.
     """
+    if load_kwargs is None:
+        load_kwargs = {}
     reference_opac = Opac(reference_file, loader=loader, load_kwargs=load_kwargs)
 
     real_wavelength_grid = reference_opac.wl
@@ -80,16 +83,16 @@ def interpolate_CIA(
     # need to put it on the right temperature grid, too!
     real_temperature_grid = reference_opac.T
 
-    df = Opac_cia(CIA_file, loader="exotransmit_cia", view="full_frame").cross_section
+    df = Opac_cia(cia_file, loader="exotransmit_cia", view="full_frame").cross_section
 
-    check_temp_grid(df, real_temperature_grid, CIA_file)
+    check_temp_grid(df, real_temperature_grid, cia_file)
 
     if reference_opac.wl.max() > df.wav.max() or reference_opac.wl.min() < df.wav.min():
         print(
             "Reference file has a larger wavelength grid than CIA file. Will fill with zeros."
         )
 
-    species_dict_interped = get_empty_species_dict(CIA_file)
+    species_dict_interped = get_empty_species_dict(cia_file)
     interped_wavelengths = []
     interped_temps = []
 
@@ -122,6 +125,7 @@ def interpolate_CIA(
     reference_species = species_dict_interped[list(species_dict_interped.keys())[0]]
 
     buffer = "   "  # there's a set of spaces between each string!
+    temp = np.nan  # fill value
     for i in tqdm(range(len(reference_species))):
         # the first line gets different treatment!
         if i == 0:
@@ -129,7 +133,7 @@ def interpolate_CIA(
                 interped_temps
             )  # add the LOWEST temperature in the temperature grid!
             new_string += ["{:.12e}".format(temp) + "\n"]
-        if interped_temps[i] != temp:
+        elif interped_temps[i] != temp:
             temp = interped_temps[i]
             new_string += ["{:.12e}".format(temp) + "\n"]
         wavelength_string = "{:.12e}".format(interped_wavelengths[i])
@@ -146,8 +150,8 @@ def interpolate_CIA(
     # todo: check the insert. and can pull wavelength grid.
     temp_string = " ".join(str(temp) for temp in real_temperature_grid) + " \n"
     new_string.insert(0, temp_string)
-    if type(outfile) == type(None):
-        outfile = CIA_file.split(".dat")[0]
+    if isinstance(outfile, type(None)):
+        outfile = cia_file.split(".dat")[0]
         outfile += "_highres.dat"
     f2 = open(outfile, "w")
     f2.writelines(new_string)
@@ -156,10 +160,10 @@ def interpolate_CIA(
     return
 
 
-######################### Pt. 2: Chunking ####################################
+# Pt. 2: Chunking
 
 
-def chunk_wavelengths_CIA(file, ref_file_base, numfiles):
+def chunk_wavelengths_cia(file, ref_file_base, numfiles):
     """
     Performs chunking based on the reference file's wavelength chunking.
     Inputs
@@ -195,6 +199,7 @@ def chunk_wavelengths_CIA(file, ref_file_base, numfiles):
 
     ntemps = 0
 
+    temperature = np.nan  # fill value
     for line in tqdm(
         f1, desc="Writing lines to chunk files"
     ):  # read through all lines in the opacity file
@@ -209,7 +214,7 @@ def chunk_wavelengths_CIA(file, ref_file_base, numfiles):
         if ticker == wav_per_chunk:
             file_suffix += 1  # start writing to different file
             ticker = 0
-            true_file_suffix = (file_suffix) % numfiles
+            true_file_suffix = file_suffix % numfiles
             wav_per_chunk = chunk_list[true_file_suffix]
 
             write_to_file(temperature, file, file_suffix, numfiles),
@@ -249,6 +254,19 @@ def prepend_line(file_name, line):
     """
     Insert given string as a new line at the beginning of a file. Used to fix the header within
     the chunked CIA files.
+
+    Inputs
+    -------
+        :file_name: (str) path to file to be modified.
+        :line: (str) line to be inserted.
+
+    Outputs
+    --------
+        None
+
+    Side effects
+    ------------
+        Modifies the file in place.
     """
 
     # define name of temporary dummy file

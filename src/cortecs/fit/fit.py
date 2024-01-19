@@ -1,6 +1,7 @@
 """
 The high-level API for fitting. Requires the Opac object.
 """
+
 import warnings
 from functools import partial
 from multiprocessing import Pool
@@ -33,11 +34,27 @@ class Fitter(object):
         "polynomial": prep_polynomial,
     }
 
+    save_method_dict = {
+        "pca": save_pca,
+        "neural_net": save_neural_net,
+        "polynomial": save_polynomial,
+    }
+
     def __init__(self, opac, method="pca", **fitter_kwargs):
         """
         todo: make list of opac
         fits the opacity data to a neural network.
-        :param Opac: Opac object
+
+        Inputs
+        ------
+        opac: Opac
+            the opacity object.
+        method: str
+            the method to use for fitting. Options include (in order of increasing complexity) include
+            'polynomial', 'pca', and 'neural_net'. The more complex the model, the larger the model size (i.e., potentially
+            the lower the compression factor), and the more likely it is to fit well.
+        fitter_kwargs: dict
+            kwargs that are passed to the fitter.
         """
         self.opac = opac
         self.fitter_kwargs = fitter_kwargs
@@ -59,8 +76,11 @@ class Fitter(object):
         """
         fits the opacity data to a neural network. loops over all wavelengths.
         Can loop over a list of species? ...should be parallelized!
-        :param plot: whether or not to plot the loss
-        :return: history, neural_network
+
+        Inputs
+        ------
+        parallel: bool
+            whether to parallelize the fitting.
         """
 
         # iterate over the wavelengths.
@@ -136,4 +156,12 @@ class Fitter(object):
             p.join()
             self.pbar.close()
 
+        return
+
+    def save(self, savename):
+        """
+        saves the fitter results.
+        """
+        save_func = self.save_method_dict[self.method]
+        save_func(savename, self.fitter_results)
         return
