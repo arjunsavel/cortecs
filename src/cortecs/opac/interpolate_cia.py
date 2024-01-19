@@ -51,6 +51,111 @@ def check_temp_grid(df, real_temperature_grid, cia_file):
     return
 
 
+def check_wav_grid(reference_opac, df):
+    """
+    Checks that the wavelength grid of the CIA file is the same as the reference file.
+    Inputs
+    ------
+        :reference_opac: (Opac) Opac object with the wavelength grid of interest.
+        :df: (pd.DataFrame) dataframe with the CIA data.
+    Outputs
+    -------
+        None
+    Side effects
+    -------------
+        Raises a ValueError if the wavelength grid is not the same.
+    """
+    if reference_opac.wl.max() > df.wav.max() or reference_opac.wl.min() < df.wav.min():
+        print(
+            "Reference file has a larger wavelength grid than CIA file. Will fill with zeros."
+        )
+    return
+
+
+def initialize_species_dict(species_dict, wavelength_grid):
+    """
+    Initializes a dictionary of species to be interpolated.
+    Inputs
+    ------
+        :species_dict: (dict) dictionary of species to be interpolated.
+    Outputs
+    -------
+        None
+    Side effects
+    -------------
+        Modifies species_dict in place.
+    """
+    for species_key in species_dict.keys():
+        species_dict[species_key] += list(np.ones_like(wavelength_grid) * 0.0)
+    return species_dict
+
+
+def add_line_string_species(line_string, species_dict, i, buffer):
+    """
+    Adds the species to the line string.
+    Inputs
+    ------
+        :line_string: (str) the line string to be modified.
+        :species_dict: (dict) dictionary of species to be interpolated.
+        :i: (int) index of the line string.
+        :buffer: (str) buffer between each species.
+    Outputs
+    -------
+        None
+    Side effects
+    -------------
+        Modifies line_string in place.
+    """
+    for species_key in species_dict.keys():
+        line_string += "{:.12e}".format(species_dict[species_key][i]) + buffer
+    return line_string
+
+
+def build_new_string(
+    interped_wavelengths, interped_temps, reference_species, species_dict_interped
+):
+    """
+    Builds the new string that will be written to the new CIA file.
+    Inputs
+    ------
+        :interped_wavelengths: (list) list of wavelengths that have been interpolated.
+        :interped_temps: (list) list of temperatures that have been interpolated.
+        :reference_species: (list) list of species that have been interpolated.
+        :buffer: (str) buffer between each species.
+    Outputs
+    -------
+        :new_string: (list) list of strings that will be written to the new CIA file.
+    Side effects
+    -------------
+        None
+    """
+    new_string = []
+    buffer = "   "  # there's a set of spaces between each string!
+    temp = np.nan  # fill value
+
+    for i in tqdm(range(len(reference_species))):
+        # the first line gets different treatment!
+        if i == 0:
+            temp = np.min(
+                interped_temps
+            )  # add the LOWEST temperature in the temperature grid!
+            new_string += ["{:.12e}".format(temp) + "\n"]
+        elif interped_temps[i] != temp:
+            temp = interped_temps[i]
+            new_string += ["{:.12e}".format(temp) + "\n"]
+        wavelength_string = "{:.12e}".format(interped_wavelengths[i])
+
+        line_string = wavelength_string + buffer
+
+        line_string = add_line_string_species(
+            line_string, species_dict_interped, i, buffer
+        )
+
+        new_string += [line_string + "\n"]
+
+    return new_string
+
+
 def interpolate_cia(
     cia_file, reference_file, outfile=None, loader="exotransmit", load_kwargs=None
 ):
@@ -87,22 +192,18 @@ def interpolate_cia(
 
     check_temp_grid(df, real_temperature_grid, cia_file)
 
-    if reference_opac.wl.max() > df.wav.max() or reference_opac.wl.min() < df.wav.min():
-        print(
-            "Reference file has a larger wavelength grid than CIA file. Will fill with zeros."
-        )
+    check_wav_grid(reference_opac, df)
 
     species_dict_interped = get_empty_species_dict(cia_file)
     interped_wavelengths = []
     interped_temps = []
 
-    # perform interpolation
+    # perform interpolation. todo: is this redudnant?
     for unique_temp in tqdm(real_temperature_grid, desc="Interpolating"):
         if unique_temp not in df.temp.unique():
-            for species_key in species_dict_interped.keys():
-                species_dict_interped[species_key] += list(
-                    np.ones_like(real_wavelength_grid) * 0.0
-                )
+            species_dict_interped = initialize_species_dict(
+                species_dict_interped, real_wavelength_grid
+            )
 
         else:
             sub_df = df[df.temp == unique_temp]
@@ -117,35 +218,12 @@ def interpolate_cia(
         interped_temps += list(np.ones_like(real_wavelength_grid) * unique_temp)
 
     # write to a new file
-
-    # todo: remove this redundant code.
-    new_string = []
-
     # this is pretty gross below : (
     reference_species = species_dict_interped[list(species_dict_interped.keys())[0]]
 
-    buffer = "   "  # there's a set of spaces between each string!
-    temp = np.nan  # fill value
-    for i in tqdm(range(len(reference_species))):
-        # the first line gets different treatment!
-        if i == 0:
-            temp = np.min(
-                interped_temps
-            )  # add the LOWEST temperature in the temperature grid!
-            new_string += ["{:.12e}".format(temp) + "\n"]
-        elif interped_temps[i] != temp:
-            temp = interped_temps[i]
-            new_string += ["{:.12e}".format(temp) + "\n"]
-        wavelength_string = "{:.12e}".format(interped_wavelengths[i])
-
-        line_string = wavelength_string + buffer
-
-        for species_key in species_dict_interped.keys():
-            line_string += (
-                "{:.12e}".format(species_dict_interped[species_key][i]) + buffer
-            )
-
-        new_string += [line_string + "\n"]
+    new_string = build_new_string(
+        interped_wavelengths, interped_temps, reference_species, species_dict_interped
+    )
 
     # todo: check the insert. and can pull wavelength grid.
     temp_string = " ".join(str(temp) for temp in real_temperature_grid) + " \n"

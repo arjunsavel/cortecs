@@ -204,6 +204,19 @@ class loader_exotransmit_cia(loader_base):
     loads in opacity data that are used with the PLATON code's collision-induced absorption..
     """
 
+    def check_line_break(self, line, temperature):
+        """
+        Checks whether the given line should be skipped
+
+        """
+        truth_val = False
+        if not line or line == "\n":
+            truth_val = True
+        if len(line.split()) == 1 and line != "\n":  # this is a new temperature
+            temperature = eval(line[:-1])
+            truth_val = True
+        return truth_val, temperature
+
     def load(self, cross_sec_filename, verbose=False):
         """
         loads in opacity data that's built for exo-transmit. To be passed on to Opac object.
@@ -227,12 +240,14 @@ class loader_exotransmit_cia(loader_base):
         species_dict = get_empty_species_dict(cross_sec_filename, verbose=verbose)
 
         # read through all lines in the CIA file
+        temperature = 0.0  # initialize
+
         for line in tqdm(f1[1:], desc="Reading CIA file"):
-            if not line or line == "\n":
-                continue  # don't want it to break!
-            if len(line.split()) == 1 and line != "\n":  # this is a new temperature
-                temperature = eval(line[:-1])
-                continue  # nothing else on this line
+            truth_val, temperature = self.check_line_break(line, temperature)
+
+            if truth_val:
+                continue
+
             values = [eval(value) for value in line.split()]
             temperatures += [temperature]
             wavelengths += [values[0]]
@@ -499,31 +514,30 @@ class writer_exotransmit_cia(writer_base):
         columns.remove("temp")
         columns.remove("wav")
 
-        species_dict_interped = opac.cross_section[columns].to_dict()
-        interped_temps = opac.T
-        interped_wavelengths = opac.wl
+        self.species_dict_interped = opac.cross_section[columns].to_dict()
+        self.interped_temps = opac.T
+        self.interped_wavelengths = opac.wl
 
         # this is pretty gross below : (
-        reference_species = species_dict_interped[list(species_dict_interped.keys())[0]]
+        reference_species = self.species_dict_interped[
+            list(self.species_dict_interped.keys())[0]
+        ]
 
         # todo: include the different temperature range on which to interpolate.
 
-        buffer = "   "  # there's a set of spaces between each string!
+        self.buffer = "   "  # there's a set of spaces between each string!
         temp = 0.0  # initial value
         for i in tqdm(range(len(reference_species)), desc="Writing file"):
             new_string, temp = self.append_line_string(
                 new_string,
                 i,
-                interped_temps,
-                interped_wavelengths,
-                species_dict_interped,
-                buffer,
                 temp,
             )
 
         # todo: check the insert. and can pull wavelength grid.
         temp_string = (
-            " ".join(str(temp) for temp in np.sort(np.unique(interped_temps))) + " \n"
+            " ".join(str(temp) for temp in np.sort(np.unique(self.interped_temps)))
+            + " \n"
         )
         new_string.insert(0, temp_string)
 
@@ -535,30 +549,28 @@ class writer_exotransmit_cia(writer_base):
         self,
         new_string,
         i,
-        interped_temps,
-        interped_wavelengths,
-        species_dict_interped,
-        buffer,
         temp,
     ):
         # the first line gets different treatment!
         if i == 0:
             temp = np.min(
-                interped_temps
+                self.interped_temps
             )  # add the LOWEST temperature in the temperature grid!
             new_string += ["{:.12e}".format(temp) + "\n"]
-        if interped_temps[i] != temp:
-            temp = interped_temps[i]
+        if self.interped_temps[i] != temp:
+            temp = self.interped_temps[i]
             new_string += ["{:.12e}".format(temp) + "\n"]
-        wavelength_string = "{:.12e}".format(interped_wavelengths[i])
+        wavelength_string = "{:.12e}".format(self.interped_wavelengths[i])
 
-        line_string = wavelength_string + buffer
+        line_string = wavelength_string + self.buffer
 
-        for species_key in species_dict_interped.keys():
+        for species_key in self.species_dict_interped.keys():
             # again, this works because python dicts are ordered in 3.6+
             line_string += (
-                "{:.12e}".format(list(species_dict_interped[species_key].values())[i])
-                + buffer
+                "{:.12e}".format(
+                    list(self.species_dict_interped[species_key].values())[i]
+                )
+                + self.buffer
             )
 
         new_string += [line_string + "\n"]

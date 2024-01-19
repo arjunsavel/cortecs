@@ -104,7 +104,7 @@ def do_pca(cube, nc=3):
     return xMat, standardized_cube, s, vh, u
 
 
-def fit_pca(cross_section, P, T, xMat, nc=3, wav_ind=1, savename=None):
+def fit_pca(cross_section, P, T, xMat, **kwargs):
     """
     Fits the PCA to the opacity data.
 
@@ -113,15 +113,10 @@ def fit_pca(cross_section, P, T, xMat, nc=3, wav_ind=1, savename=None):
         :cross_section: (ntemp x npressure) the array of cross-sections being fit.
         :P: pressure grid
         :T: temperature grid
-        :nc: (int) number of PCA components to keep. Increasing the number of components can make the reconstruction
-        of opacity data more accurate, but it can also lead to overfitting and make the model size larger (i.e.,
-        decrease the compression factor).
-        :wav_ind: (int) index of wavelength to fit.
-        :savename: (str) if not None, the PCA components will be saved to this filename.
+        :xMat: (npres x nc) PCA components
 
     Returns
     -------
-        :xMat: (n_exp x nc) PCA components
         :beta: (nc x pixels) PCA coefficients
     """
 

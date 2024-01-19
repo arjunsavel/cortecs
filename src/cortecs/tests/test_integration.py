@@ -12,7 +12,6 @@ import random
 import tensorflow as tf
 
 import cortecs
-from cortecs.opac.opac import *
 from cortecs.eval.eval import *
 from cortecs.opt.opt import *
 import pickle
@@ -91,7 +90,6 @@ class TestIntegration(unittest.TestCase):
             fitter.opac.T,
             fitter.opac.P,
             None,
-            all_wl=False,
             n_layers=3,
             n_neurons=8,
             activation="sigmoid",
