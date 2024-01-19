@@ -91,7 +91,6 @@ class TestIntegration(unittest.TestCase):
             fitter.opac.T,
             fitter.opac.P,
             None,
-            all_wl=False,
             n_layers=3,
             n_neurons=8,
             activation="sigmoid",
