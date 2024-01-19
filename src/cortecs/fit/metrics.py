@@ -23,9 +23,7 @@ def plot_loss(history):
     return
 
 
-def calc_metrics(
-    opac_obj, fitter, tp_undersample_factor=2, wl_under_sample_factor=8, plot=False
-):
+def calc_metrics(fitter, tp_undersample_factor=2, wl_under_sample_factor=8, plot=False):
     """
         calculates the mean and percent error  associated with the fit.
     .
@@ -40,7 +38,7 @@ def calc_metrics(
         wl_under_sample_factor: int
             factor to undersample the wavelength grid by.
     """
-    evaluator = Evaluator(opac_obj, fitter)
+    evaluator = Evaluator(fitter.opac, fitter)
     AMU = 1.6605390666e-24  # atomic mass unit in cgs. From astropy!
 
     vals = []
