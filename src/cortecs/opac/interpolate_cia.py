@@ -85,8 +85,8 @@ def add_line_string_species(line_string, species_dict, i, buffer):
     -------------
         Modifies line_string in place.
     """
-    for species_key in species_dict_interped.keys():
-        line_string += "{:.12e}".format(species_dict_interped[species_key][i]) + buffer
+    for species_key in species_dict.keys():
+        line_string += "{:.12e}".format(species_dict[species_key][i]) + buffer
     return
 
 
