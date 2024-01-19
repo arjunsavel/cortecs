@@ -204,6 +204,19 @@ class loader_exotransmit_cia(loader_base):
     loads in opacity data that are used with the PLATON code's collision-induced absorption..
     """
 
+    def check_line_break(self, line, temperature):
+        """
+        Checks whether the given line should be skipped
+
+        """
+        truth_val = False
+        if not line or line == "\n":
+            truth_val = True
+        if len(line.split()) == 1 and line != "\n":  # this is a new temperature
+            temperature = eval(line[:-1])
+            truth_val = True
+        return truth_val, temperature
+
     def load(self, cross_sec_filename, verbose=False):
         """
         loads in opacity data that's built for exo-transmit. To be passed on to Opac object.
@@ -227,12 +240,14 @@ class loader_exotransmit_cia(loader_base):
         species_dict = get_empty_species_dict(cross_sec_filename, verbose=verbose)
 
         # read through all lines in the CIA file
+        temperature = 0.0  # initialize
+
         for line in tqdm(f1[1:], desc="Reading CIA file"):
-            if not line or line == "\n":
-                continue  # don't want it to break!
-            if len(line.split()) == 1 and line != "\n":  # this is a new temperature
-                temperature = eval(line[:-1])
-                continue  # nothing else on this line
+            truth_val, temperature = self.check_line_break(line)
+
+            if truth_val:
+                continue
+
             values = [eval(value) for value in line.split()]
             temperatures += [temperature]
             wavelengths += [values[0]]
