@@ -23,6 +23,22 @@ def plot_loss(history):
     return
 
 
+def title_format(quantity):
+    """
+    formats the title of the histogram based on the quantity being plotted.
+
+    Inputs
+    ------
+    quantity: array-like
+        the quantity being plotted.
+    """
+    plt.title(
+        "Mean: {:.2f}, Std: {:.2f}".format(np.mean(quantity), np.std(quantity)),
+        fontsize=20,
+    )
+    return
+
+
 def calc_metrics(fitter, tp_undersample_factor=2, wl_under_sample_factor=8, plot=False):
     """
         calculates the mean and percent error  associated with the fit.
@@ -68,20 +84,14 @@ def calc_metrics(fitter, tp_undersample_factor=2, wl_under_sample_factor=8, plot
         plt.hist(abs_diffs, color="dodgerblue")
         plt.xlabel("Abs. residuals in log10 opacity", fontsize=20)
         plt.ylabel("Count", fontsize=20)
-        plt.title(
-            "Mean: {:.2f}, Std: {:.2f}".format(np.mean(abs_diffs), np.std(abs_diffs)),
-            fontsize=20,
-        )
+
+        title_format(abs_diffs)
 
         plt.figure()
         plt.hist(percent_diffs, color="goldenrod")
         plt.xlabel("Percent. residuals in log10 opacity", fontsize=20)
-        plt.title(
-            "Mean: {:.2f}, Std: {:.2f}".format(
-                np.mean(percent_diffs), np.std(percent_diffs)
-            ),
-            fontsize=20,
-        )
+        title_format(abs_diffs)
+
         plt.ylabel("Count", fontsize=20)
 
     return vals, orig_vals, abs_diffs, percent_diffs
