@@ -138,17 +138,17 @@ class loader_platon(loader_base):
         # todo: check wl units. They're in meters here.
         # temperatures are in K.
         # pressures are in Pa, I believe.
-        wl = np.load(wl_filename)
-        T = np.load(T_filename)
-        P = np.load(P_filename)
+        wl = np.load(wl_filename, allow_pickle=True)
+        T = np.load(T_filename, allow_pickle=True)
+        P = np.load(P_filename, allow_pickle=True)
         cross_section = np.load(
-            cross_sec_filename
+            cross_sec_filename, allow_pickle=True
         )  # packaged as T x P x wl. todo: check packing
         # cross-section units for fitting...? keep the same internally.
         species = cross_sec_filename.split("_")[-1].split(".")[0]
         try:
             self.species_weight = self.species_weight_dict[species]
-        except:
+        except KeyError:
             raise KeyError(
                 f"Species {species} read from filename and not found in species_weight_dict. Please add it."
             )
@@ -190,8 +190,8 @@ class loader_platon_cia(loader_base):
         # todo: check wl units. They're in meters here.
         # temperatures are in K.
         # pressures are in Pa, I believe.
-        wl = np.load(wl_filename)
-        T = np.load(T_filename)
+        wl = np.load(wl_filename, allow_pickle=True)
+        T = np.load(T_filename, allow_pickle=True)
         data = pickle.load(
             open(cross_sec_filename, "rb"), encoding="latin1"
         )  # packaged as T x P x wl. todo: check packing
@@ -327,6 +327,24 @@ class loader_exotransmit(loader_base):
         return np.array(wavelengths), np.array(opacities)
 
     def load(self, filename):
+        """
+        Loads file.
+
+        Inputs
+        ------
+        filename : str
+            name of file to load
+
+        Outputs
+        -------
+        wl : np.ndarray
+            wavelengths
+        T : np.ndarray
+            temperatures
+        P : np.ndarray
+            pressures
+        """
+
         wl, opacities = self.get_lams_and_opacities(filename)
         T, P = self.get_t_p(filename)
 
@@ -337,9 +355,16 @@ class loader_exotransmit(loader_base):
 def get_empty_species_dict(CIA_file, verbose=False):
     """
     returns a species dictioanry given a CIA file
-    :param CIA_file:
-    :param verbose:
-    :return:
+
+    Inputs
+    -------
+        :CIA_file: (str) path to CIA file. e.g., 'opacCIA/opacCIA.dat'
+        :verbose: (bool) whether to print out the species that are likely in the file.
+
+    Outputs
+    -------
+        :species_dict: (dict) dictionary of species.
+
     """
     n_species = get_n_species(CIA_file, verbose=verbose)
     if n_species == 8:
@@ -485,29 +510,14 @@ class writer_exotransmit_cia(writer_base):
 
         buffer = "   "  # there's a set of spaces between each string!
         for i in tqdm(range(len(reference_species)), desc="Writing file"):
-            # the first line gets different treatment!
-            if i == 0:
-                temp = np.min(
-                    interped_temps
-                )  # add the LOWEST temperature in the temperature grid!
-                new_string += ["{:.12e}".format(temp) + "\n"]
-            if interped_temps[i] != temp:
-                temp = interped_temps[i]
-                new_string += ["{:.12e}".format(temp) + "\n"]
-            wavelength_string = "{:.12e}".format(interped_wavelengths[i])
-
-            line_string = wavelength_string + buffer
-
-            for species_key in species_dict_interped.keys():
-                # again, this works because python dicts are ordered in 3.6+
-                line_string += (
-                    "{:.12e}".format(
-                        list(species_dict_interped[species_key].values())[i]
-                    )
-                    + buffer
-                )
-
-            new_string += [line_string + "\n"]
+            new_string = self.append_line_string(
+                new_string,
+                i,
+                interped_temps,
+                interped_wavelengths,
+                species_dict_interped,
+                buffer,
+            )
 
         # todo: check the insert. and can pull wavelength grid.
         temp_string = (
@@ -518,5 +528,38 @@ class writer_exotransmit_cia(writer_base):
         f2 = open(outfile, "w")
         f2.writelines(new_string)
         f2.close()
+
+    def append_line_string(
+        self,
+        new_string,
+        i,
+        interped_temps,
+        interped_wavelengths,
+        species_dict_interped,
+        buffer,
+    ):
+        # the first line gets different treatment!
+        if i == 0:
+            temp = np.min(
+                interped_temps
+            )  # add the LOWEST temperature in the temperature grid!
+            new_string += ["{:.12e}".format(temp) + "\n"]
+        if interped_temps[i] != temp:
+            temp = interped_temps[i]
+            new_string += ["{:.12e}".format(temp) + "\n"]
+        wavelength_string = "{:.12e}".format(interped_wavelengths[i])
+
+        line_string = wavelength_string + buffer
+
+        for species_key in species_dict_interped.keys():
+            # again, this works because python dicts are ordered in 3.6+
+            line_string += (
+                "{:.12e}".format(list(species_dict_interped[species_key].values())[i])
+                + buffer
+            )
+
+        new_string += [line_string + "\n"]
+
+        return new_string
 
     # todo: maybe the loader objects should also take an opac object. for parallel structure : )
