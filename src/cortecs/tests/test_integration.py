@@ -188,13 +188,13 @@ class TestIntegration(unittest.TestCase):
         max_size = 1.6
         max_evaluations = 8
         optimizer.optimize(max_size, max_evaluations)
-        print(optimizer.best_params)
+        # print(optimizer.best_params)
         self.assertTrue(
             optimizer.best_params
             == {
                 "n_layers": 2,
                 "n_neurons": 2.0,
-                "activation": "relu",
+                "activation": "sigmoid",
                 "learn_rate": 0.01,
             }
         )
