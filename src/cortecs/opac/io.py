@@ -509,14 +509,16 @@ class writer_exotransmit_cia(writer_base):
         # todo: include the different temperature range on which to interpolate.
 
         buffer = "   "  # there's a set of spaces between each string!
+        temp = 0.0  # initial value
         for i in tqdm(range(len(reference_species)), desc="Writing file"):
-            new_string = self.append_line_string(
+            new_string, temp = self.append_line_string(
                 new_string,
                 i,
                 interped_temps,
                 interped_wavelengths,
                 species_dict_interped,
                 buffer,
+                temp,
             )
 
         # todo: check the insert. and can pull wavelength grid.
@@ -537,6 +539,7 @@ class writer_exotransmit_cia(writer_base):
         interped_wavelengths,
         species_dict_interped,
         buffer,
+        temp,
     ):
         # the first line gets different treatment!
         if i == 0:
@@ -560,6 +563,6 @@ class writer_exotransmit_cia(writer_base):
 
         new_string += [line_string + "\n"]
 
-        return new_string
+        return new_string, temp
 
     # todo: maybe the loader objects should also take an opac object. for parallel structure : )
