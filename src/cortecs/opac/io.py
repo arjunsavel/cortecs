@@ -243,7 +243,7 @@ class loader_exotransmit_cia(loader_base):
         temperature = 0.0  # initialize
 
         for line in tqdm(f1[1:], desc="Reading CIA file"):
-            truth_val, temperature = self.check_line_break(line)
+            truth_val, temperature = self.check_line_break(line, temperature)
 
             if truth_val:
                 continue
