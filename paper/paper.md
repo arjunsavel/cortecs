@@ -108,11 +108,6 @@ and its `cortecs` reconstruction. Note that opacities less than $10^-{60}$$ are 
 presented here; an opacity of $$\sigma_\lambda=10^-{60}$ would require a column nearly $10^{27}$m long to become
 optically thick at a pressure of 1 bar and temperature of 1000 K. \label{fig:example}](example_application.png)
 
-| Method         | Compression factor | Median accuracy | Compression time  |
-|----------------|--------------------|-----------------|-------------------|
-| PCA            | 13                 |                 |                   |
-| Polynomials    | Text               |                 |                   |
-| Neural network | Text               |                 |                   |
 
 
 # Workflow
@@ -153,12 +148,23 @@ Importantly, we find that our compressed-opacity retrieval yields posterior dist
 and Bayesian evidences that are consistent with those from the benchmark
 retrieval using uncompressed opacity (\autoref{fig:corner}) within a comparable runtime. The two posterior distributions exhibit
 slightly different substructure, which we attribute to the compressed results requiring 10% more samples to converge and
-residual differents between the compressed and uncompressed opacities.
+residual differences between the compressed and uncompressed opacities.
 The results from this exercise indicate that our compression/decompression scheme
 is accurate enough to be used in at least some high-resolution retrievals.
 
 ![The posterior distributions for our baseline WASP-77Ab retrieval (teal)
 and our retrieval using opacities compressed by `cortecs` (gold). \label{fig:corner}](pca_compress.png)
+
+
+| Method         | Compression factor | Median absolute deviation | Compression time (s) | Decompression time (s) |
+|----------------|--------------------|---------------------------|----------------------|------------------------|
+| PCA            | 13                 | 0.30                      | 2.6 $$\times 10^1$$  | 2.3 $$\times 10^2$$    |
+| Polynomials    | 44                 | 0.24                      | 7.8$$\times 10^2$$   | 3.6$$\times 10^3$$     |
+| Neural network | 9                  | 2.6                       | 1.4$$\times 10^7$$   | 3.6$$\times 10^4$$     |
+
+Comparison of compression methods used for the HITEMP CO line list [@rothman:2010] over the IGRINS wavelength range
+at a resolving power of 250,000. Note that the neural network compression performance and timings are only assessed at
+a single wavelength point and extrapolated over the full wavelength range.
 
 
 # Acknowledgements
