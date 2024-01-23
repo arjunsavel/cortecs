@@ -61,15 +61,17 @@ def calc_metrics(fitter, tp_undersample_factor=2, wl_under_sample_factor=8, plot
     orig_vals = []
     abs_diffs = []
     percent_diffs = []
-    for i in tqdm(range(len(opac_obj.T))[::tp_undersample_factor]):
-        for j in range(len(opac_obj.P))[::tp_undersample_factor]:
-            for k in range(len(opac_obj.wl))[::wl_under_sample_factor]:
-                val = evaluator.eval(opac_obj.T[i], opac_obj.P[j], opac_obj.wl[k])
+    for i in tqdm(range(len(fitter.opac.T))[::tp_undersample_factor]):
+        for j in range(len(fitter.opac.P))[::tp_undersample_factor]:
+            for k in range(len(fitter.opac.wl))[::wl_under_sample_factor]:
+                val = evaluator.eval(
+                    fitter.opac.T[i], fitter.opac.P[j], fitter.opac.wl[k]
+                )
                 # todo: check that this works for not just PLATON
                 val = np.log10(val * evaluator.load_obj.species_weight * AMU * 1e-4)
                 if not np.isfinite(val):
                     val = -104
-                orig_val = opac_obj.cross_section[i, j, k]
+                orig_val = fitter.opac.cross_section[i, j, k]
                 abs_diffs += [val - orig_val]
                 percent_diffs += [100 * (val - orig_val) / orig_val]
                 vals += [val]
