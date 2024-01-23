@@ -36,6 +36,7 @@ def feed_forward_equal_layer_sizes(x, n_layers, weights, biases):
     return res
 
 
+# todo: add test to make sure feed forward actually works!
 def feed_forward(x, n_layers, weights, biases):
     """
     feed forward neural network. this is a function that takes in the input, weights, and biases and returns the output.

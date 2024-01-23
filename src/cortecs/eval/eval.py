@@ -85,4 +85,6 @@ class Evaluator(object):
             if eval_result == 0:
                 eval_result = 1e-104  # todo: fix this inf situation
 
+        # todo: patch the eval neural net? it doesn't return the biases?
+
         return eval_result
