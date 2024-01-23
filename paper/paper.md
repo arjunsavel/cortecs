@@ -55,7 +55,7 @@ high-resolution spectra.
 
 How do we decrease the RAM footprint of these calculations? By far the largest contributor to the RAM footprint,
 at least as measured on disk, is the opacity data. For instance, the opacity data for a single gas species across
-the wavelength range of the IGRINS spectrograph [@mace:2018] takes up 2.5 GB of non-volatile memory (i.e., the file size is 2.5 GB) at float64 precision and at a resolving power of 400,000
+the wavelength range of the Immersion GRating INfrared Spectrometer spectrograph [IGRINS; @mace:2018] takes up 2.5 GB of non-volatile memory (i.e., the file size is 2.5 GB) at float64 precision and at a resolving power of 400,000
 (as used in [@line:2021], with 39 temperature points and 18 pressure points, using, e.g., the [@polyansky:2018] water opacity tables). It stands to reason
 that decreasing the amount of RAM/VRAM consumed by opacity data would strongly decrease the total amount of RAM/VRAM consumed
 by the radiative transfer calculation.
@@ -104,9 +104,15 @@ is shown in \autoref{fig:example}.
 
 ![Top panel: The original opacity function of CO [@rothman:2010] (solid lines) and its `cortecs` reconstruction (transparent lines) over a large
 wavelength range and at multiple temperatures and pressures. Bottom panel: the absolute residuals between the opacity function
-and its `cortecs` reconstruction. Note that opacities less than $10^-{60}$ are not generally relevant for the benchmark
-presented here; an opacity of $\sigma_\lambda=10^-{60}$ would require a column nearly $10^{27}$m long to become
+and its `cortecs` reconstruction. Note that opacities less than $10^-{60}$$ are not generally relevant for the benchmark
+presented here; an opacity of $$\sigma_\lambda=10^-{60}$ would require a column nearly $10^{27}$m long to become
 optically thick at a pressure of 1 bar and temperature of 1000 K. \label{fig:example}](example_application.png)
+
+| Method         | Compression factor | Median accuracy | Compression time  |
+|----------------|--------------------|-----------------|-------------------|
+| PCA            | 13                 |                 |                   |
+| Polynomials    | Text               |                 |                   |
+| Neural network | Text               |                 |                   |
 
 
 # Workflow
@@ -119,7 +125,9 @@ A typical workflow with `cortecs` involves the following steps:
 5. Decompression: Evaluate the opacity with `cortecs`'s `eval` methods.
 
 The accuracy of these fits may or may not be suitable for a given application. It is important to test that
-the error incurred using `cortecs` does not impact the results of your application. We provide an example of such
+the error incurred using `cortecs` does not impact the results of your application---for instance,
+by using the `cortecs.fit.metrics.calc_metrics` function to calculate the error incurred by the compression
+and by calculating spectra with and without using `cortecs`-compressed opacities. We provide an example of such
 a benchmarking exercise below.
 
 # Benchmark: High-resolution retrieval of WASP-77Ab
