@@ -129,7 +129,10 @@ a benchmarking exercise below.
 As a proof of concept, we perform a parameter inference exercise [a "retrieval", @madhusudhan:2009] on the high-resolution
 thermal emission spectrum of the
 fiducial hot Jupiter WASP-77Ab [@line:2021; @mansfield:2022; @august:2023] as observed at IGRINS.
-The retrieval pairs `PyMultiNest` [@buchner:2014] sampling with the `CHIMERA` radiative transfer code [@line:2013].
+The retrieval pairs `PyMultiNest` [@buchner:2014] sampling with the `CHIMERA` radiative transfer code [@line:2013],
+with opacity from $$\rm H_2O$$ [@polyansky:2018], $$\rm CO$$ [@rothman:2010], $$\rm CH_4$$ [@hargreaves:2020],
+$$\rm NH_3$$ [@coles:2019], $$\rm HCN$$ [@yurchenko:2011], $$\rm H_2S$$ [@azzam:2016], and $$\rm H_2-H_2$$
+collosion-induced absorption [@karman:2019].
 The non-compressed retrieval uses the data and retrieval framework from [@line:2021], run in an upcoming article (Savel et al. 2024, submitted).
 For this experiment, we use the PCA-based compression scheme implemented in `cortecs`, preserving 3 principal components
 and their corresponding weights as a function for each wavelength as a lossy compression of the original opacity data.
