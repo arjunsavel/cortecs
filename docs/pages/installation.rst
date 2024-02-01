@@ -49,4 +49,6 @@ From the outermost :code:`cortecs` directory, run
 
 .. code-block:: bash
 
-    python3 -m unittest discover src
+    python3 -m unittest discover src/cortecs/tests
+
+These tests should only take a couple of minutes to run on a laptop.
