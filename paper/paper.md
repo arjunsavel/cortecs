@@ -137,7 +137,7 @@ The non-compressed retrieval uses the data and retrieval framework from [@line:2
 For this experiment, we use the PCA-based compression scheme implemented in `cortecs`, preserving 3 principal components
 and their corresponding weights as a function for each wavelength as a lossy compression of the original opacity data.
 
-Using `cortecs`, we compress the input opacity files by a factor of 13. These opacity data (cite them) were originally
+Using `cortecs`, we compress the input opacity files by a factor of 13. These opacity data (as described in the previous paragraph) were originally
 stored as 2.0 GB .h5 files containing 39 temperature points, 18 pressure points, and 373,260 wavelength points. The compressed opacity data are stored
 as 154 MB files of PCA coefficients and 1.1 KB files of PCA vectors (which are reused for each wavelength point).
 These on-disk memory quotes are relatively faithful to the in-memory RAM footprint of the data when stored as `numpy`
