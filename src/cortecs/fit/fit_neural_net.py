@@ -3,10 +3,18 @@ Trains a neural network to fit the opacity data.
 """
 import pickle
 
-import keras
 import numpy as np
-import tensorflow as tf
-from tensorflow.keras import layers
+
+try:
+    import keras
+    import tensorflow as tf
+    from tensorflow.keras import layers
+except ModuleNotFoundError(
+    "The optional neural network-related packages have not been installed. If you would like to"
+    + "use cortecs to fit with a neural network, please install cortecs with neural network functionality"
+    + "as follows: python3 -m pip install -e .[neural_networks]"
+):
+    pass
 
 from cortecs.fit.metrics import *
 
