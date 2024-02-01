@@ -154,7 +154,7 @@ class loader_platon(loader_base):
             )
         cross_section = cross_section * AMU * self.species_weight * 1e-4
 
-        # set a floor to the opacities
+        # set a floor to the opacities, as per the floor used in the PLATON code's opacity files.
         cross_section[np.less(cross_section, 1e-104)] = 1e-104
 
         # and now make it log10
