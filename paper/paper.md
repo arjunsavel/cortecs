@@ -31,8 +31,8 @@ The absorption and emission of light by exoplanet atmospheres encode details of 
 composition, temperature, and dynamics. Fundamentally, simulating these processes requires detailed knowledge
 of the opacity of gases within an atmosphere. When modeling broad wavelength ranges at high resolution, such opacity data for
 even a single gas can take up multiple gigabytes of system random-access memory (RAM). This aspect can be a limiting
-factor in determining the number of gases to consider in a simulation, or even in choosing the architecture of
-the system used for the simulation. Here, we present `cortecs`, a Python tool for compressing
+factor when considering the number of gases to consider in a simulation, the sampling strategy used for inference, or even the architecture of
+the system used for calculations. Here, we present `cortecs`, a Python tool for compressing
 opacity data. `cortecs` provides flexible methods for fitting the
 temperature, pressure, and wavelength dependencies of opacity data and for evaluating the opacity with accelerated,
 GPU-friendly methods. The package is actively developed on GitHub (<https://github.com/arjunsavel/cortecs>), and it is
