@@ -56,7 +56,8 @@ high-resolution spectra.
 How do we decrease the RAM footprint of these calculations? By far the largest contributor to the RAM footprint,
 at least as measured on disk, is the opacity data. For instance, the opacity data for a single gas species across
 the wavelength range of the Immersion GRating INfrared Spectrometer spectrograph [IGRINS; @mace:2018] takes up 2.5 GB of non-volatile memory (i.e., the file size is 2.5 GB) at float64 precision and at a resolving power of 400,000
-(as used in [@line:2021], with 39 temperature points and 18 pressure points, using, e.g., the [@polyansky:2018] water opacity tables). It stands to reason
+(as used in [@line:2021], with 39 temperature points and 18 pressure points, using, e.g., the [@polyansky:2018] water opacity tables).
+In many cases, not all wavelengths need to be loaded, e.g. if the user is down-sampling resolution. Even so, it stands to reason
 that decreasing the amount of RAM/VRAM consumed by opacity data would strongly decrease the total amount of RAM/VRAM consumed
 by the radiative transfer calculation.
 
@@ -68,20 +69,22 @@ accuracy at the spectrum level.
 
 While our benchmark case (see Benchmark) demonstrates the applicability of `cortecs` to high-resolution
 opacity functions of molecular gas, the package is general and can be applied to any opacity data that has
-pressure and temperature dependence, such as the opacity of neutral atoms or ions. Additionally, the code has
-only been verified to produce reasonable amounts of error in the spectra of exoplanet atmospheres at pressures
-greater than a microbar for a single composition. This caveat is important to note for a few reasons:
+pressure and temperature dependence, such as the opacity of neutral atoms or ions. Additionally, our benchmark only
+shows that the amounts of error from our compression technique is reasonable in the spectra of exoplanet atmospheres
+at pressures greater than a microbar for a single composition. This caveat is important to note for a few reasons:
 
 1. Based on error propagation, the error in the opacity function will be magnified in the spectrum based on
 the number of cells that are traced during radiative transfer. The number of spatial cells used to simulate exoplanet
 atmospheres (in our case, 100) is small enough that the `cortecs` error is not massive at the spectrum level.
-2. Exoplanet atmospheres can justifiably be modeled as in hydrostatic equilibrium at pressures greater than a microbar.
+2. Exoplanet atmospheres are often modeled in hydrostatic equilibriumg at pressures greater than a microbar
+[e.g., @barstow2020comparison; @showman2020atmospheric].
 When modeling atmospheres in hydrostatic equilibrium, the final spectrum essentially maps to the altitude at which
 the gas becomes optically thick. If `cortecs`-compressed opacities were used to model an optically thin gas over
 large path lengths, then smaller opacities would be more important. However, `cortecs` tends to perform worse at
 modeling opacity functions that jump from very low to very high opacities, so it may not perform optimally for these
 optically thin scenarios.
-3. The program may perform poorly for opacity functions with sharp features in their temperature--pressure dependence.
+3. The program may perform poorly for opacity functions with sharp features in their temperature--pressure dependence
+[e.g., the Lyman series transitions of hydrogen; @kurucz2017including].
 That is, it may require so many parameters to fit the opacity function that the compression is no longer worthwhile.
 
 
@@ -105,7 +108,7 @@ is shown in \autoref{fig:example}.
 ![Top panel: The original opacity function of CO [@rothman:2010] (solid lines) and its `cortecs` reconstruction (transparent lines) over a large
 wavelength range and at multiple temperatures and pressures. Bottom panel: the absolute residuals between the opacity function
 and its `cortecs` reconstruction. Note that opacities less than $10^-{60}$ are not generally relevant for the benchmark
-presented here; an opacity of $$\sigma_\lambda=10^-{60}$ would require a column nearly $10^{27}$m long to become
+presented here; an opacity of $$\sigma_\lambda=10^-{60}$ would require a column nearly $10^{34}$m long to become
 optically thick at a pressure of 1 bar and temperature of 1000 K. \label{fig:example}](example_application.png)
 
 
@@ -142,7 +145,7 @@ stored as 2.0 GB .h5 files containing 39 temperature points, 18 pressure points,
 as 154 MB files of PCA coefficients and 1.1 KB files of PCA vectors (which are reused for each wavelength point).
 These on-disk memory quotes are relatively faithful to the in-memory RAM footprint of the data when stored as `numpy`
 arrays (2.1 GB for the uncompressed data and 160 MB for the compressed data). Reading in the original files takes
-1.1 $\pm$ 0.1 seconds, while reading in the compressed files takes 24.4 $\pm$ 0.3 ms. Accessing/evaluating an opacity
+1.1 $\pm$ 0.1 seconds, while reading in the compressed files takes 24.4 $\pm$ 0.3 ms. Accessing/evaluating a single opacity
 value takes 174.0 $\pm$ 0.5 ns for the uncompressed data and 789 $\pm$ 5 ns for the compressed data. All of these timing
 experiments are performed on a 2021 MacBook Pro with an Apple M1 Pro chip and 16 GB of RAM.
 
@@ -150,7 +153,8 @@ experiments are performed on a 2021 MacBook Pro with an Apple M1 Pro chip and 16
 Importantly, we find that our compressed-opacity retrieval yields posterior distributions [as plotted by the `corner` package, @corner:2016]
 and Bayesian evidences that are consistent with those from the benchmark
 retrieval using uncompressed opacity (\autoref{fig:corner}) within a comparable runtime. The two posterior distributions exhibit
-slightly different substructure, which we attribute to the compressed results requiring 10% more samples to converge and
+slightly different substructure, which we attribute to the compressed results requiring 10% more samples to converge
+(about 5 hours of extra runtime on a roughly 2 day-long calculation) and
 residual differences between the compressed and uncompressed opacities.
 The results from this exercise indicate that our compression/decompression scheme
 is accurate enough to be used in at least some high-resolution retrievals.
@@ -167,7 +171,7 @@ and our retrieval using opacities compressed by `cortecs` (gold). \label{fig:cor
 
 Comparison of compression methods used for the HITEMP CO line list [@rothman:2010] over the IGRINS wavelength range
 at a resolving power of 250,000. Note that the neural network compression performance and timings are only assessed at
-a single wavelength point and extrapolated over the full wavelength range.
+a single wavelength point and extrapolated over the full wavelength range. The timing is over the entire wavelength range.
 
 
 # Acknowledgements
