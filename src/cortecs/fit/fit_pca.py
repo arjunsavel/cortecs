@@ -173,5 +173,4 @@ def save_pca(savename, fit_results):
     """
     # pdb.set_trace()
     vectors, beta = fit_results
-    np.save(savename + "_coeffs.npy", beta)
-    np.save(savename + "_vectors.npy", vectors)
+    np.savez_compressed(savename + "npz", pca_coeffs=beta, vectors=vectors)
