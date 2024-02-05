@@ -39,7 +39,7 @@ def title_format(quantity):
     return
 
 
-def calc_metrics(fitter, tp_undersample_factor=2, wl_under_sample_factor=8, plot=False):
+def calc_metrics(fitter, tp_undersample_factor=1, wl_under_sample_factor=8, plot=False):
     """
         calculates the mean and percent error  associated with the fit.
     .
@@ -57,6 +57,13 @@ def calc_metrics(fitter, tp_undersample_factor=2, wl_under_sample_factor=8, plot
     evaluator = Evaluator(fitter.opac, fitter)
     AMU = 1.6605390666e-24  # atomic mass unit in cgs. From astropy!
 
+    try:
+        species_weight = evaluator.load_obj.species_weight
+    except AttributeError:
+        raise AttributeError(
+            "Object has not been loaded to include the species weight. Please load the opacities appropriately."
+        )
+
     vals = []
     orig_vals = []
     abs_diffs = []
@@ -68,7 +75,7 @@ def calc_metrics(fitter, tp_undersample_factor=2, wl_under_sample_factor=8, plot
                     fitter.opac.T[i], fitter.opac.P[j], fitter.opac.wl[k]
                 )
                 # todo: check that this works for not just PLATON
-                val = np.log10(val * evaluator.load_obj.species_weight * AMU * 1e-4)
+                val = np.log10(val * species_weight * AMU * 1e-4)
                 if not np.isfinite(val):
                     val = -104
                 orig_val = fitter.opac.cross_section[i, j, k]
