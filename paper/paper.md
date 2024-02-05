@@ -49,7 +49,7 @@ radiative transfer equation over tens of thousands of wavelength points [e.g.,
 @beltz:2023;  @savel:2022; @line:2021; @wardenier:2023;  @gandhi:2023; @prinoth:2023; @maguire:2023].
 To decrease computational runtime,
 some codes have parallelized the problem on GPUs [e.g., @lee:2022; @line:2021 ]. However, GPUs cannot in general hold large amounts of
-data their video random-access memory (VRAM) [e.g., @ito:2017]; only the cutting-edge, most expensive GPUs are equipped with VRAM in excess of 30 GB
+data in their video random-access memory (VRAM) [e.g., @ito:2017]; only the cutting-edge, most expensive GPUs are equipped with VRAM in excess of 30 GB
 (such as the NVIDIA A100 or H100). RAM and VRAM management is therefore a clear concern when producing
 high-resolution spectra.
 
