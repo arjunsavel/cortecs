@@ -55,9 +55,9 @@ high-resolution spectra.
 
 How do we decrease the RAM footprint of these calculations? By far the largest contributor to the RAM footprint,
 at least as measured on disk, is the opacity data. For instance, the opacity data for a single gas species across
-the wavelength range of the Immersion GRating INfrared Spectrometer spectrograph [IGRINS; @mace:2018] takes up 2.5 GB of non-volatile memory (i.e., the file size is 2.5 GB) at float64 precision and at a resolving power of 400,000
-(as used in [@line:2021], with 39 temperature points and 18 pressure points, using, e.g., the [@polyansky:2018] water opacity tables).
-In many cases, not all wavelengths need to be loaded, e.g. if the user is down-sampling resolution. Even so, it stands to reason
+the wavelength range of the Immersion GRating INfrared Spectrometer spectrograph [IGRINS, @mace:2018] takes up 2.5 GB of non-volatile memory (i.e., the file size is 2.5 GB) at `float64` precision and at a resolving power of 400,000
+[as used in @line:2021; with 39 temperature points and 18 pressure points, using, e.g., the @polyansky:2018 water opacity tables).
+In many cases, not all wavelengths need to be loaded, e.g. if the user is down-sampling the resolution of their opacity function. Even so, it stands to reason
 that decreasing the amount of RAM/VRAM consumed by opacity data would strongly decrease the total amount of RAM/VRAM consumed
 by the radiative transfer calculation.
 
@@ -68,24 +68,24 @@ This feature implies that the opacity data should be compressible without signif
 accuracy at the spectrum level.
 
 While our benchmark case (see Benchmark) demonstrates the applicability of `cortecs` to high-resolution
-opacity functions of molecular gas, the package is general and can be applied to any opacity data that has
-pressure and temperature dependence, such as the opacity of neutral atoms or ions. Additionally, our benchmark only
-shows that the amounts of error from our compression technique is reasonable in the spectra of exoplanet atmospheres
+opacity functions of molecular gases, the package is general and can be applied to any opacity data that has
+pressure and temperature dependence, such as the opacity of neutral atoms or ions. Our benchmark only
+shows, however, that the amounts of error from our compression technique is reasonable in the spectra of exoplanet atmospheres
 at pressures greater than a microbar for a single composition. This caveat is important to note for a few reasons:
 
 1. Based on error propagation, the error in the opacity function will be magnified in the spectrum based on
 the number of cells that are traced during radiative transfer. The number of spatial cells used to simulate exoplanet
-atmospheres (in our case, 100) is small enough that the `cortecs` error is not massive at the spectrum level.
-2. Exoplanet atmospheres are often modeled in hydrostatic equilibriumg at pressures greater than a microbar
+atmospheres (in our case, 100) is small enough that the `cortecs` error is not large at the spectrum level.
+2. Exoplanet atmospheres are often modeled in hydrostatic equilibrium at pressures greater than a microbar
 [e.g., @barstow2020comparison; @showman2020atmospheric].
 When modeling atmospheres in hydrostatic equilibrium, the final spectrum essentially maps to the altitude at which
 the gas becomes optically thick. If `cortecs`-compressed opacities were used to model an optically thin gas over
-large path lengths, then smaller opacities would be more important. However, `cortecs` tends to perform worse at
+large path lengths, however, then smaller opacities would be more important. `cortecs` tends to perform worse at
 modeling opacity functions that jump from very low to very high opacities, so it may not perform optimally for these
 optically thin scenarios.
 3. The program may perform poorly for opacity functions with sharp features in their temperature--pressure dependence
-[e.g., the Lyman series transitions of hydrogen; @kurucz2017including].
-That is, it may require so many parameters to fit the opacity function that the compression is no longer worthwhile.
+[e.g., the Lyman series transitions of hydrogen, @kurucz2017including].
+That is, the data may require so many parameters to be fit that the compression is no longer worthwhile.
 
 
 # Methods
