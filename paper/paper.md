@@ -91,9 +91,9 @@ That is, the data may require so many parameters to be fit that the compression 
 # Methods
 `cortecs` seeks to compress redundant information by representing opacity data not as the
 opacity itself but as fits to the opacity as a function of temperature and pressure. We generally refer to this process
-as ''compression'' as opposed to ''fitting'' to emphasize that we do not seek to construct physically motivated,
+as "compression" as opposed to "fitting" to emphasize that we do not seek to construct physically motivated,
 predictive, or comprehensible models of the opacity function. Rather, we simply seek representations of the opacity function
-that consume less RAM/VRAM. The compression methods we use are ''lossy''' --- the original opacity data cannot be exactly recovered with our methods.
+that consume less RAM/VRAM. The compression methods we use are "lossy" --- the original opacity data cannot be exactly recovered with our methods.
 We find that the loss of accuracy is tolerable for at least the hot Jupiter emission spectroscopy application (see Benchmark below).
 
 We provide three methods of increasing complexity (and flexibility) for
@@ -108,7 +108,7 @@ is shown in \autoref{fig:example}.
 ![Top panel: The original opacity function of CO [@rothman:2010] (solid lines) and its `cortecs` reconstruction (transparent lines) over a large
 wavelength range and at multiple temperatures and pressures. Bottom panel: the absolute residuals between the opacity function
 and its `cortecs` reconstruction. Note that opacities less than $10^-{60}$ are not generally relevant for the benchmark
-presented here; an opacity of $$\sigma_\lambda=10^-{60}$ would require a column nearly $10^{34}$m long to become
+presented here; an opacity of $\sigma_\lambda=10^{-60}$ would require a column nearly $10^{35}$m long to become
 optically thick at a pressure of 1 bar and temperature of 1000 K. \label{fig:example}](example_application.png)
 
 
