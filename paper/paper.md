@@ -120,7 +120,7 @@ A typical workflow with `cortecs` involves the following steps:
 2. Fitting: Compress the opacity data with `cortecs`'s `fit` methods.
 3. Saving: Save the compressed opacity data (the fitted parameters) to disk.
 4. Loading: Load the compressed opacity data from disk in whatever program you're applying the data---e.g., within your radiative transfer code.
-5. Decompression: Evaluate the opacity with `cortecs`'s `eval` methods.
+5. Decompressing: Evaluate the opacity with `cortecs`'s `eval` methods.
 
 The accuracy of these fits may or may not be suitable for a given application. It is important to test that
 the error incurred using `cortecs` does not impact the results of your application---for instance,
