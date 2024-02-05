@@ -170,8 +170,8 @@ and our retrieval using opacities compressed by `cortecs` (gold). \label{fig:cor
 | Neural network | 9                  | 2.6                       | 1.4$$\times 10^7$$   | 3.6$$\times 10^4$$     |
 
 Comparison of compression methods used for the HITEMP CO line list [@rothman:2010] over the IGRINS wavelength range
-at a resolving power of 250,000. Note that the neural network compression performance and timings are only assessed at
-a single wavelength point and extrapolated over the full wavelength range. The timing is over the entire wavelength range.
+at a resolving power of 250,000, cumulative for all data points. Note that the neural network compression performance and timings are only assessed at
+a single wavelength point and extrapolated over the full wavelength range.
 
 
 # Acknowledgements
