@@ -73,7 +73,7 @@ pressure and temperature dependence, such as the opacity of neutral atoms or ion
 shows, however, that the amounts of error from our compression technique is reasonable in the spectra of exoplanet atmospheres
 at pressures greater than a microbar for a single composition. This caveat is important to note for a few reasons:
 
-1. Based on error propagation, the error in the opacity function will be magnified in the spectrum based on
+1. Based on error propagation, the error in the opacity function may be magnified in the spectrum based on
 the number of cells that are traced during radiative transfer. The number of spatial cells used to simulate exoplanet
 atmospheres (in our case, 100) is small enough that the `cortecs` error is not large at the spectrum level.
 2. Exoplanet atmospheres are often modeled in hydrostatic equilibrium at pressures greater than a microbar
@@ -86,6 +86,19 @@ optically thin scenarios.
 3. The program may perform poorly for opacity functions with sharp features in their temperature--pressure dependence
 [e.g., the Lyman series transitions of hydrogen, @kurucz2017including].
 That is, the data may require so many parameters to be fit that the compression is no longer worthwhile.
+
+The effects of points 1 and 2 are shown in \autoref{fig:column_experiment}. The column simulated varies in temperature
+from 100 K to 500 K at a constant pressure of 0.1 Pa and a constant density of 0.003 g/cm$^3$. The absolute value of the
+optical depth is far from the true value at this wavelength. Over short distances, this error is infinitesimal.
+Over much larger distances, the error accumulates, leading to large differences in $e^{-\tau}$ (the transmission as
+yielded by Beer's Law). Hence, in this limiting case, the poor fit at very low opacity levels is not acceptable because
+of the large physical distances simulated.
+
+
+![The results of a simple toy model demonstrating a `cortecs` failure mode.
+The toy model is a single column, with the number of grid cells within the column varied (along the x-axis).
+For each number of cells, we calculate the difference in the optical depth $\tau$ as calculated using `cortecs`-compressed
+opacities (using the polynomial compression method) and the second to last wavelength point of native `PLATON` methane opacity. \label{fig:column_experiment}](column_experiment.png)
 
 
 # Methods
