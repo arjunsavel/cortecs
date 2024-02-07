@@ -55,9 +55,12 @@ def eval_pca(temperature, pressure, wavelength, T, P, wl, fitter_results):
         The wavelength to evaluate at.
 
     """
-    temperature_ind = np.where(np.isclose(T, temperature))[0][0]
-    pressure_ind = np.where(np.isclose(P, pressure))[0][0]
-    wavelength_ind = np.where(np.isclose(wl, wavelength))[0][0]
+    # find the nearest temperature, pressure, and wavelength indices.
+
+    temperature_ind = np.argmin(np.abs(T - temperature))
+    pressure_ind = np.argmin(np.abs(P - pressure))
+    wavelength_ind = np.argmin(np.abs(wl - wavelength))
+
     pca_vectors, pca_coeffs_all_wl = fitter_results
     pca_coeffs = pca_coeffs_all_wl[wavelength_ind, :, :]
 
