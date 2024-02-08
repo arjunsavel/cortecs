@@ -152,7 +152,7 @@ def move_cross_section_axis(cross_section, fit_axis):
 
 
 def prep_pca(
-    cross_section, wav_ind=-1, nc=2, force_fit_constant=False, fit_axis="best"
+    cross_section, wav_ind=-1, nc=2, force_fit_constant=False, fit_axis="pressure"
 ):
     """
     Prepares the opacity data for PCA. That is, it calculates the PCA components to be fit along the entire
