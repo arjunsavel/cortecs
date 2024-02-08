@@ -119,6 +119,7 @@ def fit_pca(cross_section, P, T, xMat, fit_axis="pressure", **kwargs):
     -------
         :beta: (nc x pixels) PCA coefficients
     """
+    print("shapes for everything:", cross_section.shape, P.shape, T.shape, xMat.shape)
     cross_section = move_cross_section_axis(cross_section, fit_axis)
 
     beta = fit_mlr(cross_section, xMat)
