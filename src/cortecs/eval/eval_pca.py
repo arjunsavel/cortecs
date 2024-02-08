@@ -40,7 +40,9 @@ def eval_pca_ind_wav(temperature_ind, pressure_ind, vectors, pca_coeffs):
     return xsec_val
 
 
-def eval_pca(temperature, pressure, wavelength, T, P, wl, fitter_results):
+def eval_pca(
+    temperature, pressure, wavelength, T, P, wl, fitter_results, fit_axis="pressure"
+):
     """
     Evaluates the PCA fit at a given temperature, pressure, and wavelength.
 
@@ -64,4 +66,23 @@ def eval_pca(temperature, pressure, wavelength, T, P, wl, fitter_results):
     pca_vectors, pca_coeffs_all_wl = fitter_results
     pca_coeffs = pca_coeffs_all_wl[wavelength_ind, :, :]
 
-    return eval_pca_ind_wav(temperature_ind, pressure_ind, pca_vectors, pca_coeffs)
+    # todo: figure out how to order the pressure and temperature inds!
+    if fit_axis == "pressure":
+        first_arg = temperature_ind
+        second_arg = pressure_ind
+    elif fit_axis == "temperature":
+        first_arg = pressure_ind
+        second_arg = temperature_ind
+    elif fit_axis == "best":
+        T_length = len(T)
+        P_length = len(P)
+
+        # todo: what if equal?
+        if T_length > P_length:
+            first_arg = pressure_ind
+            second_arg = temperature_ind
+        else:
+            first_arg = pressure_ind
+            second_arg = temperature_ind
+
+    return eval_pca_ind_wav(first_arg, second_arg, pca_vectors, pca_coeffs)

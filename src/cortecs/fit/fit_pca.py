@@ -104,7 +104,7 @@ def do_pca(cube, nc=3):
     return xMat, standardized_cube, s, vh, u
 
 
-def fit_pca(cross_section, P, T, xMat, **kwargs):
+def fit_pca(cross_section, P, T, xMat, fit_axis="pressure", **kwargs):
     """
     Fits the PCA to the opacity data.
 
@@ -119,12 +119,40 @@ def fit_pca(cross_section, P, T, xMat, **kwargs):
     -------
         :beta: (nc x pixels) PCA coefficients
     """
+    cross_section = move_cross_section_axis(cross_section, fit_axis)
 
     beta = fit_mlr(cross_section, xMat)
     return beta
 
 
-def prep_pca(cross_section, wav_ind=-1, nc=2, force_fit_constant=False):
+def move_cross_section_axis(cross_section, fit_axis):
+    """
+    todo: add docstring
+    :param cross_section:
+    :param fit_axis:
+    :return:
+    """
+    fit_axis_options = ["best", "temperature", "pressure"]
+    if fit_axis not in fit_axis_options:
+        raise ValueError(f"fit_axis param must be one of: {fit_axis_options}")
+
+    # the current shape prefers pressure. let's auto-check, though
+    if fit_axis == "best":
+        # actually want SECOND longest.
+        longest_axis = np.argmax(cross_section[:, :, 0].shape)
+
+        # now move that longest axis to 0.
+        cross_section = np.moveaxis(cross_section, longest_axis, 1)
+
+    elif fit_axis == "temperature":
+        cross_section = np.moveaxis(cross_section, 0, 1)
+
+    return cross_section
+
+
+def prep_pca(
+    cross_section, wav_ind=-1, nc=2, force_fit_constant=False, fit_axis="best"
+):
     """
     Prepares the opacity data for PCA. That is, it calculates the PCA components to be fit along the entire
     dataset by fitting the PCA to a single wavelength.
@@ -144,11 +172,15 @@ def prep_pca(cross_section, wav_ind=-1, nc=2, force_fit_constant=False):
         :force_fit_constant: (bool) if True, will allow the PCA to fit an opacity function without temperature and pressure
         dependence. This usually isn't recommended, if these PCA vectors are to e used to fit other wavelengths that
         *do* have temperature and pressure dependence.
+        :fit_axis: (str) the axis to fit against. determines the shape of the final vectors and components.
+        if "best", chooses the largest axis. otherwise, can select "temperature" or "pressure".
 
     Returns
     -------
         :xMat: (n_exp x nc) PCA components
     """
+    cross_section = move_cross_section_axis(cross_section, fit_axis)
+
     single_pres_single_temp = cross_section[:, :, wav_ind]
     if (
         np.all(single_pres_single_temp == single_pres_single_temp[0, 0])
