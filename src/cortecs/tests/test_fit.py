@@ -86,7 +86,20 @@ class TestFitUtils(unittest.TestCase):
         bad_cube = np.zeros((3, 3)) * np.nan
 
         self.assertRaises(
-            np.linalg.LinAlgError,
+            ValueError,
+            do_pca,
+            bad_cube,
+        )
+
+    def test_nan_pca_cube_errors(self):
+        """
+        i want to make a linalg errror!
+        :return:
+        """
+        bad_cube = np.zeros((3, 3)) * np.inf
+
+        self.assertRaises(
+            ValueError,
             do_pca,
             bad_cube,
         )
