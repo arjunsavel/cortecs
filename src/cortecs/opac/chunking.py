@@ -24,6 +24,7 @@ so far, only works for exo-transmit chunks. TODO: generalize for others.
 """
 
 import os
+from glob import glob
 
 import numpy as np
 from tqdm import tqdm
@@ -244,6 +245,7 @@ def add_previous(num_to_add, file, previous_file):
         f2.write(x)
         f2.close()
         if ticker == num_to_add:
+            pdb.set_trace()
             return
 
 
@@ -270,10 +272,14 @@ def add_overlap(filename, v_max=11463.5):
     Side effects:
         Modifies every 'filename*.dat' file.
     """
-    for i in tqdm(
-        range(len(os.listdir()[:-1])), position=0, leave=True
+    print("for sure adding overlap")
+    files = glob(filename + "*.dat")
+    for i, file in tqdm(
+        enumerate(files), total=len(files), position=0, leave=True, desc="eeeeee"
     ):  # don't include the last file
-        file = filename + str(i) + ".dat"
+        if file == filename + ".dat":
+            continue  # only add over lap to the chunked file
+        print("for sure adding overlapppp")
 
         next_file = filename + str(i + 1) + ".dat"
 
@@ -295,8 +301,11 @@ def add_overlap(filename, v_max=11463.5):
         delta_lam = 2 * max_curr_lam * v_max / c  # delta_lambda/lambda = v/c
 
         # add another 20 indices to be safe!
-        max_lam_to_add_ind = (
-            np.argmin(np.abs(next_lams - (max_curr_lam + delta_lam))) + 20
-        )
+        # max_lam_to_add_ind = (
+        #     np.argmin(np.abs(next_lams - (max_curr_lam + delta_lam))) + 20
+        # )
+        max_lam_to_add_ind = np.argmin(np.abs(next_lams - (max_curr_lam + delta_lam)))
+        print("max lam to add")
+        print(max_lam_to_add_ind)
 
         add_lams(max_lam_to_add_ind, file, next_file)

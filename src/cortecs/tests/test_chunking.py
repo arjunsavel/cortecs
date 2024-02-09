@@ -87,10 +87,10 @@ class TestIntegration(unittest.TestCase):
         Test that the overlap is added to the end of the first file.
         """
         # clean up the files already made!!
-        # os.remove(self.first_file)
-        # os.remove(self.second_file)
-        #
-        # chunk_wavelengths(self.opacity_file, wav_per_chunk=2, add_overlap=True)
+        os.remove(self.first_file)
+        os.remove(self.second_file)
+
+        chunk_wavelengths(self.opacity_file, wav_per_chunk=2)
         opac_obj0_orig = Opac(
             self.first_file,
             loader="exotransmit",
@@ -100,7 +100,7 @@ class TestIntegration(unittest.TestCase):
             loader="exotransmit",
         )
 
-        add_overlap(self.file_base)
+        add_overlap(self.file_base, v_max=0.0)
 
         # now get the wavelengths of each file
         opac_obj_ref = Opac(self.opacity_file, loader="exotransmit")
