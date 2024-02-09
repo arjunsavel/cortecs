@@ -87,8 +87,8 @@ def eval_pca(
 
         # todo: what if equal?
         if T_length > P_length:
-            first_arg = pressure_ind
-            second_arg = temperature_ind
+            first_arg = temperature_ind
+            second_arg = pressure_ind
         else:
             first_arg = pressure_ind
             second_arg = temperature_ind
