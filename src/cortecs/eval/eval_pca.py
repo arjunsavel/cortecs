@@ -66,6 +66,8 @@ def eval_pca(
 
     """
     # find the nearest temperature, pressure, and wavelength indices.
+    print("this is my fit axis")
+    print(fit_axis)
 
     temperature_ind = np.argmin(np.abs(T - temperature))
     pressure_ind = np.argmin(np.abs(P - pressure))
