@@ -87,8 +87,8 @@ class TestIntegration(unittest.TestCase):
         Test that the overlap is added to the end of the first file.
         """
         # clean up the files already made!!
-        os.remove(self.first_file)
-        os.remove(self.second_file)
+        # os.remove(self.first_file)
+        # os.remove(self.second_file)
 
         chunk_wavelengths(self.opacity_file, wav_per_chunk=2)
         opac_obj0_orig = Opac(
