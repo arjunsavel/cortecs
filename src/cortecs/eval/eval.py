@@ -28,6 +28,7 @@ class Evaluator(object):
         self.wl = opac.wl
         self.P = opac.P
         self.T = opac.T
+        self.fit_kwargs = fitter.fitter_kwargs
 
         if not hasattr(fitter, "fitter_results"):
             raise ValueError("Fitter must be run before being passed to an Evaluator.")

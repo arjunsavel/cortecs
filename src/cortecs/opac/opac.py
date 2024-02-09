@@ -18,7 +18,7 @@ class Opac(object):
     """
 
     method_dict = {
-        "chimera": loader_base,
+        "chimera": loader_chimera,
         "helios": loader_helios,
         "platon": loader_platon,
         "exotransmit": loader_exotransmit,
@@ -28,7 +28,12 @@ class Opac(object):
     T = None
     P = None
 
-    def __init__(self, filename, loader="chimera", load_kwargs={}):
+    def __init__(
+        self,
+        filename,
+        loader="chimera",
+        load_kwargs={},
+    ):
         """
         wraps around the loaders.
 

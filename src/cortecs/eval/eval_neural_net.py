@@ -61,7 +61,14 @@ def feed_forward(x, n_layers, weights, biases):
 
 # @jax.jit
 def eval_neural_net(
-    T, P, temperatures, pressures, wavelengths, n_layers=None, weights=None, biases=None
+    T,
+    P,
+    temperatures=None,
+    pressures=None,
+    wavelengths=None,
+    n_layers=None,
+    weights=None,
+    biases=None,
 ):
     """
     evaluates the neural network at a given temperature and pressure.
