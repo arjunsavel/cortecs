@@ -5,6 +5,8 @@ import unittest
 from cortecs.fit.fit import *
 from cortecs.opac.opac import *
 from cortecs.fit.fit_pca import *
+from cortecs.fit.metrics import *
+
 import os
 import sys
 import numpy as np
@@ -205,3 +207,29 @@ class TestIntegration(unittest.TestCase):
                 "learn_rate": 0.01,
             }
         )
+
+    def test_pca_different_axis(self):
+        """
+        test that the PCA fit works well enough even when fit along a different axis.
+        """
+        load_kwargs = {
+            "T_filename": self.T_filename,
+            "P_filename": self.P_filename,
+            "wl_filename": self.wl_filename,
+        }
+        opac_obj = Opac(
+            self.cross_sec_filename, loader="platon", load_kwargs=load_kwargs
+        )
+        # fit axis is temperature now
+        fitter = Fitter(
+            opac_obj, method="pca", wav_ind=-2, nc=3, fit_axis="temperature"
+        )
+
+        # run the metrics to see what the median absolute deviation is
+        vals, orig_vals, abs_diffs, percent_diffs = calc_metrics(
+            fitter, tp_undersample_factor=1, wl_under_sample_factor=8, plot=False
+        )
+
+        # check that the median absolute deviation is less than 10%
+        median_err = np.median(np.abs(percent_diffs))
+        self.assertTrue(median_err < 10)
