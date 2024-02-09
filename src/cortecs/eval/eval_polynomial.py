@@ -11,6 +11,7 @@ def eval_polynomial(
     pressures,
     wavelengths,
     fitter_results,
+    **kwargs,
 ):
     """
     evaluates the polynomial at a given temperature and pressure.

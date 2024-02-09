@@ -119,14 +119,14 @@ def fit_pca(cross_section, P, T, xMat, fit_axis="pressure", **kwargs):
     -------
         :beta: (nc x pixels) PCA coefficients
     """
-    print("shapes for everything:", cross_section.shape, P.shape, T.shape, xMat.shape)
-    cross_section = move_cross_section_axis(cross_section, fit_axis)
+    # print("shapes for everything:", cross_section.shape, P.shape, T.shape, xMat.shape)
 
+    cross_section = move_cross_section_axis(cross_section, fit_axis)
     beta = fit_mlr(cross_section, xMat)
     return beta
 
 
-def move_cross_section_axis(cross_section, fit_axis):
+def move_cross_section_axis(cross_section, fit_axis, dim=2):
     """
     todo: add docstring
     :param cross_section:
@@ -140,7 +140,10 @@ def move_cross_section_axis(cross_section, fit_axis):
     # the current shape prefers pressure. let's auto-check, though
     if fit_axis == "best":
         # actually want SECOND longest.
-        longest_axis = np.argmax(cross_section[:, :, 0].shape)
+        if dim == 3:
+            longest_axis = np.argmax(cross_section[:, :, 0].shape)
+        else:
+            longest_axis = np.argmax(cross_section.shape)
 
         # now move that longest axis to 0.
         cross_section = np.moveaxis(cross_section, longest_axis, 1)
@@ -180,8 +183,7 @@ def prep_pca(
     -------
         :xMat: (n_exp x nc) PCA components
     """
-    cross_section = move_cross_section_axis(cross_section, fit_axis)
-
+    cross_section = move_cross_section_axis(cross_section, fit_axis, dim=3)
     single_pres_single_temp = cross_section[:, :, wav_ind]
     if (
         np.all(single_pres_single_temp == single_pres_single_temp[0, 0])

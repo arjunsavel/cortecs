@@ -69,6 +69,7 @@ def eval_neural_net(
     n_layers=None,
     weights=None,
     biases=None,
+    **kwargs
 ):
     """
     evaluates the neural network at a given temperature and pressure.
