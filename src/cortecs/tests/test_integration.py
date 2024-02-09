@@ -230,4 +230,4 @@ class TestIntegration(unittest.TestCase):
 
         # check that the median absolute deviation is less than 10%
         median_err = np.median(np.abs(abs_diffs))
-        self.assertTrue(median_err < 20)  # a reasonable fit
+        self.assertTrue(median_err < 1)  # a reasonable fit
