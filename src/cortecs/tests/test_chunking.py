@@ -9,7 +9,7 @@ from cortecs.opac.opac import Opac
 
 
 class TestIntegration(unittest.TestCase):
-    opacity_file = os.path.abspath(".") + "/src/cortecs/tests/temperatures.npy"
+    opacity_file = os.path.abspath(".") + "/src/cortecs/tests/opacCH4_narrow_wl.dat"
 
     def test_chunking_two_files(self):
         """
