@@ -87,8 +87,8 @@ class TestIntegration(unittest.TestCase):
         Test that the overlap is added to the end of the first file.
         """
         # clean up the files already made!!
-        # os.remove(self.first_file)
-        # os.remove(self.second_file)
+        os.remove(self.first_file)
+        os.remove(self.second_file)
 
         chunk_wavelengths(self.opacity_file, wav_per_chunk=2)
         opac_obj0_orig = Opac(
@@ -118,4 +118,42 @@ class TestIntegration(unittest.TestCase):
             and len(opac_obj1.wl) >= len(opac_obj1_orig.wl)
         )
 
-        # self.assertEqual(opac_obj_ref.wl), len(opac_obj0.wl) + len(opac_obj1.wl))
+    def add_overlap_with_single_overlap_point(self):
+        """
+        just overlap a single point and make sure that works.
+        :return:
+        """
+        os.remove(self.first_file)
+        os.remove(self.second_file)
+
+        chunk_wavelengths(self.opacity_file, wav_per_chunk=2)
+        opac_obj0_orig = Opac(
+            self.first_file,
+            loader="exotransmit",
+        )
+        opac_obj1_orig = Opac(
+            self.second_file,
+            loader="exotransmit",
+        )
+
+        # calculate the vmax so that one point is changed
+        # velocity is C * delta lambda over lambda
+        c = 3e8
+        max_curr_lam = np.max(opac_obj0_orig.wl)
+        v_max = c * (opac_obj1_orig.wl[0] - max_curr_lam) / max_curr_lam
+        add_overlap(self.file_base, v_max=v_max)
+
+        # now get the wavelengths of each file
+        opac_obj_ref = Opac(self.opacity_file, loader="exotransmit")
+        opac_obj0 = Opac(
+            self.first_file,
+            loader="exotransmit",
+        )
+        opac_obj1 = Opac(
+            self.second_file,
+            loader="exotransmit",
+        )
+        self.assertTrue(
+            len(opac_obj1.wl.min) == len(opac_obj0.wl.max())
+            and len(opac_obj1.wl) == 1 + len(opac_obj1_orig.wl)
+        )
