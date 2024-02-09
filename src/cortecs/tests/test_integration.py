@@ -224,7 +224,7 @@ class TestIntegration(unittest.TestCase):
         fitter = Fitter(
             opac_obj, method="pca", wav_ind=-2, nc=3, fit_axis="temperature"
         )
-
+        fitter.fit()
         # run the metrics to see what the median absolute deviation is
         vals, orig_vals, abs_diffs, percent_diffs = calc_metrics(
             fitter, tp_undersample_factor=1, wl_under_sample_factor=8, plot=False
