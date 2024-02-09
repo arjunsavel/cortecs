@@ -9,31 +9,41 @@ from cortecs.opac.opac import Opac
 
 
 class TestIntegration(unittest.TestCase):
+    opacity_file = os.path.abspath(".") + "/src/cortecs/tests/temperatures.npy"
+
     def test_chunking_two_files(self):
         """
         Test the chunking function.
         """
-        file = "opacCH4_narrow_wl.dat"
-        chunk_wavelengths(file, nchunks=2)  # evenly split into two chunks
+        chunk_wavelengths(self.opacity_file, nchunks=2)  # evenly split into two chunks
 
         # now test that the two files were created
 
         self.assertTrue(
-            os.path.exists("opacCH4_narrow_wl0.dat")
-            and os.path.exists("opacCH4_narrow_wl1.dat")
+            os.path.exists(
+                os.path.abspath(".") + "/src/cortecs/tests/" + "opacCH4_narrow_wl0.dat"
+            )
+            and os.path.exists(
+                os.path.abspath(".") + "/src/cortecs/tests/" + "opacCH4_narrow_wl1.dat"
+            )
         )
 
     def test_wls_of_each_created_file(self):
         """
         Test that the number of wavelengths in each file is EXACTLY the same.
         """
-        file = "opacCH4_narrow_wl.dat"
-        chunk_wavelengths(file, nchunks=2)
+        chunk_wavelengths(self.opacity_file, nchunks=2)
 
         # now get the wavelengths of each file
-        opac_obj_ref = Opac(file, loader="exotransmit")
-        opac_obj0 = Opac("opacCH4_narrow_wl0.dat", loader="exotransmit")
-        opac_obj1 = Opac("opacCH4_narrow_wl1.dat", loader="exotransmit")
+        opac_obj_ref = Opac(self.opacity_file, loader="exotransmit")
+        opac_obj0 = Opac(
+            os.path.abspath(".") + "/src/cortecs/tests/opacCH4_narrow_wl0.dat",
+            loader="exotransmit",
+        )
+        opac_obj1 = Opac(
+            os.path.abspath(".") + "/src/cortecs/tests/opacCH4_narrow_wl1.dat",
+            loader="exotransmit",
+        )
 
         np.testing.assert_array_equal(
             opac_obj_ref.wl, np.concatenate((opac_obj0.wl, opac_obj1.wl))

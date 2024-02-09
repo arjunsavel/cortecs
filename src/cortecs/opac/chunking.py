@@ -31,7 +31,13 @@ from tqdm import tqdm
 from cortecs.opac.opac import *
 
 
-def chunk_wavelengths(file, nchunks=None, wav_per_chunk=None, adjust_wavelengths=False):
+def chunk_wavelengths(
+    file,
+    nchunks=None,
+    wav_per_chunk=None,
+    adjust_wavelengths=False,
+    loader="exotransmit",
+):
     """
     Performs wavelength-chunking.
 
@@ -66,7 +72,7 @@ def chunk_wavelengths(file, nchunks=None, wav_per_chunk=None, adjust_wavelengths
         )
 
     if not wav_per_chunk:
-        opac = Opac(file, loader="exotransmit")
+        opac = Opac(file, loader=loader)
         num_wavelengths = len(opac.wl)
         del opac  # clean it up
         wav_per_chunk = round(num_wavelengths / nchunks)
