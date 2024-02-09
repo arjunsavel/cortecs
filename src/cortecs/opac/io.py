@@ -352,7 +352,8 @@ class loader_exotransmit(loader_base):
         opacities = []
 
         # read through all lines in the opacity file
-        for x in tqdm(f1, desc="reading wavelengths"):
+        # skip through the header!
+        for x in tqdm(f1[2:], desc="reading wavelengths"):
             # check if blank line
             if not x:
                 continue
@@ -362,13 +363,17 @@ class loader_exotransmit(loader_base):
                 wavelengths += [eval(x[:-1])]
             else:
                 # the first entry in each opacity line is the pressure
-                opacity_string = commad.split(" ")[1:]
+                opacity_string = x.split()[1:]
                 opacity_vals = np.array([eval(opacity) for opacity in opacity_string])
                 opacities += [opacity_vals]
 
         f.close()
+        # pdb.set_trace()
         del f1
-        return np.array(wavelengths), np.array(opacities)
+        try:
+            return np.array(wavelengths), np.array(opacities)
+        except:
+            pdb.set_trace()
 
     def load(self, filename):
         """
