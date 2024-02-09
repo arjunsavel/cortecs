@@ -123,8 +123,8 @@ class TestIntegration(unittest.TestCase):
         just overlap a single point and make sure that works.
         :return:
         """
-        os.remove(self.first_file)
-        os.remove(self.second_file)
+        # os.remove(self.first_file)
+        # os.remove(self.second_file)
 
         chunk_wavelengths(self.opacity_file, wav_per_chunk=2)
         opac_obj0_orig = Opac(
