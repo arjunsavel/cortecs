@@ -40,6 +40,7 @@ def chunk_wavelengths(
 ):
     """
     Performs wavelength-chunking.
+    todo: yell if the chunked results are already in the directory?
 
     Inputs
     -------
@@ -88,21 +89,27 @@ def chunk_wavelengths(
     file_suffix = 0
 
     # read through all lines in the opacity file. todo: from already read in opacity?
-    for x in tqdm(f1):
+    # past the header
+    write_to_file(header, file, file_suffix)
+    for x in tqdm(f1[2:]):
+        # print(x)
         if not x:
             continue
         commad = x.replace(" ", ",")
-
+        # pdb.set_trace()
         if len(np.array([eval(commad)]).flatten()) == 1:  # if a wavelength line
             ticker += 1
-        elif len(x.split(" ")) == 48 and adjust_wavelengths:  # this is ntemp, I believe
-            x = adjust_wavelength_unit(x, 1e-4, style="full")
-        #                pass # don't need to adust wavelengths anymore!
-
-        if ticker == wav_per_chunk:
+            print(x)
+            # print(file_suffix)
+        # elif len(x.split(" ")) == 48 and adjust_wavelengths:  # this is ntemp, I believe
+        #     x = adjust_wavelength_unit(x, 1e-4, style="full")
+        # #                pass # don't need to adust wavelengths anymore!
+        if ticker == wav_per_chunk + 1:
             file_suffix += 1  # start writing to different file
+
             ticker = 0
             write_to_file(header, file, file_suffix)
+
         write_to_file(x, file, file_suffix)
 
     f.close()

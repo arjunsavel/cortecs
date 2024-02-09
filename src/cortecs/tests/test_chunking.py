@@ -10,41 +10,45 @@ from cortecs.opac.opac import Opac
 
 class TestIntegration(unittest.TestCase):
     opacity_file = os.path.abspath(".") + "/src/cortecs/tests/opacCH4_narrow_wl.dat"
+    first_file = os.path.abspath(".") + "/src/cortecs/tests/" + "opacCH4_narrow_wl0.dat"
+    second_file = (
+        os.path.abspath(".") + "/src/cortecs/tests/" + "opacCH4_narrow_wl1.dat"
+    )
 
     def test_chunking_two_files(self):
         """
         Test the chunking function.
         """
-        chunk_wavelengths(self.opacity_file, nchunks=2)  # evenly split into two chunks
+        chunk_wavelengths(
+            self.opacity_file, wav_per_chunk=2
+        )  # evenly split into two chunks
 
         # now test that the two files were created
 
         self.assertTrue(
-            os.path.exists(
-                os.path.abspath(".") + "/src/cortecs/tests/" + "opacCH4_narrow_wl0.dat"
-            )
-            and os.path.exists(
-                os.path.abspath(".") + "/src/cortecs/tests/" + "opacCH4_narrow_wl1.dat"
-            )
+            os.path.exists(self.first_file) and os.path.exists(self.second_file)
         )
 
     def test_wls_of_each_created_file(self):
         """
         Test that the number of wavelengths in each file is EXACTLY the same.
         """
-        chunk_wavelengths(self.opacity_file, nchunks=2)
+        # clean up the files already made!!
+        os.remove(self.first_file)
+        os.remove(self.second_file)
+
+        chunk_wavelengths(self.opacity_file, wav_per_chunk=2)
 
         # now get the wavelengths of each file
         opac_obj_ref = Opac(self.opacity_file, loader="exotransmit")
         opac_obj0 = Opac(
-            os.path.abspath(".") + "/src/cortecs/tests/opacCH4_narrow_wl0.dat",
+            self.first_file,
             loader="exotransmit",
         )
         opac_obj1 = Opac(
-            os.path.abspath(".") + "/src/cortecs/tests/opacCH4_narrow_wl1.dat",
+            self.second_file,
             loader="exotransmit",
         )
-
         np.testing.assert_array_equal(
             opac_obj_ref.wl, np.concatenate((opac_obj0.wl, opac_obj1.wl))
         )
