@@ -370,8 +370,10 @@ class loader_exotransmit(loader_base):
         f.close()
         # pdb.set_trace()
         del f1
-
-        return np.array(wavelengths), np.array(opacities)
+        try:
+            return np.array(wavelengths), np.array(opacities)
+        except:
+            pdb.set_trace()
 
     def load(self, filename):
         """
