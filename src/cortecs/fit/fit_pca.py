@@ -97,9 +97,9 @@ def do_pca(cube, nc=3):
     try:
         xMat, s, vh, u = do_svd(standardized_cube, nc, nx)
 
-    except np.linalg.LinAlgError:
+    except np.linalg.LinAlgError as e:
         print("SVD did not converge.")
-        return
+        raise e
 
     return xMat, standardized_cube, s, vh, u
 
