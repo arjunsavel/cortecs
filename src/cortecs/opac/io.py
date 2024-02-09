@@ -1,8 +1,6 @@
 """
 Reads opacity data from various sources.
 
-
-
 author: @arjunsavel
 """
 import pickle
@@ -18,19 +16,32 @@ AMU = 1.6605390666e-24  # atomic mass unit in cgs. From astropy!
 class loader_base(object):
     """
     loads in opacity data from various sources. To be passed on to Opac object.
+
+    todo: tutorial on how to use this?
     """
 
-    wl_key = "wno"
-    T_key = "T"
-    P_key = "P"
-    cross_section_key = "xsec"
-    wl_style = "wno"
-
-    def __init__(self):
+    def __init__(
+        self,
+        wl_key="wno",
+        T_key="T",
+        P_key="P",
+        cross_section_key="xsec",
+        wl_style="wno",
+        temperature_axis=0,
+        pressure_axis=1,
+        wavelength_axis=2,
+    ):
         """
-        nothing to do here
+        sets the keys for the loader object.
         """
-        pass
+        self.wl_key = wl_key
+        self.T_key = T_key
+        self.P_key = P_key
+        self.cross_section_key = cross_section_key
+        self.wl_style = wl_style
+        self.temperature_axis = temperature_axis
+        self.pressure_axis = pressure_axis
+        self.wavelength_axis = wavelength_axis
 
     def load(self, filename):
         """
@@ -60,9 +71,27 @@ class loader_base(object):
         cross_section = np.array(hf[self.cross_section_key], dtype=np.float64)
         hf.close()
 
+        # want temperature index 0, pressure to 1, wavelength to 2 for standard usage.
+        cross_section = np.moveaxis(
+            cross_section,
+            [self.temperature_axis, self.pressure_axis, self.wavelength_axis],
+            [0, 1, 2],
+        )
+
         if self.wl_style == "wno":
             wl = 1e4 / wl
+
+        if np.all(np.diff(wl)) < 0:
+            wl = wl[::-1]
+            cross_section = cross_section[:, :, ::-1]
+            # reverse!
         return wl, T, P, cross_section
+
+
+class loader_chimera(loader_base):
+    """
+    loads in opacity data that are produced with the CHIMERA code.
+    """
 
 
 class loader_helios(loader_base):
@@ -323,7 +352,8 @@ class loader_exotransmit(loader_base):
         opacities = []
 
         # read through all lines in the opacity file
-        for x in tqdm(f1, desc="reading wavelengths"):
+        # skip through the header!
+        for x in tqdm(f1[2:], desc="reading wavelengths"):
             # check if blank line
             if not x:
                 continue
@@ -333,13 +363,17 @@ class loader_exotransmit(loader_base):
                 wavelengths += [eval(x[:-1])]
             else:
                 # the first entry in each opacity line is the pressure
-                opacity_string = commad.split(" ")[1:]
+                opacity_string = x.split()[1:]
                 opacity_vals = np.array([eval(opacity) for opacity in opacity_string])
                 opacities += [opacity_vals]
 
         f.close()
+        # pdb.set_trace()
         del f1
-        return np.array(wavelengths), np.array(opacities)
+        try:
+            return np.array(wavelengths), np.array(opacities)
+        except:
+            pdb.set_trace()
 
     def load(self, filename):
         """

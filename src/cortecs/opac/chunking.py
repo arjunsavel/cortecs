@@ -24,6 +24,7 @@ so far, only works for exo-transmit chunks. TODO: generalize for others.
 """
 
 import os
+from glob import glob
 
 import numpy as np
 from tqdm import tqdm
@@ -31,9 +32,16 @@ from tqdm import tqdm
 from cortecs.opac.opac import *
 
 
-def chunk_wavelengths(file, nchunks=None, wav_per_chunk=None, adjust_wavelengths=False):
+def chunk_wavelengths(
+    file,
+    nchunks=None,
+    wav_per_chunk=None,
+    adjust_wavelengths=False,
+    loader="exotransmit",
+):
     """
     Performs wavelength-chunking.
+    todo: yell if the chunked results are already in the directory?
 
     Inputs
     -------
@@ -66,7 +74,7 @@ def chunk_wavelengths(file, nchunks=None, wav_per_chunk=None, adjust_wavelengths
         )
 
     if not wav_per_chunk:
-        opac = Opac(file, loader="exotransmit")
+        opac = Opac(file, loader=loader)
         num_wavelengths = len(opac.wl)
         del opac  # clean it up
         wav_per_chunk = round(num_wavelengths / nchunks)
@@ -82,21 +90,27 @@ def chunk_wavelengths(file, nchunks=None, wav_per_chunk=None, adjust_wavelengths
     file_suffix = 0
 
     # read through all lines in the opacity file. todo: from already read in opacity?
-    for x in tqdm(f1):
+    # past the header
+    write_to_file(header, file, file_suffix)
+    for x in tqdm(f1[2:]):
+        # print(x)
         if not x:
             continue
         commad = x.replace(" ", ",")
-
+        # pdb.set_trace()
         if len(np.array([eval(commad)]).flatten()) == 1:  # if a wavelength line
             ticker += 1
-        elif len(x.split(" ")) == 48 and adjust_wavelengths:  # this is ntemp, I believe
-            x = adjust_wavelength_unit(x, 1e-4, style="full")
-        #                pass # don't need to adust wavelengths anymore!
-
-        if ticker == wav_per_chunk:
+            print(x)
+            # print(file_suffix)
+        # elif len(x.split(" ")) == 48 and adjust_wavelengths:  # this is ntemp, I believe
+        #     x = adjust_wavelength_unit(x, 1e-4, style="full")
+        # #                pass # don't need to adust wavelengths anymore!
+        if ticker == wav_per_chunk + 1:
             file_suffix += 1  # start writing to different file
+
             ticker = 0
             write_to_file(header, file, file_suffix)
+
         write_to_file(x, file, file_suffix)
 
     f.close()
@@ -191,49 +205,6 @@ def add_lams(max_lam_to_add_ind, file, next_file):
             return
 
 
-def add_previous(num_to_add, file, previous_file):
-    """
-    Adds a certain number of wavelength points to a file from a previous one.
-
-    Inputs:
-        :num_to_add: (int) number of wavelength points to add from one file to the other.
-        :file: (str) (str) path to file to which wavelength points are being *added*.
-        :previous_file: (str) path to file from which wavelength points are being drawn.
-
-    Outputs:
-        None
-
-    Side effects:
-        Modifies file.
-    """
-    try:
-        f = open(previous_file)
-    except FileNotFoundError:
-        print(f"{previous_file} not found. Moving on!")
-        return
-
-    f1 = f.readlines()[2:]  # first two files of opacity are header info
-    f.close()
-
-    ticker = 0
-
-    # read through all lines in the opacity file
-    for x in f1[::-1]:
-        if not x:
-            continue
-
-        commad = x.replace(" ", ",")
-        if len(np.array([eval(commad)]).flatten()) == 1:  # if a wavelength line
-            ticker += 1
-
-        # append line to file
-        f2 = open(file, "a")
-        f2.write(x)
-        f2.close()
-        if ticker == num_to_add:
-            return
-
-
 def add_overlap(filename, v_max=11463.5):
     """
     Adds overlap from file n+1 to file n. The last file has nothing added to it. This
@@ -257,10 +228,14 @@ def add_overlap(filename, v_max=11463.5):
     Side effects:
         Modifies every 'filename*.dat' file.
     """
-    for i in tqdm(
-        range(len(os.listdir()[:-1])), position=0, leave=True
+    print("for sure adding overlap")
+    files = glob(filename + "*.dat")
+    for i, file in tqdm(
+        enumerate(files), total=len(files), position=0, leave=True, desc="eeeeee"
     ):  # don't include the last file
-        file = filename + str(i) + ".dat"
+        if file == filename + ".dat":
+            continue  # only add over lap to the chunked file
+        print("for sure adding overlapppp")
 
         next_file = filename + str(i + 1) + ".dat"
 
@@ -282,8 +257,11 @@ def add_overlap(filename, v_max=11463.5):
         delta_lam = 2 * max_curr_lam * v_max / c  # delta_lambda/lambda = v/c
 
         # add another 20 indices to be safe!
-        max_lam_to_add_ind = (
-            np.argmin(np.abs(next_lams - (max_curr_lam + delta_lam))) + 20
-        )
+        # max_lam_to_add_ind = (
+        #     np.argmin(np.abs(next_lams - (max_curr_lam + delta_lam))) + 20
+        # )
+        max_lam_to_add_ind = np.argmin(np.abs(next_lams - (max_curr_lam + delta_lam)))
+        print("max lam to add")
+        print(max_lam_to_add_ind)
 
         add_lams(max_lam_to_add_ind, file, next_file)

@@ -54,7 +54,8 @@ class Fitter(object):
             'polynomial', 'pca', and 'neural_net'. The more complex the model, the larger the model size (i.e., potentially
             the lower the compression factor), and the more likely it is to fit well.
         fitter_kwargs: dict
-            kwargs that are passed to the fitter.
+            kwargs that are passed to the fitter. one kwarg, for instance, is the fit_axis: for PCA,
+            this determines what axis is fit against.
         """
         self.opac = opac
         self.fitter_kwargs = fitter_kwargs
@@ -70,6 +71,7 @@ class Fitter(object):
         self.P = self.opac.P
         self.T = self.opac.T
 
+        # todo: figure out how to change the fitting...based on the fit axis?
         return
 
     def fit(self, parallel=False):
