@@ -83,7 +83,7 @@ class TestFitUtils(unittest.TestCase):
         if i pass nans, should fail.
         :return:
         """
-        bad_cube = np.zeros((3, 3, 3)) * np.nan
+        bad_cube = np.zeros((3, 3)) * np.nan
 
         self.assertRaises(
             np.linalg.LinAlgError,
