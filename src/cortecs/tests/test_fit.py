@@ -7,6 +7,7 @@ from cortecs.opac.opac import *
 from cortecs.fit.fit_pca import *
 import os
 import sys
+import numpy as np
 
 sys.path.insert(0, os.path.abspath("."))
 
@@ -56,3 +57,36 @@ class TestFitter(unittest.TestCase):
 
         fitter = Fitter(self.opac, method="pca")
         self.assertEqual(fitter.fit_func, fit_pca)
+
+
+class TestFitUtils(unittest.TestCase):
+    """
+    Test the fitter object itself
+    """
+
+    T_filename = os.path.abspath(".") + "/src/cortecs/tests/temperatures.npy"
+    P_filename = os.path.abspath(".") + "/src/cortecs/tests/pressures.npy"
+    wl_filename = os.path.abspath(".") + "/src/cortecs/tests/wavelengths.npy"
+    cross_sec_filename = (
+        os.path.abspath(".") + "/src/cortecs/tests/absorb_coeffs_C2H4.npy"
+    )
+
+    load_kwargs = {
+        "T_filename": T_filename,
+        "P_filename": P_filename,
+        "wl_filename": wl_filename,
+    }
+    opac = Opac(cross_sec_filename, loader="platon", load_kwargs=load_kwargs)
+
+    def test_nan_pca_cube_errors(self):
+        """
+        if i pass nans, should fail.
+        :return:
+        """
+        bad_cube = np.zeros((3, 3, 3)) * np.nan
+
+        self.assertRaises(
+            np.linalg.LinAlgError,
+            do_pca,
+            bad_cube,
+        )
