@@ -205,50 +205,6 @@ def add_lams(max_lam_to_add_ind, file, next_file):
             return
 
 
-def add_previous(num_to_add, file, previous_file):
-    """
-    Adds a certain number of wavelength points to a file from a previous one.
-
-    Inputs:
-        :num_to_add: (int) number of wavelength points to add from one file to the other.
-        :file: (str) (str) path to file to which wavelength points are being *added*.
-        :previous_file: (str) path to file from which wavelength points are being drawn.
-
-    Outputs:
-        None
-
-    Side effects:
-        Modifies file.
-    """
-    try:
-        f = open(previous_file)
-    except FileNotFoundError:
-        print(f"{previous_file} not found. Moving on!")
-        return
-
-    f1 = f.readlines()[2:]  # first two files of opacity are header info
-    f.close()
-
-    ticker = 0
-
-    # read through all lines in the opacity file
-    for x in f1[::-1]:
-        if not x:
-            continue
-
-        commad = x.replace(" ", ",")
-        if len(np.array([eval(commad)]).flatten()) == 1:  # if a wavelength line
-            ticker += 1
-
-        # append line to file
-        f2 = open(file, "a")
-        f2.write(x)
-        f2.close()
-        if ticker == num_to_add:
-            pdb.set_trace()
-            return
-
-
 def add_overlap(filename, v_max=11463.5):
     """
     Adds overlap from file n+1 to file n. The last file has nothing added to it. This
