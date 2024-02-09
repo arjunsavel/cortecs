@@ -78,6 +78,7 @@ class Evaluator(object):
             self.wl,
             self.fitter_results,
             **self.eval_kwargs,
+            **self.fit_kwargs,
         )
         # we need to recast the units if PLATON was used.
         if isinstance(self.load_obj, loader_platon):

@@ -41,7 +41,15 @@ def eval_pca_ind_wav(temperature_ind, pressure_ind, vectors, pca_coeffs):
 
 
 def eval_pca(
-    temperature, pressure, wavelength, T, P, wl, fitter_results, fit_axis="pressure"
+    temperature,
+    pressure,
+    wavelength,
+    T,
+    P,
+    wl,
+    fitter_results,
+    fit_axis="pressure",
+    **kwargs
 ):
     """
     Evaluates the PCA fit at a given temperature, pressure, and wavelength.
