@@ -1,7 +1,6 @@
 """
 The high-level API for fitting. Requires the Opac object.
 """
-
 import warnings
 from functools import partial
 from multiprocessing import Pool
@@ -138,8 +137,15 @@ class Fitter(object):
         :return:
         """
         with warnings.catch_warnings():
-            num_processes = 3
-            func = partial(self.func_fit, self.P, self.T, **self.fitter_kwargs)
+            num_processes = 1
+
+            func = partial(
+                self.fit_func,
+                P=self.P,
+                T=self.T,
+                prep_res=self.prep_res,
+                **self.fitter_kwargs
+            )
 
             self.pbar = tqdm(
                 total=len(self.wl),
@@ -150,17 +156,35 @@ class Fitter(object):
             )
 
             # these two lines are where the bulk of the multiprocessing happens
-            p = Pool(num_processes)
+            pool = Pool(num_processes)
 
-            for i in range(len(self.wl)):
-                p.apply_async(
-                    func,
-                    args=(self.Opac.cross_section[:, :, i],),
-                    callback=self.update_pbar,
+            # actualy loop over using pool.map. need
+            # reformat the cross_section to be a list of 2D arrays
+            cross_section_reformatted = [
+                self.opac.cross_section[:, :, i] for i in range(len(self.wl))
+            ]
+
+            # we tehcnically want sorted results. but apply async is the only way to get the progress bar to work!
+            async_result = []
+            for i, item in enumerate(cross_section_reformatted):
+                async_result.append(
+                    [i, pool.apply_async(func, args=(item,), callback=self.update_pbar)]
                 )
-            p.close()
-            p.join()
+
+            # Close the pool
+            pool.close()
+            pool.join()
+
+            # Close the progress bar
             self.pbar.close()
+
+            # sort the results based on the index
+            sorted_results = [None] * len(async_result)
+            for item in async_result:
+                i, res = item
+                sorted_results[i] = res.get()
+
+        self.fitter_results = [self.prep_res, sorted_results]
 
         return
 
