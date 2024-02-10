@@ -56,7 +56,7 @@ high-resolution spectra.
 How do we decrease the RAM footprint of these calculations? By far the largest contributor to the RAM footprint,
 at least as measured on disk, is the opacity data. For instance, the opacity data for a single gas species across
 the wavelength range of the Immersion GRating INfrared Spectrometer spectrograph [IGRINS, @mace:2018] takes up 2.5 GB of non-volatile memory (i.e., the file size is 2.5 GB) at `float64` precision and at a resolving power of 400,000
-[as used in @line:2021; with 39 temperature points and 18 pressure points, using, e.g., the @polyansky:2018 water opacity tables).
+(as used in @line:2021; with 39 temperature points and 18 pressure points, using, e.g., the @polyansky:2018 water opacity tables).
 In many cases, not all wavelengths need to be loaded, e.g. if the user is down-sampling the resolution of their opacity function. Even so, it stands to reason
 that decreasing the amount of RAM/VRAM consumed by opacity data would strongly decrease the total amount of RAM/VRAM consumed
 by the radiative transfer calculation.
@@ -98,7 +98,7 @@ of the large physical distances simulated.
 ![The results of a simple toy model demonstrating a `cortecs` failure mode.
 The toy model is a single column, with the number of grid cells within the column varied (along the x-axis).
 For each number of cells, we calculate the difference in the optical depth $\tau$ as calculated using `cortecs`-compressed
-opacities (using the polynomial compression method) and the second to last wavelength point of native `PLATON` methane opacity. \label{fig:column_experiment}](column_experiment.png)
+opacities (using the polynomial compression method) and the second-to-last wavelength point of native `PLATON` methane opacity. \label{fig:column_experiment}](column_experiment.png)
 
 
 # Methods
@@ -120,7 +120,7 @@ is shown in \autoref{fig:example}.
 
 ![Top panel: The original opacity function of CO [@rothman:2010] (solid lines) and its `cortecs` reconstruction (transparent lines) over a large
 wavelength range and at multiple temperatures and pressures. Bottom panel: the absolute residuals between the opacity function
-and its `cortecs` reconstruction. Note that opacities less than $10^-{60}$ are not generally relevant for the benchmark
+and its `cortecs` reconstruction. Note that opacities less than $10^{-60}$ are not generally relevant for the benchmark
 presented here; an opacity of $\sigma_\lambda=10^{-60}$ would require a column nearly $10^{35}$m long to become
 optically thick at a pressure of 1 bar and temperature of 1000 K. \label{fig:example}](example_application.png)
 
