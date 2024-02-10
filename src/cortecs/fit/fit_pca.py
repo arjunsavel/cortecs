@@ -104,7 +104,7 @@ def do_pca(cube, nc=3):
     return xMat, standardized_cube, s, vh, u
 
 
-def fit_pca(cross_section, P, T, xMat, fit_axis="pressure", **kwargs):
+def fit_pca(cross_section, P, T, prep_res, fit_axis="pressure", **kwargs):
     """
     Fits the PCA to the opacity data.
 
@@ -120,7 +120,7 @@ def fit_pca(cross_section, P, T, xMat, fit_axis="pressure", **kwargs):
         :beta: (nc x pixels) PCA coefficients
     """
     # print("shapes for everything:", cross_section.shape, P.shape, T.shape, xMat.shape)
-
+    xMat = prep_res
     cross_section = move_cross_section_axis(cross_section, fit_axis)
     beta = fit_mlr(cross_section, xMat)
     return beta

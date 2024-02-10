@@ -103,3 +103,39 @@ class TestFitUtils(unittest.TestCase):
             do_pca,
             bad_cube,
         )
+
+    def test_fit_parallel_zero_arg(self):
+        """
+        I want to make sure that the parallel fitting function works.
+        :return:
+        """
+        fitter_parallel = Fitter(self.opac, method="pca")
+        fitter_parallel.fit(parallel=True)
+
+        # check against serial
+        fitter_serial = Fitter(self.opac, method="pca")
+        fitter_serial.fit(parallel=False)
+
+        # are they the same?
+
+        np.testing.assert_almost_equal(
+            fitter_parallel.fitter_results[0], fitter_serial.fitter_results[0]
+        )
+
+    def test_fit_parallel_first_arg(self):
+        """
+        I want to make sure that the parallel fitting function works.
+        :return:
+        """
+        fitter_parallel = Fitter(self.opac, method="pca")
+        fitter_parallel.fit(parallel=True)
+
+        # check against serial
+        fitter_serial = Fitter(self.opac, method="pca")
+        fitter_serial.fit(parallel=False)
+
+        # are they the same?
+
+        np.testing.assert_almost_equal(
+            fitter_parallel.fitter_results[1], fitter_serial.fitter_results[1]
+        )
