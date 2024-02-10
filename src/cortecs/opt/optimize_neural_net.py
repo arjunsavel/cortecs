@@ -12,10 +12,7 @@ from cortecs.fit.fit_neural_net import *
 def optimize_neural_net(
     max_size,
     max_evaluations,
-    cross_section,
-    P,
-    T,
-    wl,
+    opac,
     min_layers=2,
     min_neurons=2,
     max_layers=3,
@@ -33,6 +30,9 @@ def optimize_neural_net(
     max_evaluations: int
         maximum number of evaluations of the neural network.
     """
+    cross_section = opac.cross_section
+    T = opac.T
+    P = opac.P
     if max_evaluations < 1:
         raise ValueError("max_evaluations must be greater than 0.")
 

@@ -208,6 +208,38 @@ class TestIntegration(unittest.TestCase):
             }
         )
 
+    def test_optimize_pca(self):
+        """
+        just the tutorial. once more!
+        :return:
+        """
+        # reset random seed
+        np.random.seed(seed)
+        tf.random.set_seed(seed)
+        os.environ["PYTHONHASHSEED"] = str(seed)
+        random.seed(seed)
+        load_kwargs = {
+            "T_filename": self.T_filename,
+            "P_filename": self.P_filename,
+            "wl_filename": self.wl_filename,
+        }
+        opac_obj = Opac(
+            self.cross_sec_filename, loader="platon", load_kwargs=load_kwargs
+        )
+        fitter = Fitter(opac_obj, method="pca", wav_ind=-2, nc=3)
+        optimizer = Optimizer(fitter)
+        max_size = 1.6
+        max_evaluations = 4
+        optimizer.optimize(max_size, max_evaluations)
+        print(optimizer.best_params)
+        self.assertTrue(
+            optimizer.best_params
+            == {
+                "n_pc": 5,
+                "wav_ind": 4615,
+            }
+        )
+
     def test_pca_temperature_axis(self):
         """
         test that the PCA fit works well enough even when fit along a different axis.

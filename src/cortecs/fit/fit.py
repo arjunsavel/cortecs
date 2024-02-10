@@ -74,7 +74,7 @@ class Fitter(object):
         # todo: figure out how to change the fitting...based on the fit axis?
         return
 
-    def fit(self, parallel=False):
+    def fit(self, parallel=False, verbose=1):
         """
         fits the opacity data to a neural network. loops over all wavelengths.
         Can loop over a list of species? ...should be parallelized!
@@ -89,13 +89,13 @@ class Fitter(object):
         prep_method = self.prep_method_dict[self.method]
         self.prep_res = prep_method(self.opac.cross_section, **self.fitter_kwargs)
         if not parallel:
-            self.fit_serial()
+            self.fit_serial(verbose=verbose)
         else:
             self.fit_parallel()
 
         return  # will I need to save and stuff like that?
 
-    def fit_serial(self):
+    def fit_serial(self, verbose=0):
         """
         fits the opacity data with a given method. Serial.
         :return:
@@ -105,7 +105,11 @@ class Fitter(object):
         # loop over the wavelengths and fit
         res = []
         with warnings.catch_warnings():
-            for i, w in tqdm(enumerate(self.wl), total=len(self.wl)):
+            if verbose == 1:
+                iterator = tqdm(enumerate(self.wl), total=len(self.wl))
+            else:
+                iterator = enumerate(self.wl)
+            for i, w in iterator:
                 cross_section = self.opac.cross_section[:, :, i]
                 res += [
                     self.fit_func(

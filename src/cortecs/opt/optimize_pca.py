@@ -7,18 +7,18 @@ import math
 import numpy as np
 from tqdm import tqdm
 
+from cortecs.fit.fit import Fitter
 from cortecs.fit.fit_neural_net import *
+from cortecs.fit.fit_pca import *
 
 
 def optimize_pca(
     max_size,
     max_evaluations,
-    cross_section,
-    P,
-    T,
-    wl,
-    min_components=2,
-    max_components=4,
+    opac,
+    min_components=3,
+    max_components=5,
+    wav_ind_start=3573,
 ):
     """
 
@@ -32,7 +32,10 @@ def optimize_pca(
 
 
     """
-
+    T = opac.T
+    P = opac.P
+    wl = opac.wl
+    cross_section = opac.cross_section
     # each axis — the wavelength index being tested and the number of components — will be tested n times.
     # n * n = max_evaluations.
     n_test_each_axis = math.floor(np.power(max_evaluations, 1 / 2))
@@ -40,32 +43,39 @@ def optimize_pca(
     n_pc_range = np.linspace(min_components, max_components, n_test_each_axis).astype(
         int
     )
-    wav_ind_range = np.linspace(0, len(wl), n_test_each_axis).astype(int)
-
+    wav_ind_range = np.linspace(wav_ind_start, len(wl) - 1, n_test_each_axis).astype(
+        int
+    )
+    print("len wl")
+    print(len(wl))
+    print("wl range")
+    print(wav_ind_range)
     (
         n_pc_grid,
         wav_ind_grid,
     ) = np.meshgrid(n_pc_range, wav_ind_range)
-
     # max_size currently isn't used.
     final_errors = []
     lin_samples = []
+    # ah. we're supposed to fit at every wavelength.
     for sample in tqdm(
-        range(len(n_pc_range.flatten())),
-        desc="Optimizing neural network hyperparameters",
+        range(len(n_pc_grid.flatten())),
+        desc="Optimizing PCA hyperparameters",
     ):
         n_pc, wav_ind = (
             n_pc_grid.flatten()[sample],
             wav_ind_grid.flatten()[sample],
         )
-        xMat = prep_pca(cross_section, wav_ind=wav_ind, nc=n_pc)
-        fit_pca(cross_section, P, T, xMat, nc=3, wav_ind=1, savename=None)
+        fitter = Fitter(opac, method="pca", wav_ind=wav_ind, nc=n_pc)
+        try:
+            fitter.fit(verbose=0)
 
-        # evaluate the fit
-        vals, orig_vals, abs_diffs, percent_diffs = calc_metrics(
-            opac_obj, fitter, plot=True
-        )
-        mse = np.mean(np.square(abs_diffs))
+            # evaluate the fit
+            vals, orig_vals, abs_diffs, percent_diffs = calc_metrics(fitter, plot=False)
+            mse = np.mean(np.square(abs_diffs))
+
+        except ValueError as e:
+            mse = np.inf
 
         final_errors += [mse]
         lin_samples += [sample]
@@ -76,5 +86,4 @@ def optimize_pca(
         "n_pc": n_pc_grid.flatten()[best_sample_ind],
         "wav_ind": wav_ind_grid.flatten()[best_sample_ind],
     }
-
     return best_params

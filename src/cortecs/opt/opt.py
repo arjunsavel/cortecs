@@ -39,13 +39,5 @@ class Optimizer(object):
         optimizes the fit.
         :return:
         """
-        self.best_params = self.opt_func(
-            max_size,
-            max_evaluations,
-            self.opac.cross_section,
-            self.P,
-            self.T,
-            self.wl,
-            **kwargs
-        )
+        self.best_params = self.opt_func(max_size, max_evaluations, self.opac, **kwargs)
         return
