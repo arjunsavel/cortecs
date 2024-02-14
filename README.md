@@ -1,6 +1,7 @@
 # cortecs
 [![status](https://joss.theoj.org/papers/b0c4f5012351abb476081ffe9226fbf4/status.svg)](https://joss.theoj.org/papers/b0c4f5012351abb476081ffe9226fbf4)
 [![PyPI version](https://badge.fury.io/py/cortecs.svg)](https://badge.fury.io/py/cortecs)
+[![Conda Version](https://img.shields.io/conda/vn/conda-forge/cortecs.svg)](https://anaconda.org/conda-forge/cortecs)
 [![Tests](https://github.com/arjunsavel/cortecs/actions/workflows/python-package.yml/badge.svg)](https://github.com/arjunsavel/cortecs/actions/workflows/python-package.yml)
 [![codecov](https://codecov.io/gh/arjunsavel/cortecs/graph/badge.svg?token=90S3STBO5X)](https://codecov.io/gh/arjunsavel/cortecs)
 [![Maintainability](https://api.codeclimate.com/v1/badges/4eb53795313af153f4cd/maintainability)](https://codeclimate.com/github/arjunsavel/cortecs/maintainability)
