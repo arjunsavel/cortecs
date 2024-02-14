@@ -8,7 +8,7 @@ import pickle
 import h5py
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
+from tqdm.autonotebook import tqdm
 
 AMU = 1.6605390666e-24  # atomic mass unit in cgs. From astropy!
 
