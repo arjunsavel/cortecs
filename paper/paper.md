@@ -36,7 +36,7 @@ the system used for calculations. Here, we present `cortecs`, a Python tool for 
 opacity data. `cortecs` provides flexible methods for fitting the
 temperature, pressure, and wavelength dependencies of opacity data and for evaluating the opacity with accelerated,
 GPU-friendly methods. The package is actively developed on GitHub (<https://github.com/arjunsavel/cortecs>), and it is
-available for download with `pip`.
+available for download with `pip` and `conda`.
 
 # Statement of need
 Observations with the latest high-resolution spectrographs [e.g., @mace:2018; @seifahrt:2020; @pepe:2021]
