@@ -27,7 +27,7 @@ import os
 from glob import glob
 
 import numpy as np
-from tqdm import tqdm
+from tqdm.autonotebook import tqdm
 
 from cortecs.opac.opac import *
 

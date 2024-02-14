@@ -3,7 +3,7 @@ Plots histograms and stuff after the fitting has occurred so that the level of f
 """
 import matplotlib.pyplot as plt
 import numpy as np
-from tqdm import tqdm
+from tqdm.autonotebook import tqdm
 
 from cortecs.eval.eval import Evaluator
 

@@ -4,7 +4,7 @@ Performs simple optimization of neural network hyperparameters.
 import math
 
 import numpy as np
-from tqdm import tqdm
+from tqdm.autonotebook import tqdm
 
 from cortecs.fit.fit_neural_net import *
 

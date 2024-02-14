@@ -6,7 +6,7 @@ from functools import partial
 from multiprocessing import Pool
 
 import numpy as np
-from tqdm import tqdm
+from tqdm.autonotebook import tqdm
 
 from cortecs.fit.fit_neural_net import *
 from cortecs.fit.fit_pca import *
