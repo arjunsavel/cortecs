@@ -13,6 +13,7 @@
 [![Paper compilation](https://github.com/arjunsavel/cortecs/actions/workflows/draft-pdf.yml/badge.svg)](https://github.com/arjunsavel/cortecs/actions/workflows/draft-pdf.yml)
 ![GitHub repo size](https://img.shields.io/github/repo-size/arjunsavel/cortecs)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/cortecs)
+[![arXiv](https://img.shields.io/badge/arXiv-2402.07047-b31b1b.svg)](https://arxiv.org/abs/2402.07047)
 
 
 
