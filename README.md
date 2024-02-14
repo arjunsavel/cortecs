@@ -1,5 +1,6 @@
 # cortecs
 [![status](https://joss.theoj.org/papers/b0c4f5012351abb476081ffe9226fbf4/status.svg)](https://joss.theoj.org/papers/b0c4f5012351abb476081ffe9226fbf4)
+[![arXiv](https://img.shields.io/badge/arXiv-2402.07047-b31b1b.svg)](https://arxiv.org/abs/2402.07047)
 [![PyPI version](https://badge.fury.io/py/cortecs.svg)](https://badge.fury.io/py/cortecs)
 [![Conda Version](https://img.shields.io/conda/vn/conda-forge/cortecs.svg)](https://anaconda.org/conda-forge/cortecs)
 [![Tests](https://github.com/arjunsavel/cortecs/actions/workflows/python-package.yml/badge.svg)](https://github.com/arjunsavel/cortecs/actions/workflows/python-package.yml)
@@ -13,7 +14,7 @@
 [![Paper compilation](https://github.com/arjunsavel/cortecs/actions/workflows/draft-pdf.yml/badge.svg)](https://github.com/arjunsavel/cortecs/actions/workflows/draft-pdf.yml)
 ![GitHub repo size](https://img.shields.io/github/repo-size/arjunsavel/cortecs)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/cortecs)
-[![arXiv](https://img.shields.io/badge/arXiv-2402.07047-b31b1b.svg)](https://arxiv.org/abs/2402.07047)
+
 
 
 
