@@ -12,4 +12,4 @@ h5py
 mock
 matplotlib
 ipykernel
-Sphinx<7.2.6.
+Sphinx<7.1.6
