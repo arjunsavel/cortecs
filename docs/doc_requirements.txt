@@ -13,3 +13,4 @@ mock
 matplotlib
 ipykernel
 pandoc>2.14.2
+Sphinx<7.2.6.
