@@ -3,7 +3,7 @@ jaxlib
 jax
 tqdm
 markupsafe==2.0.1
-nbsphinx<0.9
+nbsphinx
 sphinx_book_theme
 pandas
 keras
@@ -11,5 +11,6 @@ tensorflow
 h5py
 mock
 matplotlib
+nbconvert<7.14
 ipykernel
-Sphinx==5.3.0
+Sphinx
