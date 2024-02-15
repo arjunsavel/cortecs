@@ -3,7 +3,7 @@ jaxlib
 jax
 tqdm
 markupsafe==2.0.1
-nbsphinx<0.9.3
+nbsphinx<0.9
 sphinx_book_theme
 pandas
 keras
