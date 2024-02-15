@@ -105,7 +105,7 @@ class Fitter(object):
         res = []
         with warnings.catch_warnings():
             if verbose == 1:
-                iterator = tqdm(enumerate(self.wl), total=len(self.wl))
+                iterator = tqdm(enumerate(self.wl), total=len(self.wl), position=0, leave=True)
             else:
                 iterator = enumerate(self.wl)
             for i, w in iterator:
