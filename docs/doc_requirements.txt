@@ -12,3 +12,4 @@ h5py
 mock
 matplotlib
 ipykernel
+pandoc>2.14.2
