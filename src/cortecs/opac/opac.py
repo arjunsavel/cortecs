@@ -32,7 +32,7 @@ class Opac(object):
         self,
         filename,
         loader="chimera",
-        load_kwargs={},
+        load_kwargs=None,
     ):
         """
         wraps around the loaders.
@@ -48,6 +48,9 @@ class Opac(object):
         -------
         nothing
         """
+        if load_kwargs is None:
+            load_kwargs = {}
+
         self.filename = filename
         self.load_obj = self._get_loader(loader)
         self.wl, self.T, self.P, self.cross_section = self.load_obj.load(
