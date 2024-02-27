@@ -96,7 +96,7 @@ class TestFitUtils(unittest.TestCase):
         i want to make a linalg errror!
         :return:
         """
-        bad_cube = np.zeros((3, 3)) * np.inf
+        bad_cube = np.ones((3, 3)) * np.nan
 
         self.assertRaises(
             ValueError,
