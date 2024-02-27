@@ -120,7 +120,7 @@ is shown in \autoref{fig:example}.
 
 ![Top panel: The original opacity function of CO [@rothman:2010] (solid lines) and its `cortecs` reconstruction (transparent lines) over a large
 wavelength range and at multiple temperatures and pressures. Bottom panel: the absolute residuals between the opacity function
-and its `cortecs` reconstruction. Note that opacities less than $10^{-60}$ are not generally relevant for the benchmark
+and its `cortecs` reconstruction. $\sigma_\lambda$ is the opacity, in units of square meters. Note that opacities less than $10^{-60}$ are not generally relevant for the benchmark
 presented here; an opacity of $\sigma_\lambda=10^{-60}$ would require a column nearly $10^{35}$m long to become
 optically thick at a pressure of 1 bar and temperature of 1000 K. \label{fig:example}](example_application.png)
 
