@@ -29,10 +29,7 @@ class Opac(object):
     P = None
 
     def __init__(
-        self,
-        filename,
-        loader="chimera",
-        load_kwargs=None,
+        self, filename, loader="chimera", load_kwargs=None, loader_kwargs=None
     ):
         """
         wraps around the loaders.
@@ -43,6 +40,10 @@ class Opac(object):
             name of file to load
         loader : str
             name of loader to use. default is chimera.
+        load_kwargs : dict
+            keyword arguments to pass to the loader when loading.
+        loader_kwargs : dict
+            keyword arguments to pass to the loader when  initializing.
 
         Returns
         -------
@@ -50,9 +51,11 @@ class Opac(object):
         """
         if load_kwargs is None:
             load_kwargs = {}
+        if loader_kwargs is None:
+            loader_kwargs = {}
 
         self.filename = filename
-        self.load_obj = self._get_loader(loader)
+        self.load_obj = self._get_loader(loader, **loader_kwargs)
         self.wl, self.T, self.P, self.cross_section = self.load_obj.load(
             filename, **load_kwargs
         )
@@ -61,7 +64,7 @@ class Opac(object):
 
         return
 
-    def _get_loader(self, loader_name):
+    def _get_loader(self, loader_name, **kwargs):
         """
         gets the loader object
 
@@ -69,6 +72,8 @@ class Opac(object):
         ----------
         loader_name : str
             name of loader
+        kwargs : dict
+            keyword arguments to pass to the loader.
 
         Returns
         -------
@@ -80,7 +85,7 @@ class Opac(object):
                     self.method_dict.keys()
                 )
             )
-        return self.method_dict[loader_name]()
+        return self.method_dict[loader_name](**kwargs)
 
     # todo: implement the copy and deepcopy methods.
     def copy(self):
