@@ -57,12 +57,10 @@ def calc_metrics(fitter, tp_undersample_factor=1, wl_under_sample_factor=8, plot
     evaluator = Evaluator(fitter.opac, fitter)
     AMU = 1.6605390666e-24  # atomic mass unit in cgs. From astropy!
 
-    try:
+    if not hasattr(evaluator.load_obj, "species_weight"):
+        species_weight = 1
+    else:
         species_weight = evaluator.load_obj.species_weight
-    except AttributeError:
-        raise AttributeError(
-            "Object has not been loaded to include the species weight. Please load the opacities appropriately."
-        )
 
     vals = []
     orig_vals = []
