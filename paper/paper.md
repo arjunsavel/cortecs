@@ -87,19 +87,6 @@ optically thin scenarios.
 [e.g., the Lyman series transitions of hydrogen, @kurucz2017including].
 That is, the data may require so many parameters to be fit that the compression is no longer worthwhile.
 
-The effects of points 1 and 2 are shown in \autoref{fig:column_experiment}. The column simulated varies in temperature
-from 100 K to 500 K at a constant pressure of 0.1 Pa and a constant density of 0.003 g/cm$^3$. The absolute value of the
-optical depth is far from the true value at this wavelength. Over short distances, this error is infinitesimal.
-Over much larger distances, the error accumulates, leading to large differences in $e^{-\tau}$ (the transmission as
-yielded by Beer's Law). Hence, in this limiting case, the poor fit at very low opacity levels is not acceptable because
-of the large physical distances simulated.
-
-
-![The results of a simple toy model demonstrating a `cortecs` failure mode.
-The toy model is a single column, with the number of grid cells within the column varied (along the x-axis).
-For each number of cells, we calculate the difference in the optical depth $\tau$ as calculated using `cortecs`-compressed
-opacities (using the polynomial compression method) and the second-to-last wavelength point of native `PLATON` methane opacity. \label{fig:column_experiment}](column_experiment.png)
-
 
 # Methods
 `cortecs` seeks to compress redundant information by representing opacity data not as the
@@ -116,13 +103,20 @@ neural network; the user can specify the desired hyperparameters, such as number
 and activation function. Alternatively, any `keras` [@chollet:2015] model can be passed to the fitter. Each compression method is paired
 with a decompression method for evaluating opacity as a function of temperature, pressure, and wavelength. These decompression methods are tailored
 for GPUs and are accelerated with the `JAX` code transformation framework [@jax:2018]. An example of this reconstruction
-is shown in \autoref{fig:example}.
+is shown in \autoref{fig:example}. In the figure, opacities less than $10^{-60}$ are neglected. This is because,
+to become optically thick at a pressure of 1 bar and temperature of 1000 K, a column would need to be nearly $10^{35}$m long:
+$ds = \frac{\tau}{\alpha}$, where $ds$ is the length of the column, $\tau$ is the optical depth, and $\alpha$ is the absorption coefficient.
+Setting $\tau = 1$, we have $ds = \frac{1}{\alpha}$. The absorption coefficient is the product of the opacity and the density of the gas, so
+$ds = \frac{1}{\kappa_\lambda \rho}$. The density of the gas is the pressure divided by the product of the temperature and the gas constant,
+so $ds = \frac{k_BT\mu}{P\kappa_\lambda}$ for mean molecular weight $\mu$. For CO, the mean molecular weight is 28.01 g/mol.
+Plugging in, we arrive at $ds \approx 10^{34}$m for $kappa_\lambda = 10^{-33} cm^2/g$, which is equivalent to roughly
+$\sigma_\lambda = 10^{-60} m^2$.
 
 ![Top panel: The original opacity function of CO [@rothman:2010] (solid lines) and its `cortecs` reconstruction (transparent lines) over a large
 wavelength range and at multiple temperatures and pressures. Bottom panel: the absolute residuals between the opacity function
 and its `cortecs` reconstruction. $\sigma_\lambda$ is the opacity, in units of square meters. We cut off the opacity at $10^{-104}$, explaining the shape of the residuals in teal and dark red.
 Note that opacities less than $10^{-60}$ are not generally relevant for the benchmark
-presented here; an opacity of $\sigma_\lambda=10^{-60}$ would require a column nearly $10^{35}$m long to become
+presented here; an opacity of $\sigma_\lambda=10^{-60}$ would require a column nearly $10^{34}$m long to become
 optically thick at a pressure of 1 bar and temperature of 1000 K. \label{fig:example}](example_application.png)
 
 
