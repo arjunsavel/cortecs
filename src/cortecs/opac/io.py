@@ -545,8 +545,10 @@ class writer_exotransmit_cia(writer_base):
 
         # don't want to write temp and wav
         columns = list(opac.cross_section.columns)
-        columns.remove("temp")
-        columns.remove("wav")
+        if "temp" in columns:
+            columns.remove("temp")
+        if "wav" in columns:
+            columns.remove("wav")
 
         self.species_dict_interped = opac.cross_section[columns].to_dict()
         self.interped_temps = opac.T
