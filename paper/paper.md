@@ -145,7 +145,7 @@ with opacity from $\rm H_2O$ [@polyansky:2018], $\rm CO$ [@rothman:2010], $\rm C
 $\rm NH_3$ [@coles:2019], $\rm HCN$ [@barber:2014], $\rm H_2S$ [@azzam:2016], and $\rm H_2-H_2$
 collision-induced absorption [@karman:2019].
 The non-compressed retrieval uses the data and retrieval framework from [@line:2021], run in an upcoming article (Savel et al. 2024, submitted).
-For this experiment, we use the PCA-based compression scheme implemented in `cortecs`, preserving 3 principal components
+For this experiment, we use the PCA-based compression scheme implemented in `cortecs`, preserving 2 principal components
 and their corresponding weights as a function for each wavelength as a lossy compression of the original opacity data.
 
 Using `cortecs`, we compress the input opacity files by a factor of 13. These opacity data (as described in the previous paragraph) were originally
