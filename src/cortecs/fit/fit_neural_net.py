@@ -21,7 +21,11 @@ except ModuleNotFoundError:
     keras = None
     tf = None
     layers = None
-
+try:
+    # running the legacy Adam optimizer for the Mac folks!
+    from tensorflow.keras.optimizers.legacy import Adam
+except ImportError:
+    from tensorflow.keras.optimizers import Adam
 from cortecs.fit.metrics import *
 
 
@@ -119,10 +123,7 @@ def fit_neural_net(
     else:
         neural_network = sequential_model
 
-    # running the legacy Adam optimizer for the Mac folks!
-    neural_network.compile(
-        loss=loss, optimizer=tf.keras.optimizers.legacy.Adam(learn_rate)
-    )
+    neural_network.compile(loss=loss, optimizer=Adam(learn_rate))
 
     # unpack opacity data. todo: not repeat this for every wavelength!
     P_unraveled = unravel_data(P, T, wl)
