@@ -2,6 +2,7 @@
 Trains a neural network to fit the opacity data.
 """
 import pickle
+import warnings  # optional import handling should raise a warning instead of an error
 
 import numpy as np
 
@@ -9,12 +10,17 @@ try:
     import keras
     import tensorflow as tf
     from tensorflow.keras import layers
-except ModuleNotFoundError(
-    "The optional neural network-related packages have not been installed. If you would like to"
-    + "use cortecs to fit with a neural network, please install cortecs with neural network functionality"
-    + "as follows: python3 -m pip install -e .[neural_networks]"
-):
-    pass
+except ModuleNotFoundError:
+    warnings.warn(
+        "The optional neural network-related packages have not been installed. If you would like to"
+        + "use cortecs to fit with a neural network, please install cortecs with neural network functionality"
+        + "as follows: python3 -m pip install -e .[neural_networks]"
+    )
+
+    # Set the optional modules to None, will raise an error if the user try to use tensorflow, but they have been warned
+    keras = None
+    tf = None
+    layers = None
 
 from cortecs.fit.metrics import *
 
