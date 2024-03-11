@@ -55,7 +55,7 @@ high-resolution spectra.
 
 How do we decrease the RAM footprint of these calculations? By far the largest contributor to the RAM footprint,
 at least as measured on disk, is the opacity data. For instance, the opacity data for a single gas species across
-the wavelength range of the Immersion GRating INfrared Spectrometer spectrograph [IGRINS, @mace:2018] takes up 2.5 GB of non-volatile memory (i.e., the file size is 2.5 GB) at `float64` precision and at a resolving power of 400,000
+the wavelength range of the Immersion GRating INfrared Spectrometer spectrograph [IGRINS, @mace:2018] takes up 2.1 GB of non-volatile memory (i.e., the file size is 2.1 GB) at `float64` precision and at a resolving power of 400,000
 (as used in @line:2021; with 39 temperature points and 18 pressure points, using, e.g., the @polyansky:2018 water opacity tables).
 In many cases, not all wavelengths need to be loaded, e.g. if the user is down-sampling the resolution of their opacity function. Even so, it stands to reason
 that decreasing the amount of RAM/VRAM consumed by opacity data would strongly decrease the total amount of RAM/VRAM consumed
@@ -152,7 +152,7 @@ Using `cortecs`, we compress the input opacity files by a factor of 13. These op
 stored as 2.0 GB .h5 files containing 39 temperature points, 18 pressure points, and 373,260 wavelength points. The compressed opacity data are stored
 as 154 MB files of PCA coefficients and 1.1 KB files of PCA vectors (which are reused for each wavelength point).
 These on-disk memory quotes are relatively faithful to the in-memory RAM footprint of the data when stored as `numpy`
-arrays (2.1 GB for the uncompressed data and 160 MB for the compressed data). Reading in the original files takes
+arrays (2.1 GB for the uncompressed data and 161.2 MB for the compressed data). Reading in the original files takes
 1.1 $\pm$ 0.1 seconds, while reading in the compressed files takes 24.4 $\pm$ 0.3 ms. Accessing/evaluating a single opacity
 value takes 174.0 $\pm$ 0.5 ns for the uncompressed data and 789 $\pm$ 5 ns for the compressed data. All of these timing
 experiments are performed on a 2021 MacBook Pro with an Apple M1 Pro chip and 16 GB of RAM.
