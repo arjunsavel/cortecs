@@ -149,10 +149,10 @@ For this experiment, we use the PCA-based compression scheme implemented in `cor
 and their corresponding weights as a function for each wavelength as a lossy compression of the original opacity data.
 
 Using `cortecs`, we compress the input opacity files by a factor of 13. These opacity data (as described in the previous paragraph) were originally
-stored as 2.0 GB .h5 files containing 39 temperature points, 18 pressure points, and 373,260 wavelength points. The compressed opacity data are stored
-as 154 MB files of PCA coefficients and 1.1 KB files of PCA vectors (which are reused for each wavelength point).
+stored as 2.1 GB .h5 files containing 39 temperature points, 18 pressure points, and 373,260 wavelength points. The compressed opacity data are stored
+as 161.2 MB files of PCA coefficients and 1.1 KB files of PCA vectors (which are reused for each wavelength point).
 These on-disk memory quotes are relatively faithful to the in-memory RAM footprint of the data when stored as `numpy`
-arrays (2.1 GB for the uncompressed data and 161.2 MB for the compressed data). Reading in the original files takes
+arrays (2.1 GB for the uncompressed data and 160 MB for the compressed data). Reading in the original files takes
 1.1 $\pm$ 0.1 seconds, while reading in the compressed files takes 24.4 $\pm$ 0.3 ms. Accessing/evaluating a single opacity
 value takes 174.0 $\pm$ 0.5 ns for the uncompressed data and 789 $\pm$ 5 ns for the compressed data. All of these timing
 experiments are performed on a 2021 MacBook Pro with an Apple M1 Pro chip and 16 GB of RAM.
