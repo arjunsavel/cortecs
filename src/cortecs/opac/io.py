@@ -81,7 +81,7 @@ class loader_base(object):
         if self.wl_style == "wno":
             wl = 1e4 / wl
 
-        if np.all(np.diff(wl)) < 0:
+        if np.all(np.diff(wl)) <= 0:
             wl = wl[::-1]
             cross_section = cross_section[:, :, ::-1]
             # reverse!
