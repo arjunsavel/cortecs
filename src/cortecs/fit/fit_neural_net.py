@@ -24,6 +24,8 @@ except ModuleNotFoundError:
 try:
     # running the legacy Adam optimizer for the Mac folks!
     from tensorflow.keras.optimizers.legacy import Adam
+
+    Adam(0.1)  # test if it works
 except ImportError:
     from tensorflow.keras.optimizers import Adam
 from cortecs.fit.metrics import *
