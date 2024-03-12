@@ -1,18 +1,9 @@
-numpy
-jaxlib
-jax
-tqdm
+-e .[neural_networks]
 markupsafe==2.0.1
 nbsphinx
 sphinx_book_theme
-pandas
-keras
-tensorflow
-h5py
 mock
-matplotlib
 nbconvert<7.14
 ipykernel
 Sphinx
 sphinx-pyproject
--e .
