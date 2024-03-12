@@ -22,7 +22,13 @@ import sys
 
 from sphinx_pyproject import SphinxConfig
 
-config = SphinxConfig("../pyproject.toml", globalns=globals())
+from cortecs import __version__ as cortecs_version
+
+config = SphinxConfig(
+    "../pyproject.toml",
+    globalns=globals(),
+    config_overrides={"version": cortecs_version, "release": cortecs_version},
+)
 
 # MOCK_MODULES = [
 #     "numpy",
