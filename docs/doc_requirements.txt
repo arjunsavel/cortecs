@@ -7,3 +7,9 @@ nbconvert<7.14
 ipykernel
 Sphinx
 sphinx-pyproject
+flatbuffers==23.5.26
+grpcio==1.62.0
+ipython==8.22.1
+pyparsing==3.1.1
+requests-oauthlib==1.3.1
+tensorflow==2.15.0.post1
