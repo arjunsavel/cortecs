@@ -226,7 +226,7 @@ texinfo_documents = [
         "cortecs Documentation",
         author,
         "cortecs",
-        find_meta("description"),
+        description,
         "Miscellaneous",
     )
 ]
