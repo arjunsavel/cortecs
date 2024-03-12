@@ -25,6 +25,30 @@ A Python package for decreasing the memory footprint of opacity functions. The p
 - neural network fitting
 
 
-All fits are currently made in along the temperature and pressure axes. 
+All fits are currently made in along the temperature and pressure axes.
 
 Additionally, `cortecs` can chunk up opacity functions. The radiative transfer problem can often be cast as embarassingly parallel, so each chunk can be sent to a different CPU.
+
+
+Installation instructions
+-------------------------
+`cortecs` can be installed via pip:
+```bash
+pip install cortecs
+```
+
+or conda:
+```bash
+conda install -c conda-forge cortecs
+```
+
+or from source:
+```bash
+git clone
+cd cortecs
+pip install -e .
+```
+To install from source with optional neural network support:
+```bash
+pip install -e .[neural_networks]
+```
