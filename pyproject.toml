@@ -49,3 +49,9 @@ neural_networks = ["tensorflow<2.16",
 Homepage = "https://github.com/arjunsavel/cortecs"
 Issues = "https://github.com/arjunsavel/cortecs/issues"
 Documentation = "https://cortecs.readthedocs.io"
+
+[tool.black]
+target_version = ['py38', 'py39', 'py310', 'py311']
+
+[tool.black_nbconvert]
+target_version = ['py38', 'py39', 'py310', 'py311']
