@@ -19,10 +19,13 @@ import codecs
 import os
 import re
 import sys
+from importlib.metadata import version
 
 from sphinx_pyproject import SphinxConfig
 
-from cortecs import __version__ as cortecs_version
+import cortecs
+
+cortecs_version = version("cortecs")
 
 config = SphinxConfig(
     "../pyproject.toml",
