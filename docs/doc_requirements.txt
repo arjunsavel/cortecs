@@ -15,3 +15,4 @@ nbconvert<7.14
 ipykernel
 Sphinx
 sphinx-pyproject
+-e .
