@@ -68,8 +68,7 @@ This feature implies that the opacity data should be compressible without signif
 accuracy at the spectrum level.
 
 While our benchmark case (see Benchmark) demonstrates the applicability of `cortecs` to high-resolution
-opacity functions of molecular gases, the package is general and can be applied to any opacity data that has
-pressure and temperature dependence, such as the opacity of neutral atoms or ions. Our benchmark only
+opacity functions of molecular gases, the package is general and the compression/decompression steps of the package can be applied to any opacity data in HDF5 format that has pressure and temperature dependence, such as the opacity of neutral atoms or ions. Our benchmark only
 shows, however, that the amounts of error from our compression technique is reasonable in the spectra of exoplanet atmospheres
 at pressures greater than a microbar for a single composition. This caveat is important to note for a few reasons:
 
@@ -150,7 +149,7 @@ and their corresponding weights as a function for each wavelength as a lossy com
 
 Using `cortecs`, we compress the input opacity files by a factor of 13. These opacity data (as described in the previous paragraph) were originally
 stored as 2.1 GB .h5 files containing 39 temperature points, 18 pressure points, and 373,260 wavelength points. The compressed opacity data are stored
-as 161.2 MB files of PCA coefficients and 1.1 KB files of PCA vectors (which are reused for each wavelength point).
+as a 143.1 MB .npz file, including the PCA coefficients and PCA vectors (which are reused for each wavelength point).
 These on-disk memory quotes are relatively faithful to the in-memory RAM footprint of the data when stored as `numpy`
 arrays (2.1 GB for the uncompressed data and 160 MB for the compressed data). Reading in the original files takes
 1.1 $\pm$ 0.1 seconds, while reading in the compressed files takes 24.4 $\pm$ 0.3 ms. Accessing/evaluating a single opacity
