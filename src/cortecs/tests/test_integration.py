@@ -202,7 +202,7 @@ class TestIntegration(unittest.TestCase):
             optimizer.best_params
             == {
                 "n_layers": 2,
-                "n_neurons": 2.0,
+                "n_neurons": 2,
                 "activation": "sigmoid",
                 "learn_rate": 0.01,
             }

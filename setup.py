@@ -87,7 +87,7 @@ if __name__ == "__main__":
         include_package_data=True,
         extras_require={
             "neural_networks": [
-                "tensorflow",
+                "tensorflow<2.16",
                 "keras",
             ]
         },
