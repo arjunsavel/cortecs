@@ -42,7 +42,7 @@ dynamic = ["version"]
 
 
 [project.optional-dependencies]
-neural_networks = ["tensorflow<=2.15.0",
+neural_networks = ["tensorflow<=2.15.0.post1",
                 "keras"]
 
 [project.urls]
