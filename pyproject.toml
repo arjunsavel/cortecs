@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=64", "setuptools_scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cortecs"
+
+authors = [
+    {name = "Arjun Savel", email = "asavel@umd.edu"},
+    {name= "Megan Bedell"},
+    {name= "Eliza M.-R. Kempton"},
+]
+description = "Compress opacity for radiative transfer"
+readme = "README.md"
+requires-python = ">=3.8"
+keywords = ["astronomy"]
+license = {text = "MIT"}
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Natural Language :: English",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Astronomy",
+]
+dependencies = [
+     "numpy",
+    "jaxlib",
+    "jax",
+    "tqdm",
+    "h5py",
+    "matplotlib",
+    "pandas",
+]
+dynamic = ["version"]
+
+
+
+[project.optional-dependencies]
+neural_networks = ["tensorflow<2.16",
+                "keras"]
+
+[project.urls]
+Homepage = "https://github.com/arjunsavel/cortecs"
+Issues = "https://github.com/arjunsavel/cortecs/issues"
+Documentation = "https://cortecs.readthedocs.io"
