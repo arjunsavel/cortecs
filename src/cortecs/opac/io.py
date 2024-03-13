@@ -542,7 +542,7 @@ class writer_exotransmit_cia(writer_base):
         """
 
         new_string = []
-
+        print('optimized time')
         # don't want to write temp and wav
         columns = list(opac.cross_section.columns)
         if "temp" in columns:
@@ -588,29 +588,44 @@ class writer_exotransmit_cia(writer_base):
         temp,
     ):
         # the first line gets different treatment!
+        #if i == 0:
+        #    temp = np.min(
+        #        self.interped_temps
+        #    )  # add the LOWEST temperature in the temperature grid!
+        #    new_string += ["{:.12e}".format(temp) + "\n"]
+        #if self.interped_temps[i] != temp:
+        #    temp = self.interped_temps[i]
+        #    new_string += ["{:.12e}".format(temp) + "\n"]
+        #wavelength_string = "{:.12e}".format(self.interped_wavelengths[i])######
+
+        #line_string = wavelength_string + self.buffer
+
+        #for species_key in self.species_dict_interped.keys():
+            # again, this works because python dicts are ordered in 3.6+
+        #    line_string += (
+        #        "{:.12e}".format(
+        #            list(self.species_dict_interped[species_key].values())[i]
+        #        )
+        #        + self.buffer
+        #    )
+
+        #new_string += [line_string + "\n"]
+
+        #return new_string, temp
+
         if i == 0:
-            temp = np.min(
-                self.interped_temps
-            )  # add the LOWEST temperature in the temperature grid!
-            new_string += ["{:.12e}".format(temp) + "\n"]
+            temp = np.min(self.interped_temps)
+            new_string.append("{:.12e}\n".format(temp))
         if self.interped_temps[i] != temp:
             temp = self.interped_temps[i]
-            new_string += ["{:.12e}".format(temp) + "\n"]
-        wavelength_string = "{:.12e}".format(self.interped_wavelengths[i])
+            new_string.append("{:.12e}\n".format(temp))
 
+        wavelength_string = "{:.12e}".format(self.interped_wavelengths[i])
         line_string = wavelength_string + self.buffer
 
-        for species_key in self.species_dict_interped.keys():
-            # again, this works because python dicts are ordered in 3.6+
-            line_string += (
-                "{:.12e}".format(
-                    list(self.species_dict_interped[species_key].values())[i]
-                )
-                + self.buffer
-            )
+        species_values = [species_dict_value[i] for species_dict_value in self.species_dict_interped.values()]
+        line_string += self.buffer.join("{:.12e}".format(value) for value in species_values)
 
-        new_string += [line_string + "\n"]
-
+        new_string.append(line_string + "\n")
         return new_string, temp
-
-    # todo: maybe the loader objects should also take an opac object. for parallel structure : )
+        # todo: maybe the loader objects should also take an opac object. for parallel structure : )
