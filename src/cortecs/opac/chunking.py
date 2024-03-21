@@ -38,6 +38,7 @@ def chunk_wavelengths(
     wav_per_chunk=None,
     adjust_wavelengths=False,
     loader="exotransmit",
+    load_kwargs=None,
 ):
     """
     Performs wavelength-chunking.
@@ -74,7 +75,7 @@ def chunk_wavelengths(
         )
 
     if not wav_per_chunk:
-        opac = Opac(file, loader=loader)
+        opac = Opac(file, loader=loader, load_kwargs=load_kwargs)
         num_wavelengths = len(opac.wl)
         del opac  # clean it up
         wav_per_chunk = round(num_wavelengths / nchunks)
