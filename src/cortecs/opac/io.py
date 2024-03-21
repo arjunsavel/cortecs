@@ -388,7 +388,7 @@ class loader_exotransmit(loader_base):
         except:
             pdb.set_trace()
 
-    def load(self, filename):
+    def load(self, filename, fullfile=True):
         """
         Loads file.
 
@@ -415,7 +415,9 @@ class loader_exotransmit(loader_base):
 
         # and now make it log10
         cross_section = np.log10(cross_section)
-        cross_section = cross_section.reshape(len(T), len(P), len(wl))
+
+        if fullfile:  # only reshape if it's not a "test" file.
+            cross_section = cross_section.reshape(len(T), len(P), len(wl))
 
         return wl, T, P, cross_section
 
