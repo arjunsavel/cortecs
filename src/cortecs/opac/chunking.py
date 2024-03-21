@@ -38,6 +38,7 @@ def chunk_wavelengths(
     wav_per_chunk=None,
     adjust_wavelengths=False,
     loader="exotransmit",
+    load_kwargs=None,
 ):
     """
     Performs wavelength-chunking.
@@ -74,7 +75,7 @@ def chunk_wavelengths(
         )
 
     if not wav_per_chunk:
-        opac = Opac(file, loader=loader)
+        opac = Opac(file, loader=loader, load_kwargs=load_kwargs)
         num_wavelengths = len(opac.wl)
         del opac  # clean it up
         wav_per_chunk = round(num_wavelengths / nchunks)
@@ -205,7 +206,7 @@ def add_lams(max_lam_to_add_ind, file, next_file):
             return
 
 
-def add_overlap(filename, v_max=11463.5):
+def add_overlap(filename, v_max=11463.5, load_kwargs=None):
     """
     Adds overlap from file n+1 to file n. The last file has nothing added to it. This
     step is necessary for the Doppler-on version of the RT code.
@@ -240,12 +241,12 @@ def add_overlap(filename, v_max=11463.5):
         next_file = filename + str(i + 1) + ".dat"
 
         # go into file n to determine the delta lambda
-        opac = Opac(file, loader="exotransmit")
+        opac = Opac(file, loader="exotransmit", load_kwargs=load_kwargs)
         curr_lams = opac.wl
         del opac
 
         try:
-            opac = Opac(next_file, loader="exotransmit")
+            opac = Opac(next_file, loader="exotransmit", load_kwargs=load_kwargs)
             next_lams = opac.wl
             del opac
         except FileNotFoundError:

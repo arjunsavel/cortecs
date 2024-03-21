@@ -3,6 +3,7 @@ Reads opacity data from various sources.
 
 author: @arjunsavel
 """
+
 import pickle
 
 import h5py
@@ -80,6 +81,7 @@ class loader_base(object):
 
         if self.wl_style == "wno":
             wl = 1e4 / wl
+            wl *= 1e-6  # now in meters
 
         if np.all(np.diff(wl)) <= 0:
             wl = wl[::-1]
@@ -353,29 +355,40 @@ class loader_exotransmit(loader_base):
 
         # read through all lines in the opacity file
         # skip through the header!
-        for x in tqdm(f1[2:], desc="reading wavelengths"):
-            # check if blank line
+        for x in tqdm(f1[2:], desc="reading exotransmit wavelengths"):
+            # # check if blank line
             if not x:
                 continue
             # check if a wavelength line
-            commad = x.replace(" ", ",")
-            if len(np.array([eval(commad)]).flatten()) == 1:
-                wavelengths += [eval(x[:-1])]
+            # commad = x.replace(" ", ",")
+            # if len(np.array([eval(commad)]).flatten()) == 1:
+            #     wavelengths.append(eval(x[:-1]))
+            # else:
+            #     # the first entry in each opacity line is the pressure
+            #     opacity_string = x.split()[1:]
+            #     opacity_vals = [eval(opacity) for opacity in opacity_string]
+            #     opacities.append(opacity_vals)
+            if not x.strip():
+                continue
+                # check if a wavelength line
+            line_values = x.split()
+            if len(line_values) == 1:
+                wavelengths.append(float(line_values[0]))
             else:
                 # the first entry in each opacity line is the pressure
-                opacity_string = x.split()[1:]
-                opacity_vals = np.array([eval(opacity) for opacity in opacity_string])
-                opacities += [opacity_vals]
+                opacity_vals = [float(opacity) for opacity in line_values[1:]]
+                opacities.append(opacity_vals)
 
         f.close()
         # pdb.set_trace()
+        # oh this isn't reshaped haha
         del f1
         try:
             return np.array(wavelengths), np.array(opacities)
         except:
             pdb.set_trace()
 
-    def load(self, filename):
+    def load(self, filename, fullfile=True):
         """
         Loads file.
 
@@ -394,10 +407,19 @@ class loader_exotransmit(loader_base):
             pressures
         """
 
-        wl, opacities = self.get_lams_and_opacities(filename)
+        wl, cross_section = self.get_lams_and_opacities(filename)
         T, P = self.get_t_p(filename)
+        P /= 1e5  # internally in bars
 
-        return wl, T, P, opacities
+        cross_section[np.less(cross_section, 1e-104)] = 1e-104
+
+        # and now make it log10
+        cross_section = np.log10(cross_section)
+
+        if fullfile:  # only reshape if it's not a "test" file.
+            cross_section = cross_section.reshape(len(T), len(P), len(wl))
+
+        return wl, T, P, cross_section
 
 
 # todo: put these in the opac class?
@@ -516,10 +538,22 @@ def get_n_species(CIA_file, verbose=False):
 
 
 class writer_base(object):
-    def __init__(self):
+    def __init__(
+        self,
+        wl_key="wno",
+        T_key="T",
+        P_key="P",
+        cross_section_key="xsec",
+        wl_style="wno",
+    ):
         """
         nothing to do here
         """
+        self.wl_key = wl_key
+        self.T_key = T_key
+        self.P_key = P_key
+        self.cross_section_key = cross_section_key
+        self.wl_style = wl_style
         pass
 
 
@@ -542,7 +576,7 @@ class writer_exotransmit_cia(writer_base):
         """
 
         new_string = []
-        print('optimized time')
+        print("optimized time")
         # don't want to write temp and wav
         columns = list(opac.cross_section.columns)
         if "temp" in columns:
@@ -588,20 +622,20 @@ class writer_exotransmit_cia(writer_base):
         temp,
     ):
         # the first line gets different treatment!
-        #if i == 0:
+        # if i == 0:
         #    temp = np.min(
         #        self.interped_temps
         #    )  # add the LOWEST temperature in the temperature grid!
         #    new_string += ["{:.12e}".format(temp) + "\n"]
-        #if self.interped_temps[i] != temp:
+        # if self.interped_temps[i] != temp:
         #    temp = self.interped_temps[i]
         #    new_string += ["{:.12e}".format(temp) + "\n"]
-        #wavelength_string = "{:.12e}".format(self.interped_wavelengths[i])######
+        # wavelength_string = "{:.12e}".format(self.interped_wavelengths[i])######
 
-        #line_string = wavelength_string + self.buffer
+        # line_string = wavelength_string + self.buffer
 
-        #for species_key in self.species_dict_interped.keys():
-            # again, this works because python dicts are ordered in 3.6+
+        # for species_key in self.species_dict_interped.keys():
+        # again, this works because python dicts are ordered in 3.6+
         #    line_string += (
         #        "{:.12e}".format(
         #            list(self.species_dict_interped[species_key].values())[i]
@@ -609,9 +643,9 @@ class writer_exotransmit_cia(writer_base):
         #        + self.buffer
         #    )
 
-        #new_string += [line_string + "\n"]
+        # new_string += [line_string + "\n"]
 
-        #return new_string, temp
+        # return new_string, temp
 
         if i == 0:
             temp = np.min(self.interped_temps)
@@ -623,9 +657,46 @@ class writer_exotransmit_cia(writer_base):
         wavelength_string = "{:.12e}".format(self.interped_wavelengths[i])
         line_string = wavelength_string + self.buffer
 
-        species_values = [species_dict_value[i] for species_dict_value in self.species_dict_interped.values()]
-        line_string += self.buffer.join("{:.12e}".format(value) for value in species_values)
+        species_values = [
+            species_dict_value[i]
+            for species_dict_value in self.species_dict_interped.values()
+        ]
+        line_string += self.buffer.join(
+            "{:.12e}".format(value) for value in species_values
+        )
 
         new_string.append(line_string + "\n")
         return new_string, temp
         # todo: maybe the loader objects should also take an opac object. for parallel structure : )
+
+
+class writer_chimera(writer_base):
+    """
+    does writing for the exotransmit object, takng in an opac object.
+    """
+
+    def write(self, opac, outfile, verbose=False):
+        """
+        loads in opacity data that's built for exo-transmit. To be passed on to Opac object.
+        """
+
+        # below is the write
+        wl = 1e6 * opac.wl  # now in microns
+        wno = 1e4 / wl  # now in cm^-1
+        wno = wno[::-1]
+        cross_section = opac.cross_section[:, ::-1]
+        cross_section = np.moveaxis(cross_section, 0, -1)
+        # want temperature index 0, pressure to 1, wavelength to 2 for standard usage.
+
+        hf = h5py.File(outfile, "w")
+        hf.create_dataset(self.wl_key, data=wno)
+        hf.create_dataset(self.T_key, data=opac.T)
+        hf.create_dataset(self.P_key, data=opac.P)
+        hf.create_dataset(self.cross_section_key, data=cross_section)
+
+        # ah man darn the xsec shape is wrong.
+
+        hf.close()
+
+        # todo: once this is done, check that everything is in the correct units.
+        return
