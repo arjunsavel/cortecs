@@ -44,7 +44,9 @@ class TestIntegration(unittest.TestCase):
         chunk_wavelengths(self.opacity_file, wav_per_chunk=2)
 
         # now get the wavelengths of each file
-        opac_obj_ref = Opac(self.opacity_file, loader="exotransmit")
+        opac_obj_ref = Opac(
+            self.opacity_file, loader="exotransmit", load_kwargs=self.load_kwargs
+        )
         opac_obj0 = Opac(
             self.first_file, loader="exotransmit", load_kwargs=self.load_kwargs
         )
@@ -66,7 +68,9 @@ class TestIntegration(unittest.TestCase):
         chunk_wavelengths(self.opacity_file, wav_per_chunk=2)
 
         # now get the wavelengths of each file
-        opac_obj_ref = Opac(self.opacity_file, loader="exotransmit")
+        opac_obj_ref = Opac(
+            self.opacity_file, loader="exotransmit", load_kwargs=self.load_kwargs
+        )
         opac_obj0 = Opac(
             self.first_file, loader="exotransmit", load_kwargs=self.load_kwargs
         )
@@ -100,7 +104,9 @@ class TestIntegration(unittest.TestCase):
         add_overlap(self.file_base, v_max=0.0)
 
         # now get the wavelengths of each file
-        opac_obj_ref = Opac(self.opacity_file, loader="exotransmit")
+        opac_obj_ref = Opac(
+            self.opacity_file, loader="exotransmit", load_kwargs=self.load_kwargs
+        )
         opac_obj0 = Opac(
             self.first_file, loader="exotransmit", load_kwargs=self.load_kwargs
         )
@@ -137,7 +143,9 @@ class TestIntegration(unittest.TestCase):
         add_overlap(self.file_base, v_max=v_max)
 
         # now get the wavelengths of each file
-        opac_obj_ref = Opac(self.opacity_file, loader="exotransmit")
+        opac_obj_ref = Opac(
+            self.opacity_file, loader="exotransmit", load_kwargs=self.load_kwargs
+        )
         opac_obj0 = Opac(
             self.first_file, loader="exotransmit", load_kwargs=self.load_kwargs
         )
