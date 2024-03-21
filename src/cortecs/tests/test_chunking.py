@@ -101,7 +101,7 @@ class TestIntegration(unittest.TestCase):
             self.second_file, loader="exotransmit", load_kwargs=self.load_kwargs
         )
 
-        add_overlap(self.file_base, v_max=0.0)
+        add_overlap(self.file_base, v_max=0.0, load_kwargs=self.load_kwargs)
 
         # now get the wavelengths of each file
         opac_obj_ref = Opac(
@@ -140,7 +140,7 @@ class TestIntegration(unittest.TestCase):
         c = 3e8
         max_curr_lam = np.max(opac_obj0_orig.wl)
         v_max = c * (opac_obj1_orig.wl[0] - max_curr_lam) / max_curr_lam
-        add_overlap(self.file_base, v_max=v_max)
+        add_overlap(self.file_base, v_max=v_max, load_kwargs=self.load_kwargs)
 
         # now get the wavelengths of each file
         opac_obj_ref = Opac(
