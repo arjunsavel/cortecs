@@ -686,6 +686,8 @@ class writer_chimera(writer_base):
         wno = wno[::-1]
         cross_section = opac.cross_section[:, ::-1]
         cross_section = np.moveaxis(cross_section, 0, -1)
+        cross_section = np.moveaxis(cross_section, 0, -1)
+        cross_section = np.moveaxis(cross_section, 0, -1)  # this
         # want temperature index 0, pressure to 1, wavelength to 2 for standard usage.
 
         hf = h5py.File(outfile, "w")
