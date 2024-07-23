@@ -29,9 +29,9 @@ bibliography: paper.bib
 
 The absorption and emission of light by exoplanet atmospheres encode details of atmospheric
 composition, temperature, and dynamics. Fundamentally, simulating these processes requires detailed knowledge
-of the opacity of gases within an atmosphere. When modeling broad wavelength ranges at high resolution, such opacity data for
-even a single gas can take up multiple gigabytes of system random-access memory (RAM). This aspect can be a limiting
-factor when considering the number of gases to consider in a simulation, the sampling strategy used for inference, or even the architecture of
+of the opacity of gases within an atmosphere. When modeling broad wavelength ranges at high resolution, such opacity data, for
+even a single gas, can take up multiple gigabytes of system random-access memory (RAM). This aspect can be a limiting
+factor when considering the number of gases to include in a simulation, the sampling strategy used for inference, or even the architecture of
 the system used for calculations. Here, we present `cortecs`, a Python tool for compressing
 opacity data. `cortecs` provides flexible methods for fitting the
 temperature, pressure, and wavelength dependencies of opacity data and for evaluating the opacity with accelerated,
@@ -39,7 +39,7 @@ GPU-friendly methods. The package is actively developed on GitHub (<https://gith
 available for download with `pip` and `conda`.
 
 # Statement of need
-Observations with the latest high-resolution spectrographs [e.g., @mace:2018; @seifahrt:2020; @pepe:2021]
+Observations with the latest high-resolution spectrographs [e.g., IGRINS / Gemini South, ESPRESSO / VLT, MAROON-X / Gemini North; @mace:2018; @seifahrt:2020; @pepe:2021]
 have motivated RAM-intensive simulations of exoplanet atmospheres at high spectral resolution.
 `cortecs` enables these simulations with more
 gases and on a broader range of computing architectures by compressing opacity data.
@@ -67,7 +67,7 @@ the temperature and pressure dependencies are generally smooth and similar acros
 This feature implies that the opacity data should be compressible without significant loss of
 accuracy at the spectrum level.
 
-While our benchmark case (see Benchmark) demonstrates the applicability of `cortecs` to high-resolution
+While our benchmark case (see the Benchmark section below) demonstrates the applicability of `cortecs` to high-resolution
 opacity functions of molecular gases, the package is general and the compression/decompression steps of the package can be applied to any opacity data in HDF5 format that has pressure and temperature dependence, such as the opacity of neutral atoms or ions. Our benchmark only
 shows, however, that the amounts of error from our compression technique is reasonable in the spectra of exoplanet atmospheres
 at pressures greater than a microbar for a single composition. This caveat is important to note for a few reasons:
@@ -80,7 +80,7 @@ atmospheres (in our case, 100) is small enough that the `cortecs` error is not l
 When modeling atmospheres in hydrostatic equilibrium, the final spectrum essentially maps to the altitude at which
 the gas becomes optically thick. If `cortecs`-compressed opacities were used to model an optically thin gas over
 large path lengths, however, then smaller opacities would be more important. `cortecs` tends to perform worse at
-modeling opacity functions that jump from very low to very high opacities, so it may not perform optimally for these
+modeling opacity functions that jump from very low to very high opacities, so it may not perform optimally in these
 optically thin scenarios.
 3. The program may perform poorly for opacity functions with sharp features in their temperature--pressure dependence
 [e.g., the Lyman series transitions of hydrogen, @kurucz2017including].
@@ -90,25 +90,26 @@ That is, the data may require so many parameters to be fit that the compression 
 # Methods
 `cortecs` seeks to compress redundant information by representing opacity data not as the
 opacity itself but as fits to the opacity as a function of temperature and pressure. We generally refer to this process
-as "compression" as opposed to "fitting" to emphasize that we do not seek to construct physically motivated,
+as _compression_ as opposed to _fitting_ to emphasize that we do not seek to construct physically motivated,
 predictive, or comprehensible models of the opacity function. Rather, we simply seek representations of the opacity function
-that consume less RAM/VRAM. The compression methods we use are "lossy" --- the original opacity data cannot be exactly recovered with our methods.
+that consume less RAM/VRAM. The compression methods we use are _lossy_ --- the original opacity data cannot be exactly recovered with our methods.
 We find that the loss of accuracy is tolerable for at least the hot Jupiter emission spectroscopy application (see Benchmark below).
 
 We provide three methods of increasing complexity (and flexibility) for
 compressing and decompressing opacity: polynomial-fitting, principal components analysis [PCA, e.g., @jolliffe:2016]
 and neural networks [e.g., @alzubaidi:2021]. The default neural network architecture is a fully connected
 neural network; the user can specify the desired hyperparameters, such as number of layers, neurons per layer,
-and activation function. Alternatively, any `keras` [@chollet:2015] model can be passed to the fitter. Each compression method is paired
+and activation function. Alternatively, any `keras` model [@chollet:2015] can be passed to the fitter. Each compression method is paired
 with a decompression method for evaluating opacity as a function of temperature, pressure, and wavelength. These decompression methods are tailored
 for GPUs and are accelerated with the `JAX` code transformation framework [@jax:2018]. An example of this reconstruction
-is shown in \autoref{fig:example}. In the figure, opacities less than $10^{-60}$ are neglected. This is because,
-to become optically thick at a pressure of 1 bar and temperature of 1000 K, a column would need to be nearly $10^{35}$m long:
-$ds = \frac{\tau}{\alpha}$, where $ds$ is the length of the column, $\tau$ is the optical depth, and $\alpha$ is the absorption coefficient.
-Setting $\tau = 1$, we have $ds = \frac{1}{\alpha}$. The absorption coefficient is the product of the opacity and the density of the gas, so
-$ds = \frac{1}{\kappa_\lambda \rho}$. The density of the gas is the pressure divided by the product of the temperature and the gas constant,
-so $ds = \frac{k_BT\mu}{P\kappa_\lambda}$ for mean molecular weight $\mu$. For CO, the mean molecular weight is 28.01 g/mol.
-Plugging in, we arrive at $ds \approx 10^{34}$m for $kappa_\lambda = 10^{-33} cm^2/g$, which is equivalent to roughly
+is shown in \autoref{fig:example}. In the figure, opacities less than $10^{-60}$ are ignored. This is because,
+to become optically thick at a pressure of 1 bar and temperature of 1000 K, a column would need to be nearly $10^{35}$m long.
+Here we show a brief derivation of this. The length of the column, $ds$ is $ds = \frac{\tau}{\alpha}$, where $\tau$ is the optical
+depth, and $\alpha$ is the absorption coefficient. Setting $\tau = 1$, we have $ds = \frac{1}{\alpha}$. The absorption coefficient
+is the product of the opacity and the density of the gas: $ds = \frac{1}{\kappa_\lambda \rho}$. Therefore,$ds = \frac{1}{\kappa_\lambda \rho}$.
+The density of the gas $\rho$ is the pressure divided by the product of the temperature and the gas constant:
+$\rho = \frac{P}{k_B T \mu}$ for mean molecular weight $\mu$. This leads to the final equation for the column length:
+$ds = \frac{k_BT\mu}{P\kappa_\lambda}$. For CO, the mean molecular weight is 28.01 g/mol. Plugging in, we arrive at $ds \approx 10^{34}$m (roughly 10^{17}$ parsecs) for $kappa_\lambda = 10^{-33} cm^2/g$, which is equivalent to roughly a cross-section of
 $\sigma_\lambda = 10^{-60} m^2$.
 
 ![Top panel: The original opacity function of CO [@rothman:2010] (solid lines) and its `cortecs` reconstruction (transparent lines) over a large
@@ -147,7 +148,7 @@ The non-compressed retrieval uses the data and retrieval framework from [@line:2
 For this experiment, we use the PCA-based compression scheme implemented in `cortecs`, preserving 2 principal components
 and their corresponding weights as a function for each wavelength as a lossy compression of the original opacity data.
 
-Using `cortecs`, we compress the input opacity files by a factor of 13. These opacity data (as described in the previous paragraph) were originally
+Using `cortecs`, we compress the input opacity files by a factor of 13. These opacity data (as described earlier in the paper) were originally
 stored as 2.1 GB .h5 files containing 39 temperature points, 18 pressure points, and 373,260 wavelength points. The compressed opacity data are stored
 as a 143.1 MB .npz file, including the PCA coefficients and PCA vectors (which are reused for each wavelength point).
 These on-disk memory quotes are relatively faithful to the in-memory RAM footprint of the data when stored as `numpy`
@@ -176,7 +177,7 @@ and our retrieval using opacities compressed by `cortecs` (gold). \label{fig:cor
 | Polynomials    | 44                 | 0.24                      | 7.8$$\times 10^2$$   | 3.6$$\times 10^3$$     |
 | Neural network | 9                  | 2.6                       | 1.4$$\times 10^7$$   | 3.6$$\times 10^4$$     |
 
-Comparison of compression methods used for the HITEMP CO line list [@rothman:2010] over the IGRINS wavelength range
+Comparison of compression methods used for the full HITEMP CO line list [@rothman:2010] over the IGRINS wavelength range
 at a resolving power of 250,000, cumulative for all data points. Note that the neural network compression performance and timings are only assessed at
 a single wavelength point and extrapolated over the full wavelength range.
 
