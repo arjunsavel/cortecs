@@ -110,7 +110,7 @@ is the product of the opacity and the density of the gas: $ds = \frac{1}{\kappa_
 The density of the gas $\rho$ is the pressure divided by the product of the temperature and the gas constant:
 $\rho = \frac{P}{k_B T \mu}$ for mean molecular weight $\mu$. This leads to the final equation for the column length:
 $ds = \frac{k_BT\mu}{P\kappa_\lambda}$. For CO, the mean molecular weight is 28.01 g/mol. Plugging in, we arrive at $ds \approx 10^{34}$m (roughly $10^{17}$ parsecs) for $\kappa_\lambda = 10^{-33}$ $\rm cm^2/g$, which is equivalent to roughly a cross-section of
-$\sigma_\lambda = 10^{-60} m^2$.
+$\sigma_\lambda = 10^{-60}$ $\rm m^2$.
 
 ![Top panel: The original opacity function of CO [@rothman:2010] (solid lines) and its `cortecs` reconstruction (transparent lines) over a large
 wavelength range and at multiple temperatures and pressures. Bottom panel: the absolute residuals between the opacity function
