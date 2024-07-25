@@ -39,7 +39,7 @@ GPU-friendly methods. The package is actively developed on GitHub (<https://gith
 available for download with `pip` and `conda`.
 
 # Statement of need
-Observations with the latest high-resolution spectrographs [e.g., IGRINS / Gemini South, ESPRESSO / VLT, MAROON-X / Gemini North; @mace:2018; @seifahrt:2020; @pepe:2021]
+Observations with the latest high-resolution spectrographs (e.g., IGRINS / Gemini South, ESPRESSO / VLT, MAROON-X / Gemini North; @mace:2018; @seifahrt:2020; @pepe:2021)
 have motivated RAM-intensive simulations of exoplanet atmospheres at high spectral resolution.
 `cortecs` enables these simulations with more
 gases and on a broader range of computing architectures by compressing opacity data.
@@ -103,13 +103,13 @@ and activation function. Alternatively, any `keras` model [@chollet:2015] can be
 with a decompression method for evaluating opacity as a function of temperature, pressure, and wavelength. These decompression methods are tailored
 for GPUs and are accelerated with the `JAX` code transformation framework [@jax:2018]. An example of this reconstruction
 is shown in \autoref{fig:example}. In the figure, opacities less than $10^{-60}$ are ignored. This is because,
-to become optically thick at a pressure of 1 bar and temperature of 1000 K, a column would need to be nearly $10^{35}$m long.
+to become optically thick at a pressure of 1 bar and temperature of 1000 K, a column would need to be nearly $10^{34}$m long.
 Here we show a brief derivation of this. The length of the column, $ds$ is $ds = \frac{\tau}{\alpha}$, where $\tau$ is the optical
 depth, and $\alpha$ is the absorption coefficient. Setting $\tau = 1$, we have $ds = \frac{1}{\alpha}$. The absorption coefficient
 is the product of the opacity and the density of the gas: $ds = \frac{1}{\kappa_\lambda \rho}$. Therefore,$ds = \frac{1}{\kappa_\lambda \rho}$.
 The density of the gas $\rho$ is the pressure divided by the product of the temperature and the gas constant:
 $\rho = \frac{P}{k_B T \mu}$ for mean molecular weight $\mu$. This leads to the final equation for the column length:
-$ds = \frac{k_BT\mu}{P\kappa_\lambda}$. For CO, the mean molecular weight is 28.01 g/mol. Plugging in, we arrive at $ds \approx 10^{34}$m (roughly 10^{17}$ parsecs) for $kappa_\lambda = 10^{-33} cm^2/g$, which is equivalent to roughly a cross-section of
+$ds = \frac{k_BT\mu}{P\kappa_\lambda}$. For CO, the mean molecular weight is 28.01 g/mol. Plugging in, we arrive at $ds \approx 10^{34}$m (roughly $10^{17}$ parsecs) for $kappa_\lambda = 10^{-33} cm^2/g$, which is equivalent to roughly a cross-section of
 $\sigma_\lambda = 10^{-60} m^2$.
 
 ![Top panel: The original opacity function of CO [@rothman:2010] (solid lines) and its `cortecs` reconstruction (transparent lines) over a large
