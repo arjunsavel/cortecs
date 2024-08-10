@@ -1,0 +1,42 @@
+cff-version: "1.2.0"
+authors:
+- family-names: Savel
+  given-names: Arjun B.
+  orcid: "https://orcid.org/0000-0002-2454-768X"
+- family-names: Bedell
+  given-names: Megan
+  orcid: "https://orcid.org/0000-0001-9907-7742"
+- family-names: Kempton
+  given-names: Eliza M.-R.
+  orcid: "https://orcid.org/0000-0002-1337-9051"
+contact:
+- family-names: Savel
+  given-names: Arjun B.
+  orcid: "https://orcid.org/0000-0002-2454-768X"
+doi: 10.5281/zenodo.13208759
+message: If you use this software, please cite our article in the
+  Journal of Open Source Software.
+preferred-citation:
+  authors:
+  - family-names: Savel
+    given-names: Arjun B.
+    orcid: "https://orcid.org/0000-0002-2454-768X"
+  - family-names: Bedell
+    given-names: Megan
+    orcid: "https://orcid.org/0000-0001-9907-7742"
+  - family-names: Kempton
+    given-names: Eliza M.-R.
+    orcid: "https://orcid.org/0000-0002-1337-9051"
+  date-published: 2024-08-10
+  doi: 10.21105/joss.06104
+  issn: 2475-9066
+  issue: 100
+  journal: Journal of Open Source Software
+  publisher:
+    name: Open Journals
+  start: 6104
+  title: "cortecs: A Python package for compressing opacities"
+  type: article
+  url: "https://joss.theoj.org/papers/10.21105/joss.06104"
+  volume: 9
+title: "cortecs: A Python package for compressing opacities"
